@@ -1,0 +1,191 @@
+html, body {
+	height: 100%;
+}
+
+.controls {
+    -ms-overflow-style: scrollbar;
+    -webkit-app-region: drag;
+}
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+input[type="text"],
+button,
+textarea {
+	-webkit-app-region: no-drag;
+}
+h1, h2, h3, h4, h5, h6 {
+    -webkit-user-select: none;
+}
+
+
+::-webkit-scrollbar {width: 0; visibility: none;}
+::-webkit-scrollbar-track {border-radius: 0; visibility: none;}
+::-webkit-scrollbar-thumb {border-radius: 0; visibility: none;}
+
+.flexbox-container {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.loader-container {
+  	margin-top: 250px;
+}
+
+.loader {
+  	position: relative;
+  	width: 44px;
+  	height: 8px;
+  	margin: 12px auto;
+}
+
+.dot {
+  	display: inline-block;
+  	width: 8px;
+  	height: 8px;
+  	border-radius: 4px;
+  	background: #ccc;
+  	position: absolute;
+}
+
+.dot_1 {
+  	animation: animateDot1 1.5s linear infinite;
+  	left: 12px;
+  	background: #e579b8;
+}
+
+.dot_2 {
+  	animation: animateDot2 1.5s linear infinite;
+  	animation-delay: 0.5s;
+  	left: 24px;
+}
+
+.dot_3 {
+  	animation: animateDot3 1.5s linear infinite;
+  	left: 12px;
+}
+
+.dot_4 {
+  	animation: animateDot4 1.5s linear infinite;
+  	animation-delay: 0.5s;
+  	left: 24px;
+}
+
+.btn-window-option {
+  	background: none;
+  	border: none;
+  	display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    align-items: center;
+    height: 100%;
+  	padding-left: 1em;
+}
+.btn-window-option:hover {
+  	cursor: pointer; cursor: hand;
+}
+
+.game-cover {
+    -webkit-filter: brightness(100%);
+    -webkit-transition: all 500ms ease;
+    -moz-transition: all 500ms ease;
+    -o-transition: all 500ms ease;
+    -ms-transition: all 500ms ease;
+    transition: all 500ms ease;
+    width: 100%; display: block;
+}
+.game-loaded-info {
+	padding-bottom: 1.5em;
+}
+
+.game-launch-options {
+	position: absolute;
+    bottom: 0; padding-bottom: 1em;
+}
+
+.card > .card-img-overlay {
+	visibility: hidden;
+  	opacity: 0;
+  	transition: visibility 0s, opacity 0.5s;
+}
+.card:hover > .card-img-overlay {
+  	visibility: visible;
+  	opacity: 1;
+  	transition: visibility 0s, opacity 0.5s;
+}
+
+.card:hover > .game-cover {
+	-webkit-filter: brightness(40%);
+    -webkit-transition: all 500ms ease;
+    -moz-transition: all 500ms ease;
+    -o-transition: all 500ms ease;
+    -ms-transition: all 500ms ease;
+    transition: all 500ms ease;
+}
+
+
+@keyframes animateDot1 {
+  	0% {
+    	transform: rotate(0deg) translateX(-12px);
+  	}
+  	25% {
+    	transform: rotate(180deg) translateX(-12px);
+  	}
+  	75% {
+    	transform: rotate(180deg) translateX(-12px);
+  	}
+  	100% {
+    	transform: rotate(360deg) translateX(-12px);
+  	}
+}
+@keyframes animateDot2 {
+  	0% {
+    	transform: rotate(0deg) translateX(-12px);
+  	}
+  	25% {
+    	transform: rotate(-180deg) translateX(-12px);
+  	}
+  	75% {
+    	transform: rotate(-180deg) translateX(-12px);
+  	}
+  	100% {
+    	transform: rotate(-360deg) translateX(-12px);
+  	}
+}
+@keyframes animateDot3 {
+  	0% {
+    	transform: rotate(0deg) translateX(12px);
+  	}
+  	25% {
+    	transform: rotate(180deg) translateX(12px);
+  	}
+  	75% {
+    	transform: rotate(180deg) translateX(12px);
+  	}
+  	100% {
+    	transform: rotate(360deg) translateX(12px);
+  	}
+}
+@keyframes animateDot4 {
+  	0% {
+    	transform: rotate(0deg) translateX(12px);
+  	}
+  	25% {
+    	transform: rotate(-180deg) translateX(12px);
+  	}
+  	75% {
+    	transform: rotate(-180deg) translateX(12px);
+  	}
+  	100% {
+    	transform: rotate(-360deg) translateX(12px);
+  	}
+}
