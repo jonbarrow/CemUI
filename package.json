@@ -1,0 +1,19 @@
+{
+  	"name": "CemuManager",
+  	"version": "0.1.0",
+ 	"main": "app.js",
+  	"dependencies": {
+	    "electron": "^1.6.2",
+	    "xml2js": "*",
+	    "async": "*",
+	    "request": "*",
+	    "decompress-zip": "*"
+  	},
+  	"devDependencies": {
+	    "electron": "^1.6.2",
+	    "xml2js": "*",
+    	"async": "*",
+    	"request": "*",
+    	"decompress-zip": "*"
+  	}
+}
