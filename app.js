@@ -115,7 +115,7 @@ ipcMain.on('load_game_folder', function(event) {
 		    },
 		    function(name, id, callback) {
 		    	// Gets the box art
-		        request.get('http://thegamesdb.net/banners/_gameviewcache/boxart/original/front/'+id+'-1.jpg', function (error, response, body) { 
+		        request.get('http://thegamesdb.net/banners/_gameviewcache/boxart/original/front/'+id+'-1.jpg', function (error, response, body) {
 				    if (!error && response.statusCode == 200) {
 				        var data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'); // base64
 				        games[name]["image"] = data; // stores the base64 for offline use
@@ -128,10 +128,11 @@ ipcMain.on('load_game_folder', function(event) {
 			    if (error) {
 			        console.log(error);
 			    }
+
+					event.sender.send("game_folder_loaded", {game_path:game_folder_path[0]}); // Tells application we're done
 			});
 		});
 	}
-	event.sender.send("game_folder_loaded", {game_path:game_folder_path[0]}); // Tells application we're done
 });
 
 ipcMain.on('load_window_cemu_load', function(event, data) {
@@ -170,7 +171,7 @@ ipcMain.on('load_cemu_folder', function(event) {
 	    }
 	    event.sender.send("cemu_folder_loaded", cemu); // Done
 	});
-	
+
 });
 
 ipcMain.on('load_main_window', function(event, data) {
@@ -220,7 +221,7 @@ function generalLoad() {
   			createDirectory("data/app"); // Nope! make it.
 	  	}
 	});
-	if (!fs.existsSync('data/cache/emulators.json')) { // Is there an emualtors file? 
+	if (!fs.existsSync('data/cache/emulators.json')) { // Is there an emualtors file?
 		createWindow('load_game_folder'); // Nope! Lets run the set up then!
 	} else {
 		createWindow('index'); // Yes! Run as normal, set up must have been done.
