@@ -1,0 +1,3 @@
+@echo off
+echo Running Cemu-Manager...
+call electron .
