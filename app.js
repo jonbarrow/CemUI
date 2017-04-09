@@ -232,14 +232,22 @@ function createDirectory(path) { // Makes dirs
 	});
 }
 function pickGameFolder() { // Picks dir
-	return dialog.showOpenDialog({
-	    properties: ['openDirectory']
-	});
+	var gameFolder = dialog.showOpenDialog({
+		properties: ['openDirectory']});
+
+	if (!gameFolder) {
+		return pickGameFolder();
+	}
+	return gameFolder;
 }
 function pickEmuFolder() { // Picks dir
-	return dialog.showOpenDialog({
-	    properties: ['openDirectory']
-	});
+	var emuFolder = dialog.showOpenDialog({
+		properties: ['openDirectory']});
+
+	if (!emuFolder) {
+		return pickEmuFolder();
+	}
+	return emuFolder;
 }
 function loadGame(game) {
 	// Currently unused. Will use later
