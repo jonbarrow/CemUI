@@ -7,6 +7,12 @@ CemuManager is a small fan-project aimed as practice for me in developing Electr
 ## Goals
 Getting the thing fully working. A lot of planned, and suggested, features are not yet implemented. It is nowhere near done. Eventually I'd like to expand CemuManager to support multiple WiiU emulators, and evetually for it to become an all-in-one launcher for all emulators.
 
+## Installation
+- Install npm and node
+- run `install.bat`
+
+To run Cemu-Manager, simply run `run.bat`
+
 ## Releases
 
 # V0.1.0 - First public release
