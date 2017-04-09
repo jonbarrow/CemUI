@@ -14,7 +14,7 @@ Getting the thing fully working. A lot of planned, and suggested, features are n
 To run Cemu-Manager, simply run `CemuManager.exe`
  
 ## Installation & Running for developer versions
-- Clone the repo
+- Clone the repo
 - Install npm and node
 - run `install.bat`
 
@@ -23,8 +23,8 @@ To run Cemu-Manager, simply run `dev-run.bat`
 ## Releases
 
 # V0.1.0 - First public release
-https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0
-
+(V0.1.0)[https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0]
+ 
 ## Known Bugs
 Currently the only known bug is with box art downloading. At times, some box art may not download correctly, and thus will display as an invalid image. This is because I am pulling the box art from the internet (specifically http://thegamesdb.net/). If a box art is not displaying, it means that the image did not finish downloading before you selected the Cemu folder. To fix it, go to `data/cache` and delete both `.json` files. Reopening CemuManager will then prompt you to select both folders again.
 
