@@ -8,7 +8,7 @@ CemuManager is a small fan-project aimed as practice for me in developing Electr
 Getting the thing fully working. A lot of planned, and suggested, features are not yet implemented. It is nowhere near done. Eventually I'd like to expand CemuManager to support multiple WiiU emulators, and evetually for it to become an all-in-one launcher for all emulators.
  
 ## Installation & Running for public versions
-- Download the latest release.
+- Download the latest release
 - Extract
 
 To run Cemu-Manager, simply run `CemuManager.exe`
@@ -23,7 +23,7 @@ To run Cemu-Manager, simply run `dev-run.bat`
 ## Releases
 
 # V0.1.0 - First public release
-(V0.1.0)[https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0]
+https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0
  
 ## Known Bugs
 Currently the only known bug is with box art downloading. At times, some box art may not download correctly, and thus will display as an invalid image. This is because I am pulling the box art from the internet (specifically http://thegamesdb.net/). If a box art is not displaying, it means that the image did not finish downloading before you selected the Cemu folder. To fix it, go to `data/cache` and delete both `.json` files. Reopening CemuManager will then prompt you to select both folders again.
