@@ -11,7 +11,7 @@ Getting the thing fully working. A lot of planned, and suggested, features are n
 - Install npm and node
 - run `install.bat`
 
-To run Cemu-Manager, simply run `run.bat`
+To run Cemu-Manager, simply run `dev-run.bat`
 
 ## Releases
 
