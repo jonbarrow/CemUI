@@ -2,21 +2,26 @@
 A small launcher for the Cemu WiiU emulator made with Electron
 
 ## What is it?
-CemuManager is a small fan-project aimed as practice for me in developing Electron apps. CemuManager is a small launcher "hub" for your Cemu games, allowing you to launch games in Cemu from the application.
+CemuManager is a small launcher "hub" that stores your Cemu games in a nice easy-to-access fashion.
 
-## Goals
-Getting the thing fully working. A lot of planned, and suggested, features are not yet implemented. It is nowhere near done. Eventually I'd like to expand CemuManager to support multiple WiiU emulators, and evetually for it to become an all-in-one launcher for all emulators.
+**IMPORTANT:** CemuManager is still in heavy development and may be unstable. There are many features planned.
+### Planned featured include
+- Multiple emulator support
+- "Big-picture" type mode that can be used with a controller
+- All hail the dark theme
  
 ## Installation & Running for public versions
 - Download the latest release
 - Extract
 
-To run Cemu-Manager, simply run `CemuManager.exe`
+To run CemuManager, simply run `CemuManager.exe`
  
 ## Installation & Running for developer versions
 - Clone the repo
 - Install npm and node
 - run `install.bat`
+
+To run CemuManager, simply run `run.bat`
 
 ## Building from source
 - Clone the repo
@@ -25,12 +30,12 @@ To run Cemu-Manager, simply run `CemuManager.exe`
 - run `build.bat`
 - app will be built to `builds/CemuManager-win32-ia32`
 
-To run Cemu-Manager, simply run `CemuManager.exe`
+To run CemuManager, simply run `CemuManager.exe`
 
 ## Releases
 
-# V0.1.0 - First public release
-https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0
+# v0.1.0 - First public release
+[v0.1.0](https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0)
  
 ## Known Bugs
 Currently the only known bug is with box art downloading. At times, some box art may not download correctly, and thus will display as an invalid image. This is because I am pulling the box art from the internet (specifically http://thegamesdb.net/). If a box art is not displaying, it means that the image did not finish downloading before you selected the Cemu folder. To fix it, go to `data/cache` and delete both `.json` files. Reopening CemuManager will then prompt you to select both folders again.
