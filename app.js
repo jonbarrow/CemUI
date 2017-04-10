@@ -60,7 +60,11 @@ ipcMain.on('btn-window-option-minimize', function(event, data) {
 	ApplicationWindow.minimize(); // Button in the top right
 });
 ipcMain.on('btn-window-option-maximize', function(event, data) {
-	ApplicationWindow.maximize(); // Button in the top right
+	if (!ApplicationWindow.isMaximized()) {
+	ApplicationWindow.maximize();
+	} else {
+	ApplicationWindow.unmaximize();
+	}
 });
 ipcMain.on('btn-window-option-close', function(event, data) {
 	ApplicationWindow.close();    // Button in the top right
