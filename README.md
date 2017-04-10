@@ -18,6 +18,13 @@ To run Cemu-Manager, simply run `CemuManager.exe`
 - Install npm and node
 - run `install.bat`
 
+## Building from source
+- Clone the repo
+- Install npm and node
+- run `install.bat`
+- run `build.bat`
+- app will be built to `builds/CemuManager-win32-ia32`
+
 To run Cemu-Manager, simply run `dev-run.bat`
 
 ## Releases
