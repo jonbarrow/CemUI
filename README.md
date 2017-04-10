@@ -1,4 +1,4 @@
-<img src="http://i.imgur.com/DfcYhA8.png"/>
+<img src="http://i.imgur.com/KJhV5ak.png"/>
 
 # CemuManager
 A small launcher for the Cemu WiiU emulator made with Electron
