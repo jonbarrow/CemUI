@@ -25,7 +25,7 @@ To run Cemu-Manager, simply run `CemuManager.exe`
 - run `build.bat`
 - app will be built to `builds/CemuManager-win32-ia32`
 
-To run Cemu-Manager, simply run `dev-run.bat`
+To run Cemu-Manager, simply run `CemuManager.exe`
 
 ## Releases
 
