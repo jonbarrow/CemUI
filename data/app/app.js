@@ -135,3 +135,25 @@ $("body").on("click", ".game-loaded-info", function() {
 $(function() {
 	$('.loader-container').hide();
 })
+
+/****************************************************/
+/*                    Dark Theme                    */
+/****************************************************/
+
+var isDark = true;
+
+$("#dark-theme-option").click(function() {
+    $(".dark-themeable").toggleClass("dark");
+    isDark = !isDark;
+
+    if (isDark) {
+        $(".dark-themeable").removeClass("navbar-light");
+        $(".dark-themeable").addClass("navbar-inverse");
+        $("i.dark-themeable").css("color", "white");
+    } else {
+        $(".dark-themeable").addClass("navbar-light");
+        $(".dark-themeable").removeClass("navbar-inverse");
+        $("i.dark-themeable").css("color", "");
+    }
+});
+

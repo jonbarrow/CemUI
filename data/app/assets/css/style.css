@@ -11,6 +11,10 @@ html, body {
 	height: 100%;
 }
 
+.dark {
+    background-color: #50545b;
+}
+
 .controls {
     -ms-overflow-style: scrollbar;
     -webkit-app-region: drag;
