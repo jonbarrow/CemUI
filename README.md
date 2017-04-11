@@ -6,7 +6,7 @@ A small launcher for the Cemu WiiU emulator made with Electron
 ## What is it?
 CemuManager is a small launcher "hub" that stores your Cemu games in a nice easy-to-access fashion.
 
-![](http://i.imgur.com/GNX5POC.gif)
+![](http://i.imgur.com/un8gnoP.gif)
 
 **IMPORTANT:** CemuManager is still in heavy development and may be unstable. There are many features planned.
 ##### Planned featured include
