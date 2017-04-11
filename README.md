@@ -47,8 +47,6 @@ This version fixes many bugs and redesigns the layout. This is the first product
 ## v0.1.0 - First public release
 [v0.1.0](https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0)
  
-## Known Bugs
-Currently the only known bug is with box art downloading. At times, some box art may not download correctly, and thus will display as an invalid image. This is because I am pulling the box art from the internet (specifically http://thegamesdb.net/). If a box art is not displaying, it means that the image did not finish downloading before you selected the Cemu folder. To fix it, go to `data/cache` and delete both `.json` files. Reopening CemuManager will then prompt you to select both folders again.
 
 ## Tasks to complete
 
