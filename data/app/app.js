@@ -147,13 +147,9 @@ $("#dark-theme-option").click(function() {
     isDark = !isDark;
 
     if (isDark) {
-        $(".dark-themeable").removeClass("navbar-light");
-        $(".dark-themeable").addClass("navbar-inverse");
-        $("i.dark-themeable").css("color", "white");
+        $(".dark-themeable").css("color", "white");
     } else {
-        $(".dark-themeable").addClass("navbar-light");
-        $(".dark-themeable").removeClass("navbar-inverse");
-        $("i.dark-themeable").css("color", "");
+        $(".dark-themeable").css("color", "black");
     }
 });
 
