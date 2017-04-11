@@ -65,7 +65,12 @@ ipcMain.on('btn-window-option-minimize', function(event, data) {
 	ApplicationWindow.minimize(); // Button in the top right
 });
 ipcMain.on('btn-window-option-maximize', function(event, data) {
-	ApplicationWindow.maximize(); // Button in the top right
+	// Button in the top right
+	if (!ApplicationWindow.isMaximized()) {
+ 		ApplicationWindow.maximize();
+ 	} else {
+ 		ApplicationWindow.unmaximize();
+ 	}
 });
 ipcMain.on('btn-window-option-close', function(event, data) {
 	ApplicationWindow.close();    // Button in the top right
@@ -300,14 +305,22 @@ function createDirectory(path) { // Makes dirs
 	});
 }
 function pickGameFolder() { // Picks dir
-	return dialog.showOpenDialog({
-	    properties: ['openDirectory']
-	});
+	var gameFolder = dialog.showOpenDialog({
+		properties: ['openDirectory']});
+
+	if (!gameFolder) {
+		return pickGameFolder();
+	}
+	return gameFolder;
 }
 function pickEmuFolder() { // Picks dir
-	return dialog.showOpenDialog({
-	    properties: ['openDirectory']
-	});
+	var emuFolder = dialog.showOpenDialog({
+		properties: ['openDirectory']});
+
+	if (!emuFolder) {
+		return pickEmuFolder();
+	}
+	return emuFolder;
 }
 function loadGame(game) {
 	// Currently unused. Will use later
