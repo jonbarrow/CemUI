@@ -1,7 +1,7 @@
 <img src="http://i.imgur.com/KJhV5ak.png"/>
 
 # CemuManager
-A small launcher for the Cemu WiiU emulator made with Electron
+A small launcher for the Cemu WiiU emulator made with Electron.
 You can reach us (the developers) on Discord here https://discord.gg/WYVnFEQ
 
 ## What is it?
