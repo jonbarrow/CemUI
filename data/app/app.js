@@ -140,7 +140,7 @@ $(function() {
 /*                    Dark Theme                    */
 /****************************************************/
 
-var isDark = true;
+var isDark = false;
 
 $("#dark-theme-option").click(function() {
     $(".dark-themeable").toggleClass("dark");

@@ -1,22 +1,31 @@
 <img src="http://i.imgur.com/KJhV5ak.png"/>
 
 # CemuManager
-A small launcher for the Cemu WiiU emulator made with Electron
+A small launcher for the Cemu WiiU emulator made with Electron.
+You can reach us (the developers) on Discord here https://discord.gg/WYVnFEQ
 
 ## What is it?
 CemuManager is a small launcher "hub" that stores your Cemu games in a nice easy-to-access fashion.
-
-![](http://i.imgur.com/GNX5POC.gif)
-
+ 
+<kbd>
+<img src="http://i.imgur.com/jOrxr9D.gif"/>
+</kbd>
+ 
 **IMPORTANT:** CemuManager is still in heavy development and may be unstable. There are many features planned.
+
+## How can I help? / I have a suggestion!
+We always welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone woth experience in JavaScript, Node, html, css, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules, and will be packaged by Electron just fine!
+
+If you have a suggestion, and do not know any of the required langauges, you can reach us on our Discord server: https://discord.gg/WYVnFEQ
+
 ##### Planned featured include
 - Multiple emulator support
 - "Big-picture" type mode that can be used with a controller
 - ~~All hail the dark theme~~ Added
  
 ## Installation & Running for public versions
-- Download the latest release
-- Extract
+- Download the latest release
+- Extract
 
 To run CemuManager, simply run `CemuManager.exe`
  
@@ -45,8 +54,6 @@ This version fixes many bugs and redesigns the layout. This is the first product
 ## v0.1.0 - First public release
 [v0.1.0](https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0)
  
-## Known Bugs
-Currently the only known bug is with box art downloading. At times, some box art may not download correctly, and thus will display as an invalid image. This is because I am pulling the box art from the internet (specifically http://thegamesdb.net/). If a box art is not displaying, it means that the image did not finish downloading before you selected the Cemu folder. To fix it, go to `data/cache` and delete both `.json` files. Reopening CemuManager will then prompt you to select both folders again.
 
 ## Tasks to complete
 

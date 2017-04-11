@@ -12,7 +12,10 @@ html, body {
 }
 
 .dark {
-    background-color: #50545b;
+  background-color: #50545b;
+}
+.dark * {
+  color: white !important;
 }
 
 .controls {
