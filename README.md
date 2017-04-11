@@ -2,6 +2,7 @@
 
 # CemuManager
 A small launcher for the Cemu WiiU emulator made with Electron
+You can reach us (the developers) on Discord here https://discord.gg/WYVnFEQ
 
 ## What is it?
 CemuManager is a small launcher "hub" that stores your Cemu games in a nice easy-to-access fashion.
@@ -11,6 +12,12 @@ CemuManager is a small launcher "hub" that stores your Cemu games in a nice easy
 </kbd>
  
 **IMPORTANT:** CemuManager is still in heavy development and may be unstable. There are many features planned.
+
+## How can I help? / I have a suggestion!
+We always welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone woth experience in JavaScript, Node, html, css, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules, and will be packaged by Electron just fine!
+
+If you have a suggestion, and do not know any of the required langauges, you can reach us on our Discord server: https://discord.gg/WYVnFEQ
+
 ##### Planned featured include
 - Multiple emulator support
 - "Big-picture" type mode that can be used with a controller
