@@ -1,3 +1,12 @@
+* {
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
 html, body {
 	height: 100%;
 }
@@ -5,6 +14,9 @@ html, body {
 .controls {
     -ms-overflow-style: scrollbar;
     -webkit-app-region: drag;
+}
+.controls .navbar-collapse ul {
+    -webkit-app-region: no-drag;
 }
 input[type="submit"],
 input[type="reset"],
@@ -15,7 +27,10 @@ textarea {
 	-webkit-app-region: no-drag;
 }
 h1, h2, h3, h4, h5, h6 {
-    -webkit-user-select: none;
+  -webkit-user-select: none;
+}
+body {
+  margin: 0;
 }
 
 
@@ -23,58 +38,114 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-track {border-radius: 0; visibility: none;}
 ::-webkit-scrollbar-thumb {border-radius: 0; visibility: none;}
 
+.container-fluid {
+  cursor: default;
+}
+
 .flexbox-container {
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    -ms-flex-align: center;
-    -webkit-align-items: center;
-    -webkit-box-align: center;
-    align-items: center;
-    height: 100vh;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#btn-back, #btn-launch {
+  border-radius: 0;
+  margin-right: 0;
+}
+
+.navbar {
+  border-radius: 0;
 }
 
 .loader-container {
-  	margin-top: 250px;
+  margin-top: 250px;
 }
 
 .loader {
-  	position: relative;
-  	width: 44px;
-  	height: 8px;
-  	margin: 12px auto;
+	position: relative;
+	width: 100%;
+	height: 100%;
 }
 
 .dot {
-  	display: inline-block;
-  	width: 8px;
-  	height: 8px;
-  	border-radius: 4px;
-  	background: #ccc;
-  	position: absolute;
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 4px;
+	background: #ccc;
+	position: absolute;
 }
 
 .dot_1 {
-  	animation: animateDot1 1.5s linear infinite;
-  	left: 12px;
-  	background: #e579b8;
+	animation: animateDot1 1.5s linear infinite;
+	left: 12px;
+	background: #e579b8;
 }
 
 .dot_2 {
-  	animation: animateDot2 1.5s linear infinite;
-  	animation-delay: 0.5s;
-  	left: 24px;
+	animation: animateDot2 1.5s linear infinite;
+	animation-delay: 0.5s;
+	left: 24px;
 }
 
 .dot_3 {
-  	animation: animateDot3 1.5s linear infinite;
-  	left: 12px;
+	animation: animateDot3 1.5s linear infinite;
+	left: 12px;
 }
 
 .dot_4 {
-  	animation: animateDot4 1.5s linear infinite;
-  	animation-delay: 0.5s;
-  	left: 24px;
+	animation: animateDot4 1.5s linear infinite;
+	animation-delay: 0.5s;
+	left: 24px;
+}
+
+.content-main {
+  padding-top: 3em;
+}
+
+.content-details {
+  display: none;
+  padding-top: 3em;
+  position: absolute;
+  top: 0;
+  opacity: 0;
+  color: white;
+}
+
+#details-title {
+  background: none;
+  border: none;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  align-items: center;
+  height: 100%;
+}
+#overview-wrapper {
+  height: 250px;
+  overflow: hidden;
+  font-size: 1em;
+}
+
+
+.bg-image {
+  display: none;
+  opacity: 0;
+  width:100%;
+  height:100%;
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:-5000;
+  filter: blur(1.5px) brightness(25%);
 }
 
 .btn-window-option {
@@ -107,23 +178,19 @@ h1, h2, h3, h4, h5, h6 {
 	padding-bottom: 1.5em;
 }
 
-.game-launch-options {
-	position: absolute;
-    bottom: 0; padding-bottom: 1em;
-}
 
-.card > .card-img-overlay {
+.game-loaded-info > .card > .card-img-overlay {
 	visibility: hidden;
   	opacity: 0;
   	transition: visibility 0s, opacity 0.5s;
 }
-.card:hover > .card-img-overlay {
+.game-loaded-info:hover > .card > .card-img-overlay {
   	visibility: visible;
   	opacity: 1;
   	transition: visibility 0s, opacity 0.5s;
 }
 
-.card:hover > .game-cover {
+.game-loaded-info:hover > .card > .game-cover {
 	-webkit-filter: brightness(40%);
     -webkit-transition: all 500ms ease;
     -moz-transition: all 500ms ease;
@@ -131,6 +198,16 @@ h1, h2, h3, h4, h5, h6 {
     -ms-transition: all 500ms ease;
     transition: all 500ms ease;
 }
+.dropdown-toggle::after {
+    display:none
+}
+
+.top-padding-5 { margin-top:5%; }
+.top-padding-10 { margin-top:10%; }
+.top-padding-15 { margin-top:15%; }
+.top-padding-20 { margin-top:20%; }
+.top-padding-25 { margin-top:25%; }
+.top-padding-30 { margin-top:30%; }
 
 
 @keyframes animateDot1 {

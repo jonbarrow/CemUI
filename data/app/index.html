@@ -24,12 +24,22 @@
         </div>
     </div>
 
-    <nav class="controls navbar sticky-top navbar-toggleable-xl navbar-light bg-faded">
+    <nav class="controls fixed-top navbar navbar-toggleable-xl navbar-light bg-faded">
         <a class="navbar-brand" href="#">Cemu Manager</a>
-        <div class="navbar-collapse collapse">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="#">Files</a>
+                </li>
+                <li class="nav-item btn-group">
+                    <a class="dropdown-toggle nav-link" id="settings-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    settings
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="settings-dropdown">
+                        <li><a href="#">Place Holder Data</a></li>
+                        <li><a href="#">Place Holder Data</a></li>
+                        <li><a href="#">Place Holder Data</a></li>
+                    </ul>
                 </li>
             </ul>
             <ul class="navbar-nav">
@@ -46,13 +56,50 @@
         </div>
     </nav>
 
-    <div>
-        <div style="padding-top:3em;" class="container flex-column animated fadeIn">
-            <div class="row" id="game-holder">
-                
+    <div class="container-fluid">
+        <div class="content-main">
+            <div style="padding-top:3em;" class="container flex-column animated fadeIn">
+                <div class="row" id="game-holder"></div>
+            </div>
+        </div>
+        <div class="content-details">
+            <div style="padding-top:3em;" class="container flex-column">
+                <h3 id="details-title"></h3>
+                <div class="row">
+                    <div class="col-md-3">
+                        <button id="btn-back" type="button" class="btn btn-danger btn-circle btn-lg"><i class="fa fa-arrow-left"></i> Back</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button game-path="" launch-with="cemu" id="btn-launch" type="button" class="btn btn-success btn-circle btn-lg launch"><i class="fa fa-gamepad"></i> Launch</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12" id="details-ESRB"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span>Co-op: <span id="details-coop"></span></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span>Players: <span id="details-players"></span></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span><span id="details-rating"></span>/10</span>
+                    </div>
+                </div>
+                <div class="row top-padding-10" id="game-details">
+                    <div id="overview-wrapper">
+                        <div class="col-md-12" id="details-overview"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <img src="" class="bg-image">
 
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script type="text/javascript" src="./assets/js/jquery-3.1.1.min.js"></script>
@@ -60,6 +107,8 @@
     <script type="text/javascript" src="./assets/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="./assets/js/mdb.min.js"></script>
     <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="gamepad.js"></script>
+    <script type="text/javascript">ipcRenderer.send('load_all_games_emulators');</script>
     <script>if (window.module) module = window.module;</script>
 </body>
 

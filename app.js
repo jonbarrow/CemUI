@@ -13,8 +13,12 @@ var electron      = require('electron'),
 	url           = require('url'),
 	parseString   = require('xml2js').parseString,
 	async         = require('async'),
+	Stopwatch     = require("timer-stopwatch"),
 	decompress    = require('decompress-zip'),
+	csvtojson     = require('csvtojson'),
 	request       = require('request').defaults({ encoding: null }),
+	Entities      = require('html-entities').AllHtmlEntities,
+	entities      = new Entities(),
 	dialog        = electron.dialog,
 	BrowserWindow = electron.BrowserWindow,
 	ipcMain       = electron.ipcMain,
@@ -25,18 +29,19 @@ let ApplicationWindow; // Main application window
 
 function createWindow(file) { // Creates window from file
   	ApplicationWindow = new BrowserWindow({
+  		icon: './ico.png',
   		titleBarStyle: 'hidden', // Borderless
   		frame: false             // Borderless
   	});
-
   	ApplicationWindow.loadURL(url.format({ // Makes the window
   		pathname: path.join(__dirname, '/data/app/'+file+'.html'),
     	protocol: 'file:',
     	slashes: true
   	}));
+  	//ApplicationWindow.webContents.openDevTools()
   	ApplicationWindow.on('closed', () => {
     	ApplicationWindow = null; // Clear the variable when the window closes
-  	})
+  	});
 }
 
 app.on('ready', function() {
@@ -60,82 +65,136 @@ ipcMain.on('btn-window-option-minimize', function(event, data) {
 	ApplicationWindow.minimize(); // Button in the top right
 });
 ipcMain.on('btn-window-option-maximize', function(event, data) {
-	if (!ApplicationWindow.isMaximized()) {
-	ApplicationWindow.maximize();
-	} else {
-	ApplicationWindow.unmaximize();
-	}
+	ApplicationWindow.maximize(); // Button in the top right
 });
 ipcMain.on('btn-window-option-close', function(event, data) {
 	ApplicationWindow.close();    // Button in the top right
 });
 
+ipcMain.on('load_all_games_emulators', function(event, data) {
+	var emulators = JSON.parse(fs.readFileSync('data/cache/emulators.json')),
+		emulator_keys = Object.keys(emulators),
+		emulators_list = "",
+		games = JSON.parse(fs.readFileSync('data/cache/games.json')),
+		game_keys = Object.keys(games),
+		game_list = [];
+	for (var e = emulator_keys.length - 1; e >= 0; e--) {
+		emulators_list += '<a class="dropdown-item launch" launch-with="'+emulator_keys[e]+'" href="#">'+emulator_keys[e]+'</a>\n';
+  	}
+  	for (var g = game_keys.length - 1; g >= 0; g--) {
+		game_list.push(games[game_keys[g]]);
+  	}
+  	event.sender.send("games_emulators_loaded", {game_list:game_list, emulator_list: emulators_list});
+});
+
 
 ipcMain.on('load_game_folder', function(event) {
 	var game_folder_path = pickGameFolder(), // Popup for the game folder
-		games = {}; // Object storing the games
+		games = []; // Object storing the games
+
+	event.sender.send("game_folder_loading");
 
 	var gameDirs = getDirectories(game_folder_path[0]); // Gets the files/dirs in the game folder
-	for(var g = 0, len = gameDirs.length; g < len; g++) { // Loop em
-		async.waterfall([ // Splash
-			function(callback) {
-				var gamePath = game_folder_path+"\\"+gameDirs[g]; // Full game path
-				if (isGame(gamePath)) { // verifies that it's a game
-		  			var files = fs.readdirSync(gamePath+"\\code"), // scans code dir
-						rom   = files.filter(/./.test, /\.rpx$/i)[0]; // finds the rpx file
-					callback(null, gamePath, rom); // ONWARD
-		  		}
-			},
-		    function(gamePath, rom, callback) {
-		    	fs.readFile(gamePath+"\\meta\\meta.xml", function (error, data) { // Reads the meta file for later
-				  	if (error) {
-				    	return console.log(error);
-				  	}
-				  	callback(null, data, gamePath, rom); // ONWARD
-				});
-		    },
-		    function(data, gamePath, rom, callback) {
-		        parseString(data, function (error, result) { // Parses the meta file
-			  		var name = result["menu"]["longname_en"][0]["_"].replace(/\n/g, ' ').replace(/[^a-z0-9 ]/gi,''); // Gets the name (probably wont work on other languages)
 
-					games[name] = {}, // new key in the games object
-					games[name]["title"] = result["menu"]["longname_en"][0]["_"], // Sets the game title
-					games[name]["path"] = gamePath+"\\code\\"+rom; // Sets the full path to the game
-		        	callback(null, name, gamePath); // ONWARD
-				});
-		    },
-		    function(name, gamePath, callback) {
-		        request.get('http://thegamesdb.net/api/GetGame.php?name='+name, function (error, response, body) { // Pulls game data from online API
-				    if (!error && response.statusCode == 200) {
-				        callback(null, name, body.toString()); // ONWARD
-				    }
-				});
-		    },
-		    function(name, data, callback) {
-		        parseString(data, function (error, result) { // Parses the response from the request (is XML)
-			  		var id = result["Data"]["Game"][0]["id"][0]; // Game ID
-		        	callback(null, name, id); // ONWARD
-				});
-		    },
-		    function(name, id, callback) {
-		    	// Gets the box art
-		        request.get('http://thegamesdb.net/banners/_gameviewcache/boxart/original/front/'+id+'-1.jpg', function (error, response, body) { 
-				    if (!error && response.statusCode == 200) {
-				        var data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'); // base64
-				        games[name]["image"] = data; // stores the base64 for offline use
-				        callback(null, games); // ONWARD
-				    }
-				});
-		    }
-		], function (err, result) {
-		  	fs.writeFile('data/cache/games.json', JSON.stringify(result), function(error) { // Saves the games object to a file
-			    if (error) {
-			        console.log(error);
-			    }
+	async.forEachOf(gameDirs, function (result, i, callback) {
+	    var gamePath = game_folder_path[0]+"\\"+result;
+	    if (isGame(gamePath)) { // verifies that it's a game
+	    	var files = fs.readdirSync(gamePath+"\\code"), // scans code dir
+				rom   = files.filter(/./.test, /\.rpx$/i)[0]; // finds the rpx file
+
+			var meta = fs.readFileSync(gamePath+"\\meta\\meta.xml"); // Reads the meta file for later
+
+			parseString(meta, function (error, result) { // Parses the meta file
+		  		var name = result["menu"]["longname_en"][0]["_"].replace(/\n/g, ' ').replace(/[^a-z0-9 ]/gi,''), // Gets the name (probably wont work on other languages)
+		  		title_id = [result["menu"]["title_id"][0]["_"].slice(0, 8), '-', result["menu"]["title_id"][0]["_"].slice(8)].join('');
+
+		  		//console.log(title_id);
+
+				var game = {}; // new key in the games object
+				game["title"] = result["menu"]["longname_en"][0]["_"], // Sets the game title
+				game["path"] = gamePath+"\\code\\"+rom; // Sets the full path to the game
+
+				var csv = fs.readFileSync(path.join(__dirname, './games.csv')).toString();
+
+				csvtojson().fromString(csv).on('csv',(csvRow) => {
+					if (csvRow[0] == title_id) {
+						game["Region"] = csvRow[4];
+						game["CoverArtURL"] = csvRow[5];
+					}
+				})
+				.on('done', () => {
+				    request.get(game["CoverArtURL"], function (error, response, body) {
+				    	if (error) {
+				    		callback();
+				    		return console.log(error);
+				    	}
+				    	if (response.statusCode != 200) {
+				    		callback();
+				    		return console.log(response.statusCode);
+				    	}
+				    	var data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'); // base64
+						
+						game["image"] = data; // stores the base64 for offline use
+						request.get('http://thegamesdb.net/api/GetGame.php?name='+name, function (error, response, body) { // Pulls game data from online API
+							if (!error && response.statusCode == 200) {
+								parseString(body.toString(), function (error, result) {
+									var id          = result["Data"]["Game"][0]["id"][0],          // Game ID
+							  			platform    = result["Data"]["Game"][0]["Platform"][0],    // Game Platform
+							  			releaseDate = result["Data"]["Game"][0]["ReleaseDate"][0], // Game ReleaseDate
+							  			overview    = result["Data"]["Game"][0]["Overview"][0],    // Game Overview
+							  			ESRB        = result["Data"]["Game"][0]["ESRB"][0],        // Game ESRB
+							  			players     = result["Data"]["Game"][0]["Players"][0],     // Game Players
+							  			coop        = result["Data"]["Game"][0]["Co-op"][0],       // Game Co-op
+							  			publisher   = result["Data"]["Game"][0]["Publisher"][0],   // Game Publisher
+							  			developer   = result["Data"]["Game"][0]["Developer"][0],   // Game Developer
+							  			rating      = result["Data"]["Game"][0]["Rating"][0];      // Game Rating
+
+							  		game["platform"]    = entities.encode(platform.toString()),
+							  		game["releaseDate"] = entities.encode(releaseDate.toString()),
+							  		game["overview"]    = entities.encode(overview.toString()),
+							  		game["ESRB"]        = entities.encode(ESRB.toString()),
+							  		game["players"]     = entities.encode(players.toString()),
+							  		game["coop"]        = entities.encode(coop.toString()),
+							  		game["publisher"]   = entities.encode(publisher.toString()),
+							  		game["developer"]   = entities.encode(developer.toString()),
+							  		game["rating"]      = entities.encode(rating.toString());
+
+							  		if (typeof result["Data"]["Game"][0]["Images"][0]["screenshot"] !== 'undefined') {
+							  			var bg = result["Data"]["Game"][0]["Images"][0]["screenshot"][0]["original"][0]["_"];
+							  		} else {
+							  			var bg = result["Data"]["Game"][1]["Images"][0]["screenshot"][0]["original"][0]["_"];
+							  		}
+
+							  		request.get('http://thegamesdb.net/banners/'+bg, function (error, response, body) {
+									    if (!error && response.statusCode == 200) {
+									        var data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'); // base64
+									        game["background"] = data; // stores the base64 for offline use
+
+									        games.push(game);
+									        callback(); // ONWARD
+									    } else {
+									    	console.log(error);
+									    	callback();
+									    }
+									});
+								});
+							} else {
+						    	console.log(error);
+						    	callback();
+						    }
+						})
+				    });
+				})
 			});
+		} else callback();
+	}, function () {
+	    fs.writeFile('data/cache/games.json', JSON.stringify(games), function(error) { // Saves the games object to a file
+		    if (error) {
+		        return console.log(error);
+		    }
+		    event.sender.send("game_folder_loaded", {game_path:game_folder_path[0]}); // Tells application we're done
 		});
-	}
-	event.sender.send("game_folder_loaded", {game_path:game_folder_path[0]}); // Tells application we're done
+	});
 });
 
 ipcMain.on('load_window_cemu_load', function(event, data) {
@@ -196,12 +255,17 @@ ipcMain.on('launch_game_rom', function(event, data) {
 	  	json = JSON.parse(json.toString()); // Parse the shit
 	  	emulator = json[emulator]; // Grab the emulator object
 
+	  	var stopwatch = new Stopwatch();
+		stopwatch.start();
+
 	  	exec('"'+emulator["exe_path"]+'" '+emulator["params"]+' '+'"'+game+'"', (error, stdout, stderr) => {
 	  	// Launch game with the emulator and params
 		  	if (error) {
 			    console.error(error);
 			    return;
 		  	}
+		  	console.log("Played game for "+stopwatch.ms / 1000.0+" seconds.");
+			stopwatch.stop();
 		});
 	});
 });
@@ -236,22 +300,14 @@ function createDirectory(path) { // Makes dirs
 	});
 }
 function pickGameFolder() { // Picks dir
-	var gameFolder = dialog.showOpenDialog({
-		properties: ['openDirectory']});
-
-	if (!gameFolder) {
-		return pickGameFolder();
-	}
-	return gameFolder;
+	return dialog.showOpenDialog({
+	    properties: ['openDirectory']
+	});
 }
 function pickEmuFolder() { // Picks dir
-	var emuFolder = dialog.showOpenDialog({
-		properties: ['openDirectory']});
-
-	if (!emuFolder) {
-		return pickEmuFolder();
-	}
-	return emuFolder;
+	return dialog.showOpenDialog({
+	    properties: ['openDirectory']
+	});
 }
 function loadGame(game) {
 	// Currently unused. Will use later

@@ -3,17 +3,25 @@
   	"version": "0.1.0",
  	"main": "app.js",
   	"dependencies": {
-	    "electron": "^1.6.2",
+      "electron": "^1.6.2",
+	    "electron-packager": "*",
 	    "xml2js": "*",
 	    "async": "*",
 	    "request": "*",
-	    "decompress-zip": "*"
+      "decompress-zip": "*",
+	    "html-entities": "*",
+      "timer-stopwatch": "*",
+      "csvtojson" : "*"
   	},
   	"devDependencies": {
 	    "electron": "^1.6.2",
+      "electron-packager": "*",
 	    "xml2js": "*",
     	"async": "*",
     	"request": "*",
-    	"decompress-zip": "*"
+    	"decompress-zip": "*",
+      "html-entities": "*",
+      "timer-stopwatch": "*",
+      "csvtojson" : "*"
   	}
 }
