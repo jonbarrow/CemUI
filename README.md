@@ -38,6 +38,10 @@ To run CemuManager, simply run `CemuManager.exe`
 
 # Releases
 
+## v0.1.2 - Second public release
+[v0.1.2](https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.2)
+This version fixes many bugs and redesigns the layout. This is the first production ready release.
+
 ## v0.1.0 - First public release
 [v0.1.0](https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0)
  
