@@ -12,7 +12,7 @@ CemuManager is a small launcher "hub" that stores your Cemu games in a nice easy
 ##### Planned featured include
 - Multiple emulator support
 - "Big-picture" type mode that can be used with a controller
-- All hail the dark theme
+- ~~All hail the dark theme~~ Added
  
 ## Installation & Running for public versions
 - Download the latest release

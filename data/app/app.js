@@ -86,11 +86,11 @@ $("#btn-back").click(function(event) {
     });
 
     $(this).addClass('hide');
-    $(".game-loaded-info").fadeIn();
-    $(".bg-image").animate({opacity: 0}, 1000, function() {
+    $(".game-loaded-info").fadeIn(200);
+    $(".bg-image").animate({opacity: 0}, 200, function() {
         $(".content-details").css('display', 'none');
     });
-    $(".content-details").animate({opacity: 0}, 1000, function() {
+    $(".content-details").animate({opacity: 0}, 200, function() {
         $(".game-loaded-info").removeClass('hide');
     });
 });
@@ -102,8 +102,8 @@ $("body").on("click", ".game-loaded-info", function() {
     $("#btn-back").removeClass('hide');
     $(".content-details").css('display', 'block');
     $(".game-loaded-info").addClass('hide');
-    $(".bg-image").css('display', 'inline').attr('src', $(this).attr('game-art-background')).animate({opacity: 1}, 1000);
-    $(".content-details").animate({opacity: 1}, 1000);
+    $(".bg-image").css('display', 'inline').attr('src', $(this).attr('game-art-background')).animate({opacity: 1}, 200);
+    $(".content-details").animate({opacity: 1}, 200);
     
     $('html, body').css({
         overflow: 'hidden',
@@ -129,9 +129,27 @@ $("body").on("click", ".game-loaded-info", function() {
         $('#details-overview').css('font-size', (parseInt($('#details-overview').css('font-size')) - 1) + "px" );
     }
 
-    $(".game-loaded-info.hide").fadeOut();
+    $(".game-loaded-info.hide").fadeOut(200);
 });
 
 $(function() {
 	$('.loader-container').hide();
 })
+
+/****************************************************/
+/*                    Dark Theme                    */
+/****************************************************/
+
+var isDark = true;
+
+$("#dark-theme-option").click(function() {
+    $(".dark-themeable").toggleClass("dark");
+    isDark = !isDark;
+
+    if (isDark) {
+        $(".dark-themeable").css("color", "white");
+    } else {
+        $(".dark-themeable").css("color", "black");
+    }
+});
+
