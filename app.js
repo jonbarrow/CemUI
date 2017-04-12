@@ -113,8 +113,6 @@ ipcMain.on('load_game_folder', function(event) {
 		  		var name = result["menu"]["longname_en"][0]["_"].replace(/\n/g, ' ').replace(/[^a-z0-9 ]/gi,''), // Gets the name (probably wont work on other languages)
 		  		title_id = [result["menu"]["title_id"][0]["_"].slice(0, 8), '-', result["menu"]["title_id"][0]["_"].slice(8)].join('');
 
-		  		//console.log(title_id);
-
 				var game = {}; // new key in the games object
 				game["title"] = result["menu"]["longname_en"][0]["_"], // Sets the game title
 				game["path"] = gamePath+"\\code\\"+rom; // Sets the full path to the game
@@ -143,17 +141,62 @@ ipcMain.on('load_game_folder', function(event) {
 						request.get('http://thegamesdb.net/api/GetGame.php?name='+name, function (error, response, body) { // Pulls game data from online API
 							if (!error && response.statusCode == 200) {
 								parseString(body.toString(), function (error, result) {
-									var id          = result["Data"]["Game"][0]["id"][0],          // Game ID
-							  			platform    = result["Data"]["Game"][0]["Platform"][0],    // Game Platform
-							  			releaseDate = result["Data"]["Game"][0]["ReleaseDate"][0], // Game ReleaseDate
-							  			overview    = result["Data"]["Game"][0]["Overview"][0],    // Game Overview
-							  			players     = result["Data"]["Game"][0]["Players"][0],     // Game Players
-							  			coop        = result["Data"]["Game"][0]["Co-op"][0],       // Game Co-op
-							  			publisher   = result["Data"]["Game"][0]["Publisher"][0],   // Game Publisher
-							  			developer   = result["Data"]["Game"][0]["Developer"][0],   // Game Developer
-							  			rating      = result["Data"]["Game"][0]["Rating"][0];      // Game Rating
+									
+							  		if (typeof result["Data"]["Game"][0]["id"] !== 'undefined') { // Game ID
+							  			var id = result["Data"]["Game"][0]["id"][0];
+							  		} else {
+							  			var id = result["Data"]["Game"][1]["id"][0];
+							  		}
 
-							  		if (typeof result["Data"]["Game"][0]["ESRB"][0] !== 'undefined') { // Game ESRB
+							  		if (typeof result["Data"]["Game"][0]["Platform"] !== 'undefined') { // Game Platform
+							  			var platform = result["Data"]["Game"][0]["Platform"][0];
+							  		} else {
+							  			var platform = result["Data"]["Game"][1]["Platform"][0];
+							  		}
+
+							  		if (typeof result["Data"]["Game"][0]["ReleaseDate"] !== 'undefined') { // Game ReleaseDate
+							  			var releaseDate = result["Data"]["Game"][0]["ReleaseDate"][0];
+							  		} else {
+							  			var releaseDate = result["Data"]["Game"][1]["ReleaseDate"][0];
+							  		}
+
+							  		if (typeof result["Data"]["Game"][0]["Overview"] !== 'undefined') { // Game Overview
+							  			var overview = result["Data"]["Game"][0]["Overview"][0];
+							  		} else {
+							  			var overview = result["Data"]["Game"][1]["Overview"][0];
+							  		}
+
+							  		if (typeof result["Data"]["Game"][0]["Players"] !== 'undefined') { // Game Players
+							  			var players = result["Data"]["Game"][0]["Players"][0];
+							  		} else {
+							  			var players = result["Data"]["Game"][1]["Players"][0];
+							  		}
+
+							  		if (typeof result["Data"]["Game"][0]["Co-op"] !== 'undefined') { // Game Co-op
+							  			var coop = result["Data"]["Game"][0]["Co-op"][0];
+							  		} else {
+							  			var coop = result["Data"]["Game"][1]["Co-op"][0];
+							  		}
+
+							  		if (typeof result["Data"]["Game"][0]["Publisher"] !== 'undefined') { // Game Publisher
+							  			var publisher = result["Data"]["Game"][0]["Publisher"][0];
+							  		} else {
+							  			var publisher = result["Data"]["Game"][1]["Publisher"][0];
+							  		}
+
+							  		if (typeof result["Data"]["Game"][0]["Developer"] !== 'undefined') { // Game Developer
+							  			var developer = result["Data"]["Game"][0]["Developer"][0];
+							  		} else {
+							  			var developer = result["Data"]["Game"][1]["Developer"][0];
+							  		}
+
+							  		if (typeof result["Data"]["Game"][0]["Rating"] !== 'undefined') { // Game Rating
+							  			var rating = result["Data"]["Game"][0]["Rating"][0];
+							  		} else {
+							  			var rating = result["Data"]["Game"][1]["Rating"][0];
+							  		}
+
+							  		if (typeof result["Data"]["Game"][0]["ESRB"] !== 'undefined') { // Game ESRB
 							  			var ESRB = result["Data"]["Game"][0]["ESRB"][0];
 							  		} else {
 							  			var ESRB = result["Data"]["Game"][1]["ESRB"][0];
