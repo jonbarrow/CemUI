@@ -387,6 +387,17 @@ function isGame(folder) { // Checks if it's a game or not
 	if (subDirs["code"] === null || subDirs["content"] === null || subDirs["meta"] === null) {
 		return false;
 	}
+
+	var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.rpx$/i);
+
+	if (codeFile === undefined || codeFile.length == 0) {
+		return false;
+	}
+
+	if (fs.existsSync(folder+"\\meta\\meta.xml") === null) {
+		return false;
+	}
+
 	return true;
 }
 
