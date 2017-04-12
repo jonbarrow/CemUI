@@ -18,6 +18,20 @@ We always welcome suggestions and Pull Requests! This program is written in Node
 
 If you have a suggestion, and do not know any of the required langauges, you can reach us on our Discord server: https://discord.gg/WYVnFEQ
 
+## I found a bug!
+Given that this project is still very early in development, bugs will probably be common, and vary from person to person. If you find a bug, we ask that you follow this format for reporting the bug on the `Issue` tracker on the repo:
+- A detailed name describing the bug (no "A bug happened" type titles!)
+- A detailed description of the bug
+- CemuManager version
+- Exact steps to reproduce
+- A screenshot/video of the bug/error message
+- If possible, a video or gif showing the exact steps to reproduce (There are many free video recorders out there. It doesnt matter how you record it, as long as it's recorded)
+- And above all: stay calm. Currently there are only 2 developers working on this project, and for one this is the first NodeJS app they have worked on. Also given the nature of how Electron packages apps, bugs may not occur on our end but will on yours. Please be patient while we attempt to fix the issue.
+
+Additonally, you can contact us via our Discord server if you want to speak with us directly. The link is https://discord.gg/WYVnFEQ
+
+If you have a suggestion, and do not know any of the required langauges, you can reach us on our Discord server: https://discord.gg/WYVnFEQ
+
 ##### Planned featured include
 - Multiple emulator support
 - "Big-picture" type mode that can be used with a controller
