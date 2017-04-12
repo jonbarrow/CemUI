@@ -14,9 +14,9 @@ CemuManager is a small launcher "hub" that stores your Cemu games in a nice easy
 **IMPORTANT:** CemuManager is still in heavy development and may be unstable. There are many features planned.
 
 ## How can I help? / I have a suggestion!
-We always welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone woth experience in JavaScript, Node, html, css, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules, and will be packaged by Electron just fine!
+We always welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone with experience in JavaScript, Node, html, css, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules, and will be packaged by Electron just fine!
 
-If you have a suggestion, and do not know any of the required langauges, you can reach us on our Discord server: https://discord.gg/WYVnFEQ
+If you have a suggestion, and do not know any of the required languages, you can reach us on our Discord server: https://discord.gg/WYVnFEQ
 
 ## I found a bug!
 Given that this project is still very early in development, bugs will probably be common, and vary from person to person. If you find a bug, we ask that you follow this format for reporting the bug on the `Issue` tracker on the repo:
@@ -25,10 +25,10 @@ Given that this project is still very early in development, bugs will probably b
 - CemuManager version
 - Exact steps to reproduce
 - A screenshot/video of the bug/error message
-- If possible, a video or gif showing the exact steps to reproduce (There are many free video recorders out there. It doesnt matter how you record it, as long as it's recorded)
+- If possible, a video or gif showing the exact steps to reproduce (There are many free video recorders out there. It doesn't matter how you record it, as long as it's recorded)
 - And above all: stay calm. Currently there are only 2 developers working on this project, and for one this is the first NodeJS app they have worked on. Also given the nature of how Electron packages apps, bugs may not occur on our end but will on yours. Please be patient while we attempt to fix the issue.
 
-Additonally, you can contact us via our Discord server if you want to speak with us directly. The link is https://discord.gg/WYVnFEQ
+Attitudinally, you can contact us via our Discord server if you want to speak with us directly. The link is https://discord.gg/WYVnFEQ
 
 ##### Planned featured include
 - Multiple emulator support
@@ -70,7 +70,7 @@ This version fixes many bugs and redesigns the layout. This is the first product
 ## Tasks to complete
 
 - [x] Launch games
-- [x] Lanuch games with other emulators
+- [x] Launch games with other emulators
 - [ ] Full screen mode option
 - [ ] Change settings option
 - [x] Add cemu folder
