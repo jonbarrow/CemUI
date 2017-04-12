@@ -147,12 +147,17 @@ ipcMain.on('load_game_folder', function(event) {
 							  			platform    = result["Data"]["Game"][0]["Platform"][0],    // Game Platform
 							  			releaseDate = result["Data"]["Game"][0]["ReleaseDate"][0], // Game ReleaseDate
 							  			overview    = result["Data"]["Game"][0]["Overview"][0],    // Game Overview
-							  			ESRB        = result["Data"]["Game"][0]["ESRB"][0],        // Game ESRB
 							  			players     = result["Data"]["Game"][0]["Players"][0],     // Game Players
 							  			coop        = result["Data"]["Game"][0]["Co-op"][0],       // Game Co-op
 							  			publisher   = result["Data"]["Game"][0]["Publisher"][0],   // Game Publisher
 							  			developer   = result["Data"]["Game"][0]["Developer"][0],   // Game Developer
 							  			rating      = result["Data"]["Game"][0]["Rating"][0];      // Game Rating
+
+							  		if (typeof result["Data"]["Game"][0]["ESRB"][0] !== 'undefined') { // Game ESRB
+							  			var ESRB = result["Data"]["Game"][0]["ESRB"][0];
+							  		} else {
+							  			var ESRB = result["Data"]["Game"][1]["ESRB"][0];
+							  		}
 
 							  		game["platform"]    = entities.encode(platform.toString()),
 							  		game["releaseDate"] = entities.encode(releaseDate.toString()),
