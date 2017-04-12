@@ -30,8 +30,6 @@ Given that this project is still very early in development, bugs will probably b
 
 Additonally, you can contact us via our Discord server if you want to speak with us directly. The link is https://discord.gg/WYVnFEQ
 
-If you have a suggestion, and do not know any of the required langauges, you can reach us on our Discord server: https://discord.gg/WYVnFEQ
-
 ##### Planned featured include
 - Multiple emulator support
 - "Big-picture" type mode that can be used with a controller
