@@ -1,6 +1,6 @@
 {
   	"name": "CemuManager",
-  	"version": "0.1.0",
+  	"version": "0.1.2",
  	"main": "app.js",
   	"dependencies": {
       "electron": "^1.6.2",
@@ -11,7 +11,8 @@
       "decompress-zip": "*",
 	    "html-entities": "*",
       "timer-stopwatch": "*",
-      "csvtojson" : "*"
+      "csvtojson" : "*",
+      "similarity": "*"
   	},
   	"devDependencies": {
 	    "electron": "^1.6.2",
@@ -22,6 +23,7 @@
     	"decompress-zip": "*",
       "html-entities": "*",
       "timer-stopwatch": "*",
-      "csvtojson" : "*"
+      "csvtojson" : "*",
+      "similarity": "*"
   	}
 }
