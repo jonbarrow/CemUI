@@ -25,6 +25,7 @@ Given that this project is still very early in development, bugs will probably b
 - CemuManager version
 - Exact steps to reproduce
 - A screenshot/video of the bug/error message
+- List games affected (if applicable)
 - If possible, a video or gif showing the exact steps to reproduce (There are many free video recorders out there. It doesn't matter how you record it, as long as it's recorded)
 - And above all: stay calm. Currently there are only 2 developers working on this project, and for one this is the first NodeJS app they have worked on. Also given the nature of how Electron packages apps, bugs may not occur on our end but will on yours. Please be patient while we attempt to fix the issue.
 
