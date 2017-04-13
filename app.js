@@ -16,6 +16,7 @@ var electron      = require('electron'),
 	Stopwatch     = require("timer-stopwatch"),
 	decompress    = require('decompress-zip'),
 	csvtojson     = require('csvtojson'),
+	similarity    = require("similarity"),
 	request       = require('request').defaults({ encoding: null }),
 	Entities      = require('html-entities').AllHtmlEntities,
 	entities      = new Entities(),
@@ -95,7 +96,8 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
 
 ipcMain.on('load_game_folder', function(event) {
 	var game_folder_path = pickGameFolder(), // Popup for the game folder
-		games = []; // Object storing the games
+		games = [], // Object storing the games
+		game_errors = []; // Object storing errors
 
 	event.sender.send("game_folder_loading");
 
@@ -142,15 +144,32 @@ ipcMain.on('load_game_folder', function(event) {
 							if (!error && response.statusCode == 200) {
 								parseString(body.toString(), function (error, result) {
 
+									if (typeof result["Data"]["Game"] === 'undefined') {
+										game_errors.push(game["title"]);
+										callback();
+										return;
+							  		}
+							  		if (typeof result["Data"]["Game"][0] === 'undefined') {
+										game_errors.push(game["title"]);
+										callback();
+										return;
+							  		}
+
 									var data_base = result["Data"]["Game"],
 										game_index = 0,
 										game_index_2 = 0;
 
 									for (var i = 0; i < Object.keys(data_base).length; i++) {
-										if (data_base[i]["Platform"] == "Nintendo Wii U") {
+										if ((data_base[i]["Platform"][0] == "Nintendo Wii U" || data_base[i]["Platform"][0] == "Nintendo Wii" || data_base[i]["Platform"][0] == "Nintendo Switch") && similarity(data_base[i]["GameTitle"][0], game['title']) > 0.9) {
 											game_index = i;
-											game_index_2 = game_index++;
+											game_index_2 = i+=1;
 											break;
+										}
+										
+										if (i >= Object.keys(data_base).length) {
+											game_errors.push(game["title"]);
+											callback();
+											return;
 										}
 									}
 									
@@ -162,56 +181,74 @@ ipcMain.on('load_game_folder', function(event) {
 
 							  		if (typeof result["Data"]["Game"][game_index]["Platform"] !== 'undefined') { // Game Platform
 							  			var platform = result["Data"]["Game"][game_index]["Platform"][0];
-							  		} else {
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["Platform"] !== 'undefined') {
 							  			var platform = result["Data"]["Game"][game_index_2]["Platform"][0];
+							  		} else {
+							  			var platform = "Unknown";
 							  		}
 
 							  		if (typeof result["Data"]["Game"][game_index]["ReleaseDate"] !== 'undefined') { // Game ReleaseDate
 							  			var releaseDate = result["Data"]["Game"][game_index]["ReleaseDate"][0];
-							  		} else {
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["ReleaseDate"] !== 'undefined') {
 							  			var releaseDate = result["Data"]["Game"][game_index_2]["ReleaseDate"][0];
+							  		} else {
+							  			var releaseDate = "Unknown";
 							  		}
 
 							  		if (typeof result["Data"]["Game"][game_index]["Overview"] !== 'undefined') { // Game Overview
 							  			var overview = result["Data"]["Game"][game_index]["Overview"][0];
-							  		} else {
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["Overview"] !== 'undefined') {
 							  			var overview = result["Data"]["Game"][game_index_2]["Overview"][0];
+							  		} else {
+							  			var overview = "Overview not available.";
 							  		}
 
 							  		if (typeof result["Data"]["Game"][game_index]["Players"] !== 'undefined') { // Game Players
 							  			var players = result["Data"]["Game"][game_index]["Players"][0];
-							  		} else {
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["Players"] !== 'undefined') {
 							  			var players = result["Data"]["Game"][game_index_2]["Players"][0];
+							  		} else {
+							  			var players = 1;
 							  		}
 
 							  		if (typeof result["Data"]["Game"][game_index]["Co-op"] !== 'undefined') { // Game Co-op
 							  			var coop = result["Data"]["Game"][game_index]["Co-op"][0];
-							  		} else {
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["Co-op"] !== 'undefined') {
 							  			var coop = result["Data"]["Game"][game_index_2]["Co-op"][0];
+							  		} else {
+							  			var coop ="Unknown";
 							  		}
 
 							  		if (typeof result["Data"]["Game"][game_index]["Publisher"] !== 'undefined') { // Game Publisher
 							  			var publisher = result["Data"]["Game"][game_index]["Publisher"][0];
-							  		} else {
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["Publisher"] !== 'undefined') {
 							  			var publisher = result["Data"]["Game"][game_index_2]["Publisher"][0];
+							  		} else {
+							  			var publisher = "Unknown";	
 							  		}
 
 							  		if (typeof result["Data"]["Game"][game_index]["Developer"] !== 'undefined') { // Game Developer
 							  			var developer = result["Data"]["Game"][game_index]["Developer"][0];
-							  		} else {
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["Developer"] !== 'undefined') {
 							  			var developer = result["Data"]["Game"][game_index_2]["Developer"][0];
+							  		} else {
+							  			var developer = "Unknown";
 							  		}
 
 							  		if (typeof result["Data"]["Game"][game_index]["Rating"] !== 'undefined') { // Game Rating
 							  			var rating = result["Data"]["Game"][game_index]["Rating"][0];
-							  		} else {
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["Rating"] !== 'undefined') {
 							  			var rating = result["Data"]["Game"][game_index_2]["Rating"][0];
+							  		} else {
+							  			var rating = 5;
 							  		}
 
 							  		if (typeof result["Data"]["Game"][game_index]["ESRB"] !== 'undefined') { // Game ESRB
 							  			var ESRB = result["Data"]["Game"][game_index]["ESRB"][0];
-							  		} else {
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["ESRB"] !== 'undefined') {
 							  			var ESRB = result["Data"]["Game"][game_index_2]["ESRB"][0];
+							  		} else {
+							  			var ESRB = "Unknown";
 							  		}
 
 							  		game["platform"]    = entities.encode(platform.toString()),
@@ -226,8 +263,13 @@ ipcMain.on('load_game_folder', function(event) {
 
 							  		if (typeof result["Data"]["Game"][game_index]["Images"][0]["screenshot"] !== 'undefined') {
 							  			var bg = result["Data"]["Game"][game_index]["Images"][0]["screenshot"][0]["original"][0]["_"];
+							  		} else if (typeof result["Data"]["Game"][game_index_2]["Images"][0]["screenshot"] !== 'undefined') {
+							  			var bg = result["Data"]["Game"][game_index_2]["Images"][0]["screenshot"][0]["original"][0]["_"]; //
 							  		} else {
-							  			var bg = result["Data"]["Game"][game_index_2]["Images"][0]["screenshot"][0]["original"][0]["_"];
+							  			game["background"] = "data:png;base64," + base64_encode(path.join(__dirname, './cemumanagerlogo.png'));
+							  			games.push(game);
+									    callback(); // ONWARD
+									    return;
 							  		}
 
 							  		request.get('http://thegamesdb.net/banners/'+bg, function (error, response, body) {
@@ -256,6 +298,17 @@ ipcMain.on('load_game_folder', function(event) {
 	    fs.writeFile('data/cache/games.json', JSON.stringify(games), function(error) { // Saves the games object to a file
 		    if (error) {
 		        return console.log(error);
+		    }
+		    if (game_errors.length > 0) {
+		    	var error_message = "The following game(s) encountered errors when downloading data:\n";
+		    	for (var i = 0; i < game_errors.length; i++) {
+		    		error_message += '\n'+game_errors[i];
+		    	}
+		    	error_message += '\n\nThis may be caused by spotty/no internet, a non-English game, or another error.';
+		    	dialog.showMessageBox({
+				  	type: 'question',
+				  	message: error_message
+				});
 		    }
 		    event.sender.send("game_folder_loaded", {game_path:game_folder_path[0]}); // Tells application we're done
 		});
@@ -348,11 +401,6 @@ function generalLoad() {
   			createDirectory("data/cache"); // Nope! make it.
 	  	}
 	});
-	fs.stat("data/app", function (err, stats) { // is `data/app` a thing (it should be idk how it wouldn't)?
-  		if (err) {
-  			createDirectory("data/app"); // Nope! make it.
-	  	}
-	});
 	if (!fs.existsSync('data/cache/emulators.json')) { // Is there an emualtors file? 
 		createWindow('load_game_folder'); // Nope! Lets run the set up then!
 	} else {
@@ -393,20 +441,21 @@ function getDirectories(src) {  // Gets dirs
 }
 function isGame(folder) { // Checks if it's a game or not
 	var subDirs = getDirectories(folder);
-	if (subDirs === undefined || subDirs.length == 0) {
+	if (typeof subDirs === undefined || subDirs.length < 0) {
 	    return false;
 	}
-	if (subDirs["code"] === null || subDirs["content"] === null || subDirs["meta"] === null) {
+
+	if (Object.values(subDirs).indexOf('code') <= -1 || Object.values(subDirs).indexOf('content') <= -1 || Object.values(subDirs).indexOf('meta') <= -1) {
 		return false;
 	}
 
 	var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.rpx$/i);
 
-	if (codeFile === undefined || codeFile.length == 0) {
+	if (!codeFile || codeFile.length < 0) {
 		return false;
 	}
 
-	if (fs.existsSync(folder+"\\meta\\meta.xml") === null) {
+	if (!fs.existsSync(folder+"\\meta\\meta.xml")) {
 		return false;
 	}
 
@@ -442,4 +491,8 @@ function unzip(file, target) { // Unzips
 	unzip.extract({
 	    path: target
 	});
+}
+
+function base64_encode(path) {
+    return new Buffer(fs.readFileSync(path)).toString('base64');
 }
