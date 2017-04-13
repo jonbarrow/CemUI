@@ -141,7 +141,6 @@ ipcMain.on('load_game_folder', function(event) {
 						request.get('http://thegamesdb.net/api/GetGame.php?name='+name, function (error, response, body) { // Pulls game data from online API
 							if (!error && response.statusCode == 200) {
 								parseString(body.toString(), function (error, result) {
-<<<<<<< HEAD
 
 									var data_base = result["Data"]["Game"],
 										game_index = 0,
@@ -163,65 +162,6 @@ ipcMain.on('load_game_folder', function(event) {
 
 							  		if (typeof result["Data"]["Game"][game_index]["Platform"] !== 'undefined') { // Game Platform
 							  			var platform = result["Data"]["Game"][game_index]["Platform"][0];
-=======
-									
-							  		if (typeof result["Data"]["Game"][0]["id"] !== 'undefined') { // Game ID
-							  			var id = result["Data"]["Game"][0]["id"][0];
-							  		} else {
-							  			var id = result["Data"]["Game"][1]["id"][0];
-							  		}
-
-							  		if (typeof result["Data"]["Game"][0]["Platform"] !== 'undefined') { // Game Platform
-							  			var platform = result["Data"]["Game"][0]["Platform"][0];
-							  		} else {
-							  			var platform = result["Data"]["Game"][1]["Platform"][0];
-							  		}
-
-							  		if (typeof result["Data"]["Game"][0]["ReleaseDate"] !== 'undefined') { // Game ReleaseDate
-							  			var releaseDate = result["Data"]["Game"][0]["ReleaseDate"][0];
-							  		} else {
-							  			var releaseDate = result["Data"]["Game"][1]["ReleaseDate"][0];
-							  		}
-
-							  		if (typeof result["Data"]["Game"][0]["Overview"] !== 'undefined') { // Game Overview
-							  			var overview = result["Data"]["Game"][0]["Overview"][0];
-							  		} else {
-							  			var overview = result["Data"]["Game"][1]["Overview"][0];
-							  		}
-
-							  		if (typeof result["Data"]["Game"][0]["Players"] !== 'undefined') { // Game Players
-							  			var players = result["Data"]["Game"][0]["Players"][0];
-							  		} else {
-							  			var players = result["Data"]["Game"][1]["Players"][0];
-							  		}
-
-							  		if (typeof result["Data"]["Game"][0]["Co-op"] !== 'undefined') { // Game Co-op
-							  			var coop = result["Data"]["Game"][0]["Co-op"][0];
-							  		} else {
-							  			var coop = result["Data"]["Game"][1]["Co-op"][0];
-							  		}
-
-							  		if (typeof result["Data"]["Game"][0]["Publisher"] !== 'undefined') { // Game Publisher
-							  			var publisher = result["Data"]["Game"][0]["Publisher"][0];
-							  		} else {
-							  			var publisher = result["Data"]["Game"][1]["Publisher"][0];
-							  		}
-
-							  		if (typeof result["Data"]["Game"][0]["Developer"] !== 'undefined') { // Game Developer
-							  			var developer = result["Data"]["Game"][0]["Developer"][0];
-							  		} else {
-							  			var developer = result["Data"]["Game"][1]["Developer"][0];
-							  		}
-
-							  		if (typeof result["Data"]["Game"][0]["Rating"] !== 'undefined') { // Game Rating
-							  			var rating = result["Data"]["Game"][0]["Rating"][0];
-							  		} else {
-							  			var rating = result["Data"]["Game"][1]["Rating"][0];
-							  		}
-
-							  		if (typeof result["Data"]["Game"][0]["ESRB"] !== 'undefined') { // Game ESRB
-							  			var ESRB = result["Data"]["Game"][0]["ESRB"][0];
->>>>>>> origin/dev
 							  		} else {
 							  			var platform = result["Data"]["Game"][game_index_2]["Platform"][0];
 							  		}
