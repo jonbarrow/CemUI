@@ -43,20 +43,20 @@ Additionally, you can contact us via our [Discord server][1] if you want to spea
 To run CemuManager, simply run `CemuManager.exe`
  
 ## Installation & Running for developer versions
-- Clone the repo
-- Install npm and node
-- run `install.bat`
+* [Clone the repository](https://help.github.com/articles/cloning-a-repository)
+* [Install Node.js & npm](https://docs.npmjs.com/getting-started/installing-node)
+* Run `npm install` in the CemuManager directory.
 
-To run CemuManager, simply run `run.bat`
+To run CemuManager, simply run `npm start` in the CemuManager directory.
 
 ## Building from source
-- Clone the repo
-- Install npm and node
-- run `install.bat`
-- run `build.bat`
-- app will be built to `builds/CemuManager-win32-ia32`
+* [Clone the repository](https://help.github.com/articles/cloning-a-repository)
+* [Install Node.js & npm](https://docs.npmjs.com/getting-started/installing-node)
+* Run `npm install` in the CemuManager directory.
+* Run `npm run build` in the CemuManager directory. _(The app will be built to `builds/CemuManager-win32-ia32`)_
 
-To run CemuManager, simply run `CemuManager.exe`
+
+To run CemuManager, simply run `npm start` in the CemuManager directory.
 
 # Releases
 
