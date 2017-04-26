@@ -4,15 +4,14 @@
   "version": "0.1.0",
   "main": "app.js",
   "dependencies": {
+    "pixl-xml": "*",
     "async": "^2.3.0",
-    "csvtojson": "^1.1.4",
     "decompress-zip": "^0.3.0",
     "electron": "^1.6.2",
     "electron-packager": "^8.6.0",
     "html-entities": "^1.2.1",
     "request": "^2.81.0",
-    "timer-stopwatch": "^0.2.0",
-    "xml2js": "^0.4.17"
+    "timer-stopwatch": "^0.2.0"
   },
   "scripts": {
     "start": "electron .",
