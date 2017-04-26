@@ -76,12 +76,12 @@ This version fixes many bugs and redesigns the layout. This is the first product
 - [ ] Change settings option
 - [x] Add cemu folder
 - [x] Find cemu.exe from folder
-- [ ] Add external WiiU emulators option
+- [ ] ~Add external WiiU emulators option~  Scrapped. Will be added to EmuManager
 - [x] Add game folder
 - [x] Find games within the folder
 - [ ] Dynamically load new games
 - [ ] Dynamically remove games
-- [ ] Load new game (single)
-- [ ] Remove game (single)
+- [ ] ~Load new game (single)~ Scrapped in favor of setting loading
+- [ ] ~Remove game (single)~ Scrapped in favor of setting loading
 
 [1]: https://discord.gg/WYVnFEQ
