@@ -1,5 +1,12 @@
 const {ipcRenderer} = require('electron'); // Gets ipcRenderer
 
+var isDarkTheme = false;
+
+$(function() {
+    $('.loader-container').hide();
+    $('[data-toggle="popover"]').popover();
+})
+
 /****************************************************/
 /*                      Events                      */
 /****************************************************/
@@ -11,8 +18,16 @@ $("#load_games_option").click(function(event) {
 	ipcRenderer.send('load_game_folder');
 });
 $("#load_cemu_option").click(function(event) {
-	ipcRenderer.send('load_cemu_folder');
+    ipcRenderer.send('load_cemu_folder');
 });
+$("#folder-select-cemu").click(function(event) {
+    ipcRenderer.send('change_folder', 'cemu');
+});
+$("#folder-select-game").click(function(event) {
+    $('html').html(''); // This fixes some weird Chrome rendering bug? Idk why, but fuck it. It works.
+    ipcRenderer.send('change_folder', 'game');
+});
+
 $(".btn-window-option-minimize").click(function(event) {
 	ipcRenderer.send('btn-window-option-minimize');
 });
@@ -37,6 +52,19 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
     $("h5").html("Downloading Game Data...").append('<br><small class=\"text-muted\">(This may take a moment)</small>');
     $("button").append(' <div class="fa fa-spinner fa-spin"></div>');
 });
+ipcRenderer.on('dark_theme', function(event, data) {
+    $('#dark-theme-toggle').prop("checked", true);
+    changeTheme('dark');
+});
+ipcRenderer.on('update_play_time', function(event, data) {
+    $('i.launch').each(function() {
+        if ($(this).attr('game-path') == data.game_path) {
+            $(this).parent().children('.game-time').html(msToTime(data.new_time)+'<i class="material-icons float-right">alarm</i>');
+            return false;
+        }
+    });
+
+});
 
 
 /****************************************************/
@@ -45,33 +73,16 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
 
 
 ipcRenderer.on('games_emulators_loaded', function(event, data) {
-	var games = data["game_list"],
-		emulators_list = data["emulators_list"];
-	for (var g = games.length - 1; g >= 0; g--) {
-		var element = '<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flex-center game-loaded-info" game-path="'+games[g]["path"]+'" game-art-background="'+games[g]["background"]+'" game-art-box="'+games[g]["image"]+'" game-data-platform="'+games[g]["platform"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-rating="'+games[g]["rating"]+'" game-data-title="'+games[g]["title"]+'"> \
-                    <div class="card card-inverse">\
-                        <img src="'+games[g]["image"]+'" class="card-img-top game-cover" alt="wiiu_game_thumb">\
-                        <div class="card-img-overlay">\
-                            <h5 class="card-title">'+games[g]["title"]+'</h5>\
-                            <!--div game-path="'+games[g]["path"]+'" class="btn-group dropup game-launch-options">\
-                                <button launch-with="cemu" type="button" class="btn btn-success launch">Launch</button>\
-                                <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\
-                                    <span class="sr-only">Launch With</span>\
-                                </button>\
-                                <div game-path="'+games[g]["path"]+'" class="dropdown-menu">\
-                                    <a class="dropdown-item">Launch With</a>\
-                                    <div class="dropdown-divider"></div>\
-                                    '+emulators_list+'\
-                                </div>\
-                            </div-->\
-                        </div>\
-                    </div>\
-                </div>';
-	    $("#game-holder").append(element);
-	}
+    $('#folder-select-cemu-input').val(data['settings']['cemu_folder_path']);
+    $('#folder-select-game-input').val(data['settings']['game_folder_path']);
+    loadGameDisplay(data['display']);
 });
 
-$("body").on("click", ".launch", function(){
+$("body").on("click", ".launch", function(e) {
+    if ($(this).hasClass('disabled')) {
+        console.log("disabled")
+        return false;
+    }
     ipcRenderer.send('launch_game_rom', {emulator:$(this).attr('launch-with'), rom:$(this).attr('game-path')});
 });
 
@@ -99,6 +110,12 @@ $("body").on("click", ".game-loaded-info", function() {
     if ($(this).hasClass('hide')) {
         return false;
     }
+    if ($(this).hasClass('disabled')) {
+        $('#btn-launch').addClass('disabled').addClass('btn-default').removeClass('btn-success');
+    } else {
+        $('#btn-launch').removeClass('disabled').removeClass('btn-default').addClass('btn-success');
+    }
+        
     $("#btn-back").removeClass('hide');
     $(".content-details").css('display', 'block');
     $(".game-loaded-info").addClass('hide');
@@ -118,7 +135,6 @@ $("body").on("click", ".game-loaded-info", function() {
     $("#details-ESRB").html($(this).attr('game-data-ESRB'));
     $("#details-players").html($(this).attr('game-data-players'));
     $("#details-coop").html($(this).attr('game-data-coop'));
-    $("#details-rating").html($(this).attr('game-data-rating'));
     $("#details-overview").html($(this).attr('game-data-overview'));
 
     $("#btn-launch").attr('game-path', $(this).attr('game-path'));
@@ -132,24 +148,146 @@ $("body").on("click", ".game-loaded-info", function() {
     $(".game-loaded-info.hide").fadeOut(200);
 });
 
-$(function() {
-	$('.loader-container').hide();
-})
-
 /****************************************************/
 /*                    Dark Theme                    */
 /****************************************************/
 
-var isDark = false;
-
-$("#dark-theme-option").click(function() {
-    $(".dark-themeable").toggleClass("dark");
-    isDark = !isDark;
-
-    if (isDark) {
-        $(".dark-themeable").css("color", "white");
-    } else {
-        $(".dark-themeable").css("color", "black");
+function changeTheme(theme) {
+    ipcRenderer.send('change_theme', theme);
+}
+ipcRenderer.on('theme_changed', function(event, theme) {
+    switch(theme) {
+        case 'dark':
+            $(".dark-themeable").addClass('dark');
+            $(".dark-themeable").css("color", "white");
+            isDarkTheme = true;
+            break;
+        case 'light':
+            $(".dark-themeable").removeClass("dark");
+            $(".dark-themeable").css("color", "black");
+            isDarkTheme = false;
+            break;
     }
 });
 
+$("#dark-theme-toggle").click(function() {
+    if (this.checked) {
+        changeTheme('dark');
+    } else {
+        changeTheme('light');
+    }
+});
+
+$("#dark-theme-option").click(function() {
+    changeTheme('dark');
+});
+$("#light-theme-option").click(function() {
+    changeTheme('light');
+});
+
+
+function loadGameDisplay(display) {
+    ipcRenderer.send('change_display', display);
+}
+
+ipcRenderer.on('display_changed', function(event, data) {
+    var games = data["game_list"],
+        emulators_list = data["emulators_list"],
+        display = data['display'];
+
+    $("#game-holder").css('display', 'none').html('');
+    $(".display-text-rows").css('display', 'none');
+    $(".display-text-rows ul").html('');
+
+    switch(display) {
+        case 'box':
+            $("#game-holder").css('display', 'flex');
+            for (var g = games.length - 1; g >= 0; g--) {
+                var invalid = "";
+                if (games[g]["invalid"]) invalid = 'disabled';
+
+                var element = '<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flex-center game-loaded-info '+invalid+'" game-path="'+games[g]["path"]+'" game-art-background="'+games[g]["background"]+'" game-art-box="'+games[g]["image"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-title="'+games[g]["title"]+'"> \
+                            <div class="card card-inverse">\
+                                <img src="'+games[g]["image"]+'" class="card-img-top game-cover" alt="wiiu_game_thumb">\
+                                <div class="card-img-overlay">\
+                                    <h5 class="card-title">'+games[g]["title"]+'</h5>\
+                                    <!--div game-path="'+games[g]["path"]+'" class="btn-group dropup game-launch-options">\
+                                        <button launch-with="cemu" type="button" class="btn btn-success launch">Launch</button>\
+                                        <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\
+                                            <span class="sr-only">Launch With</span>\
+                                        </button>\
+                                        <div game-path="'+games[g]["path"]+'" class="dropdown-menu">\
+                                            <a class="dropdown-item">Launch With</a>\
+                                            <div class="dropdown-divider"></div>\
+                                            '+emulators_list+'\
+                                        </div>\
+                                    </div-->\
+                                </div>\
+                            </div>\
+                        </div>';
+                $("#game-holder").append(element);
+            }
+            break;
+        case 'list':
+            $(".display-text-rows").css('display', 'block');
+            for (var g = games.length - 1; g >= 0; g--) {
+                var invalid = "";
+                if (games[g]["invalid"]) invalid = 'disabled';
+
+                if (isDarkTheme) {
+                    var element = '<li class="animated slideInUp dark-themeable dark">\
+                        <div class="collapsible-header dark-themeable dark"><i data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Launch" class="material-icons launch '+invalid+'" launch-with="cemu" game-path="'+games[g]["path"]+'" game-art-background="'+games[g]["background"]+'" game-art-box="'+games[g]["image"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-title="'+games[g]["title"]+'">queue_play_next</i>'+games[g]["title"]+'<span class="float-right game-time">'+msToTime(games[g]["play_time"])+'<i class="material-icons float-right">alarm</i></span></div>\
+                        <div class="collapsible-body dark-themeable dark"><span>'+games[g]["overview"]+'</span></div>\
+                    </li>';
+                } else {
+                    var element = '<li class="animated slideInUp dark-themeable">\
+                        <div class="collapsible-header dark-themeable">\
+                            <i data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Launch" class="material-icons launch '+invalid+'" '+invalid+' launch-with="cemu" game-path="'+games[g]["path"]+'" game-art-background="'+games[g]["background"]+'" game-art-box="'+games[g]["image"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-title="'+games[g]["title"]+'">queue_play_next</i>\
+                            '+games[g]["title"]+'<span class="float-right game-time">'+msToTime(games[g]["play_time"])+'<i class="material-icons float-right">alarm</i></span></div>\
+                        <div class="collapsible-body dark-themeable"><span>'+games[g]["overview"]+'</span></div>\
+                    </li>';
+                }
+
+                
+                $(".display-text-rows ul").append(element);
+                $('[data-toggle="popover"]').popover();
+            }
+            break;
+    }
+});
+
+$("#box-display-option").click(function() {
+    loadGameDisplay('box');
+});
+$("#list-display-option").click(function() {
+    $('html, body').css({
+        overflow: 'auto',
+        height: 'auto'
+    });
+
+    $('#btn-back').addClass('hide');
+    $(".game-loaded-info").fadeIn(200);
+    $(".bg-image").animate({opacity: 0}, 200, function() {
+        $(".content-details").css('display', 'none');
+    });
+    $(".content-details").animate({opacity: 0}, 200, function() {
+        loadGameDisplay('list');
+    });
+});
+
+function msToTime(s) {
+
+    function pad(n, z) {
+        z = z || 2;
+        return ('00' + n).slice(-z);
+    }
+
+    var ms = s % 1000;
+    s = (s - ms) / 1000;
+    var secs = s % 60;
+    s = (s - secs) / 60;
+    var mins = s % 60;
+    var hrs = (s - mins) / 60;
+
+    return pad(hrs) + ':' + pad(mins) + ':' + pad(secs) + '.' + pad(ms, 3);
+}

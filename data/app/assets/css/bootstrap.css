@@ -5557,6 +5557,11 @@ button.close {
     max-width: 300px;
   }
 }
+@media (min-width: 1px) {
+  * {
+    color: green;
+  }
+}
 
 @media (min-width: 992px) {
   .modal-lg {
