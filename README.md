@@ -73,14 +73,14 @@ This version fixes many bugs and redesigns the layout. This is the first product
 - [x] Launch games
 - [x] Launch games with other emulators
 - [ ] Full screen mode option
-- [ ] Change settings option
+- [x] Change settings option
 - [x] Add cemu folder
 - [x] Find cemu.exe from folder
 - [ ] ~Add external WiiU emulators option~  Scrapped. Will be added to EmuManager
 - [x] Add game folder
 - [x] Find games within the folder
-- [ ] Dynamically load new games
-- [ ] Dynamically remove games
+- [x] Dynamically load new games
+- [x] Dynamically remove games
 - [ ] ~Load new game (single)~ Scrapped in favor of setting loading
 - [ ] ~Remove game (single)~ Scrapped in favor of setting loading
 
