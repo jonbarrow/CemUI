@@ -1,3 +1,2 @@
 @echo off
-call npm install
-pause
+npm install

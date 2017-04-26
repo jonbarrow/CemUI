@@ -1,29 +1,28 @@
 {
-  	"name": "CemuManager",
-  	"version": "0.1.2",
- 	"main": "app.js",
-  	"dependencies": {
-      "electron": "^1.6.2",
-	    "electron-packager": "*",
-	    "xml2js": "*",
-	    "async": "*",
-	    "request": "*",
-      "decompress-zip": "*",
-	    "html-entities": "*",
-      "timer-stopwatch": "*",
-      "csvtojson" : "*",
-      "similarity": "*"
-  	},
-  	"devDependencies": {
-	    "electron": "^1.6.2",
-      "electron-packager": "*",
-	    "xml2js": "*",
-    	"async": "*",
-    	"request": "*",
-    	"decompress-zip": "*",
-      "html-entities": "*",
-      "timer-stopwatch": "*",
-      "csvtojson" : "*",
-      "similarity": "*"
-  	}
+  "name": "CemuManager",
+  "description": "A small launcher for the Cemu WiiU emulator made with Electron",
+  "version": "0.1.0",
+  "main": "app.js",
+  "dependencies": {
+    "pixl-xml": "*",
+    "async": "^2.3.0",
+    "decompress-zip": "^0.3.0",
+    "electron": "^1.6.2",
+    "electron-packager": "^8.6.0",
+    "html-entities": "^1.2.1",
+    "request": "^2.81.0",
+    "timer-stopwatch": "^0.2.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RedDuckss/CemuManager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RedDuckss/CemuManager/issues"
+  },
+  "homepage": "https://github.com/RedDuckss/CemuManager#readme"
 }
