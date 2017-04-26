@@ -58,6 +58,50 @@ html, body, .col-md-12, .row {
   color: #f55;
 }
 
+.list-compatibility.perfect {
+  color: #1ba1e2;
+}
+.list-compatibility.playable {
+  color: #60a917;
+}
+.list-compatibility.runs {
+  color: #e3c800;
+}
+.list-compatibility.loads {
+  color: #f0a30a;
+}
+.list-compatibility.unplayable {
+  color: #e51400;
+}
+.list-compatibility.default {
+  color: #333;
+}
+
+.list-compatibility-block.perfect {
+  background-color: #1ba1e2;
+  border: #1ba1e2;
+}
+.list-compatibility-block.playable {
+  background-color: #60a917;
+  border: #60a917;
+}
+.list-compatibility-block.runs {
+  background-color: #e3c800;
+  border: #e3c800;
+}
+.list-compatibility-block.loads {
+  background-color: #f0a30a;
+  border: #f0a30a;
+}
+.list-compatibility-block.unplayable {
+  background-color: #e51400;
+  border: #e51400;
+}
+.list-compatibility-block.default {
+  background-color: #333;
+  border: #333;
+}
+
 .display-options {
   display: -ms-flexbox;
   display: -webkit-flex;
@@ -256,9 +300,10 @@ body {
 }
 #details-overview {
   width: 100%;
+  overflow: auto;
 }
 #overview-wrapper {
-  height: 250px;
+  height: 200px;
   width: 100%;
   overflow: hidden;
   font-size: 1em;

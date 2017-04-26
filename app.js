@@ -536,11 +536,12 @@ function loadGameData(gamePath, name, cb) {
 			if (!xml || typeof xml["title_id"] == 'undefined' || typeof xml["longname_en"] == 'undefined' || xml["longname_en"] === '') {
 				game["invalid"]     = 'true';
 				game["title"]       = 'Invalid Game';
+				game["playability"] = 'No playability data available for this title.';
 				game["path"]        = gamePath+"\\code\\"+rom;
 				game["folder"]      = gamePath;
 				game["platform"]    = "Unknown";
 		  		game["releaseDate"] = "Unknown";
-		  		game["overview"]    = "The game located at `"+gamePath+"` was found to be invalid or corrupted. This is caused by CemuManager not being able to find the required meta tags for the game. This issue is generally caused by a blank/incomplete/invalid `meta.xml` file. If a game is not in english, this will also occur (CemuManager only officially supports english titles). As such, this game has been flagged as invalid, and will not run properly. The `Launch` button has been disabled. If you believe this to be an error please report it at https://github.com/RedDuckss/CemuManager/issues";
+		  		game["overview"]    = "The game located at `"+gamePath+"` was found to be invalid or corrupted. This is caused by CemuManager not being able to find the required meta tags for the game. This issue is generally caused by a blank/incomplete/invalid `meta.xml` file. As such, this game has been flagged as invalid, and will not run properly. The `Launch` button has been disabled. If you believe this to be an error please report it at https://github.com/RedDuckss/CemuManager/issues";
 		  		game["ESRB"]        = "Unknown";
 		  		game["players"]     = "Unknown";
 		  		game["coop"]        = "Unknown";
@@ -563,9 +564,9 @@ function loadGameData(gamePath, name, cb) {
 					  	type: 'question',
 					  	message: 'Failed to connect to API when downloading data for '+name+'. Switching to offline placeholders.'
 					});
-					//game["title"] = xml["longname_en"]["_Data"];
 					game["platform"]    = "Unknown";
 			  		game["releaseDate"] = "Unknown";
+			  		game["playability"] = 'No playability data available for this title.';
 			  		game["overview"]    = "An overview for this game cannot be displayed. This is because an overview/description could not be properly downloaded for found for this game.";
 			  		game["ESRB"]        = "Unknown";
 			  		game["players"]     = "Unknown";
@@ -640,6 +641,7 @@ function loadGameData(gamePath, name, cb) {
 	    }, function(data, callback) {
 
     		game["title"]       = entities.encode(data['game_title'].toString()),
+    		game["playability"] = entities.encode(data['game_playability'].toString()),
     		game["play_time"]   = 0,
 	  		game["releaseDate"] = entities.encode(data['game_release_date'].toString()),
 	  		game["overview"]    = entities.encode(data['game_overview'].toString()),

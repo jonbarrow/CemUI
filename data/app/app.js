@@ -136,6 +136,39 @@ $("body").on("click", ".game-loaded-info", function() {
     $("#details-players").html($(this).attr('game-data-players'));
     $("#details-coop").html($(this).attr('game-data-coop'));
     $("#details-overview").html($(this).attr('game-data-overview'));
+    $("#game-compatibility").html($(this).attr('game-playability'));
+
+    if ($(this).attr('game-playability').startsWith('Perfect')) {
+        $("#game-compatibility").parent().parent().css({
+            'background-color': '#1ba1e2',
+            'border': '#1ba1e2'
+        });
+    } else if ($(this).attr('game-playability').startsWith('Playable')) {
+        $("#game-compatibility").parent().parent().css({
+            'background-color': '#60a917',
+            'border': '#60a917'
+        });
+    } else if ($(this).attr('game-playability').startsWith('Runs')) {
+        $("#game-compatibility").parent().parent().css({
+            'background-color': '#e3c800',
+            'border': '#e3c800'
+        });
+    } else if ($(this).attr('game-playability').startsWith('Loads')) {
+        $("#game-compatibility").parent().parent().css({
+            'background-color': '#f0a30a',
+            'border': '#f0a30a'
+        });
+    } else if ($(this).attr('game-playability').startsWith('Unplayable')) {
+        $("#game-compatibility").parent().parent().css({
+            'background-color': '#e51400',
+            'border': '#e51400'
+        });
+    } else {
+        $("#game-compatibility").parent().parent().css({
+            'background-color': '#333',
+            'border': '#333'
+        });
+    }
 
     $("#btn-launch").attr('game-path', $(this).attr('game-path'));
 
@@ -206,22 +239,11 @@ ipcRenderer.on('display_changed', function(event, data) {
                 var invalid = "";
                 if (games[g]["invalid"]) invalid = 'disabled';
 
-                var element = '<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flex-center game-loaded-info '+invalid+'" game-path="'+games[g]["path"]+'" game-art-background="'+games[g]["background"]+'" game-art-box="'+games[g]["image"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-title="'+games[g]["title"]+'"> \
+                var element = '<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flex-center game-loaded-info '+invalid+'" game-playability="'+games[g]["playability"]+'" game-path="'+games[g]["path"]+'" game-art-background="'+games[g]["background"]+'" game-art-box="'+games[g]["image"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-title="'+games[g]["title"]+'"> \
                             <div class="card card-inverse">\
                                 <img src="'+games[g]["image"]+'" class="card-img-top game-cover" alt="wiiu_game_thumb">\
                                 <div class="card-img-overlay">\
                                     <h5 class="card-title">'+games[g]["title"]+'</h5>\
-                                    <!--div game-path="'+games[g]["path"]+'" class="btn-group dropup game-launch-options">\
-                                        <button launch-with="cemu" type="button" class="btn btn-success launch">Launch</button>\
-                                        <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\
-                                            <span class="sr-only">Launch With</span>\
-                                        </button>\
-                                        <div game-path="'+games[g]["path"]+'" class="dropdown-menu">\
-                                            <a class="dropdown-item">Launch With</a>\
-                                            <div class="dropdown-divider"></div>\
-                                            '+emulators_list+'\
-                                        </div>\
-                                    </div-->\
                                 </div>\
                             </div>\
                         </div>';
@@ -234,17 +256,39 @@ ipcRenderer.on('display_changed', function(event, data) {
                 var invalid = "";
                 if (games[g]["invalid"]) invalid = 'disabled';
 
+                if (games[g]['playability'].startsWith('Perfect')) {
+                    var compatibility = 'perfect';
+                } else if (games[g]['playability'].startsWith('Playable')) {
+                    var compatibility = 'playable';
+                } else if (games[g]['playability'].startsWith('Runs')) {
+                    var compatibility = 'runs';
+                } else if (games[g]['playability'].startsWith('Loads')) {
+                    var compatibility = 'loads';
+                } else if (games[g]['playability'].startsWith('Unplayable')) {
+                    var compatibility = 'unplayable';
+                } else {
+                    var compatibility = 'default';
+                }
+
                 if (isDarkTheme) {
                     var element = '<li class="animated slideInUp dark-themeable dark">\
-                        <div class="collapsible-header dark-themeable dark"><i data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Launch" class="material-icons launch '+invalid+'" launch-with="cemu" game-path="'+games[g]["path"]+'" game-art-background="'+games[g]["background"]+'" game-art-box="'+games[g]["image"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-title="'+games[g]["title"]+'">queue_play_next</i>'+games[g]["title"]+'<span class="float-right game-time">'+msToTime(games[g]["play_time"])+'<i class="material-icons float-right">alarm</i></span></div>\
+                        <div class="collapsible-header dark-themeable dark">\
+                            <i data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Launch" class="material-icons launch '+invalid+'" launch-with="cemu" game-playability="'+games[g]["playability"]+'" game-path="'+games[g]["path"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-title="'+games[g]["title"]+'">queue_play_next</i>\
+                            <i class="material-icons list-compatibility '+compatibility+'">games</i>\
+                            '+games[g]["title"]+'<span class="float-right game-time">'+msToTime(games[g]["play_time"])+'<i class="material-icons float-right">alarm</i></span>\
+                            </div>\
                         <div class="collapsible-body dark-themeable dark"><span>'+games[g]["overview"]+'</span></div>\
                     </li>';
                 } else {
                     var element = '<li class="animated slideInUp dark-themeable">\
                         <div class="collapsible-header dark-themeable">\
-                            <i data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Launch" class="material-icons launch '+invalid+'" '+invalid+' launch-with="cemu" game-path="'+games[g]["path"]+'" game-art-background="'+games[g]["background"]+'" game-art-box="'+games[g]["image"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-title="'+games[g]["title"]+'">queue_play_next</i>\
+                            <i data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Launch" class="material-icons launch '+invalid+'" '+invalid+' launch-with="cemu" game-playability="'+games[g]["playability"]+'" game-path="'+games[g]["path"]+'" game-data-releaseDate="'+games[g]["releaseDate"]+'" game-data-overview="'+games[g]["overview"]+'" game-data-ESRB="'+games[g]["ESRB"]+'" game-data-players="'+games[g]["players"]+'" game-data-coop="'+games[g]["coop"]+'" game-data-publisher="'+games[g]["publisher"]+'" game-data-developer="'+games[g]["developer"]+'" game-data-title="'+games[g]["title"]+'">queue_play_next</i>\
+                            <i class="material-icons list-compatibility '+compatibility+'">games</i>\
                             '+games[g]["title"]+'<span class="float-right game-time">'+msToTime(games[g]["play_time"])+'<i class="material-icons float-right">alarm</i></span></div>\
-                        <div class="collapsible-body dark-themeable"><span>'+games[g]["overview"]+'</span></div>\
+                        <div class="collapsible-body dark-themeable">\
+                            <span class="badge list-compatibility-block '+compatibility+'">'+games[g]["playability"]+'</span><br>\
+                            <span>'+games[g]["overview"]+'</span>\
+                        </div>\
                     </li>';
                 }
 
