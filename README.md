@@ -81,7 +81,7 @@ This version fixes many bugs and redesigns the layout. This is the first product
 - [x] Find games within the folder
 - [x] Dynamically load new games
 - [x] Dynamically remove games
-- [ ] ~Load new game (single)~ Scrapped in favor of setting loading
+- ~[ ] Load new game (single)~ Scrapped in favor of setting loading
 - [ ] ~Remove game (single)~ Scrapped in favor of setting loading
 
 [1]: https://discord.gg/WYVnFEQ
