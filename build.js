@@ -2,7 +2,7 @@ var packager = require('electron-packager')
 
 packager({
 	"dir": ".",
-	"name": "CemuManager",
+	"name": "CemUI",
 	"overwrite": true,
 	"asar": true,
 	"out": "builds/",
@@ -10,11 +10,11 @@ packager({
 	"arch": "ia32",
 	"icon": "./ico.ico",
 	"win32metadata": {
-		"CompanyName": "CemuManager",
+		"CompanyName": "CemUI",
 		"FileDescription": "A small launcher for the Cemu WiiU emulator made with Electron",
-		"OriginalFilename": "CemuManager",
+		"OriginalFilename": "CemUI",
 		"ProductName": "Cemu Manager",
-		"InternalName": "CemuManager"
+		"InternalName": "CemUI"
 	}
 }, function done_callback (err, appPaths) {
 	if(err) {
