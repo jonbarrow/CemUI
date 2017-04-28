@@ -25,6 +25,12 @@ var electron      = require('electron'),
 	ipcMain       = electron.ipcMain,
 	app           = electron.app;
 
+var user_settings = {};
+
+user_settings["is_dark"] = false;
+user_settings["display_mode"] = 'box';
+
+app.setName("Cemu Manager");
 
 const APP_VERSION = '1.0.1';
 
@@ -650,7 +656,6 @@ function isGame(folder) { // Checks if it's a game or not
 	if (!fs.existsSync(folder+"\\meta\\meta.xml")) {
 		return false;
 	}
-
 	return true;
 }
 

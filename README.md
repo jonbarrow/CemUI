@@ -1,17 +1,14 @@
-![CemuManager](http://i.imgur.com/KJhV5ak.png)
+![CemuManager](http://i.imgur.com/xoo1hvx.png)
 
-# CemuManager
+# CemUI
 A small launcher for the Cemu WiiU emulator made with Electron.
 You can reach us (the developers) on Discord [here.][1]
 
-## What is it?
-CemuManager is a small launcher "hub" that stores your Cemu games in a nice easy-to-access fashion.
+CemUI is a small launcher "hub" that stores your Cemu games in a nice easy-to-access fashion.
  
-<kbd>
-![A gif of CemuManager in action](http://i.imgur.com/jOrxr9D.gif)
-</kbd>
+[![Announcing CemUI](https://img.youtube.com/vi/ulQVvROdeVo/0.jpg)](https://www.youtube.com/watch?v=ulQVvROdeVo)
  
-**IMPORTANT:** CemuManager is still in heavy development and may be unstable. There are many features planned.
+**IMPORTANT:** CemUI is still in heavy development and may be unstable. There are many features planned.
 
 ## How can I help? / I have a suggestion!
 We always welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone with experience in JavaScript, Node, html, css, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules, and will be packaged by Electron just fine!
@@ -22,7 +19,8 @@ If you have a suggestion, and do not know any of the required languages, you can
 Given that this project is still very early in development, bugs will probably be common, and vary from person to person. If you find a bug, we ask that you follow this format for reporting the bug on the `Issue` tracker on the repo:
 - A detailed name describing the bug (no "A bug happened" type titles!)
 - A detailed description of the bug
-- CemuManager version
+
+- CemUI version
 - Exact steps to reproduce
 - A screenshot/video of the bug/error message
 - List games affected (if applicable)
@@ -40,32 +38,60 @@ Additionally, you can contact us via our [Discord server][1] if you want to spea
 - Download the latest release
 - Extract
 
-To run CemuManager, simply run `CemuManager.exe`
+To run CemUI, simply run `CemUI.exe`
  
 ## Installation & Running for developer versions
 * [Clone the repository](https://help.github.com/articles/cloning-a-repository)
 * [Install Node.js & npm](https://docs.npmjs.com/getting-started/installing-node)
-* Run `install.bat` or run `npm install` in the CemuManager directory.
+* Run `install.bat` or run `npm install` in the CemUI directory.
 
-To run CemuManager, simply run `run-dev.bat` or `npm start` in the CemuManager directory.
+To run CemUI, simply run `run-dev.bat` or `npm start` in the CemUI directory.
 
 ## Building from source
 * [Clone the repository](https://help.github.com/articles/cloning-a-repository)
 * [Install Node.js & npm](https://docs.npmjs.com/getting-started/installing-node)
-* Run `install.bat` or run `npm install` in the CemuManager directory.
-* Run `build.bat` or run `npm run build` in the CemuManager directory. _(The app will be built to `builds/CemuManager-win32-ia32`)_
+* Run `install.bat` or run `npm install` in the CemUI directory.
+* Run `build.bat` or run `npm run build` in the CemUI directory. _(The app will be built to `builds/CemuManager-win32-ia32`)_
 
 
-To run CemuManager, simply run `npm start` in the CemuManager directory.
+To run CemUI, simply run `npm start` in the CemUI directory.
 
 # Releases
 
+# Version 1.0.0
+
+# The first official public build
+
+## What's new?
+
+[v1.0.0](https://github.com/RedDuckss/CemUI/releases/tag/v1.0.0)
+
+- Changed to using a new, custom game data API (**See Disclaimer below**)
+- Use game TitleID as reference rather than game title
+- Improved dark theme
+- Dark them slider toggle
+- User settings are saved and persist between sessions
+- Revamped settings menu
+- Added `Theme`, `Display` and `Folder` options to settings menu
+- Can now change the `Games` folder
+- Can now change the `Cemu` folder
+- List and box view mode options
+- Added `Play Time` counter (only visible in `list` mode)
+- New `minimize`, `maximize` and `close` icons
+- Proper build methods using NPM
+- Many bug fixes and performance improvements
+
+## Disclaimer!
+### The custom API is _NOT_, I repeat _NOT_ 100% complete. Many pieces of information are missing for most of the games. There is a total of 3,113 games stored in the API, all of which have a TitleID and TitleName attribute. Many do not have data such as overviews, box art, background art, ESRB ratings, etc.
+
+### If you have a game which is missing data, please message us on Discord or create an issue report.
+
 ## v0.1.2 - Second public release
-[v0.1.2](https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.2)
+[v0.1.2](https://github.com/RedDuckss/CemUI/releases/tag/v0.1.2)
 This version fixes many bugs and redesigns the layout. This is the first production ready release.
 
 ## v0.1.0 - First public release
-[v0.1.0](https://github.com/RedDuckss/CemuManager/releases/tag/v0.1.0)
+[v0.1.0](https://github.com/RedDuckss/CemUI/releases/tag/v0.1.0)
  
 
 ## Tasks to complete
@@ -73,14 +99,14 @@ This version fixes many bugs and redesigns the layout. This is the first product
 - [x] Launch games
 - [x] Launch games with other emulators
 - [ ] Full screen mode option
-- [ ] Change settings option
+- [x] Change settings option
 - [x] Add cemu folder
 - [x] Find cemu.exe from folder
 - [ ] ~Add external WiiU emulators option~  Scrapped. Will be added to EmuManager
 - [x] Add game folder
 - [x] Find games within the folder
-- [ ] Dynamically load new games
-- [ ] Dynamically remove games
+- [x] Dynamically load new games
+- [x] Dynamically remove games
 - [ ] ~Load new game (single)~ Scrapped in favor of setting loading
 - [ ] ~Remove game (single)~ Scrapped in favor of setting loading
 

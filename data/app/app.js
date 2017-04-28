@@ -31,9 +31,6 @@ $("#folder-select-game").click(function(event) {
 $("#check-for-update").click(function(event) {
     ipcRenderer.send('checkForUpdate');
 });
-
-
-
 $(".btn-window-option-minimize").click(function(event) {
 	ipcRenderer.send('btn-window-option-minimize');
 });
