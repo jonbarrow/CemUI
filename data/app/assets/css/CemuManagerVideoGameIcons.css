@@ -1,0 +1,29 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('../fonts/VideoGame.eot?f4g8qi');
+  src:  url('../fonts/VideoGame.eot?f4g8qi#iefix') format('embedded-opentype'),
+    url('../fonts/VideoGame.ttf?f4g8qi') format('truetype'),
+    url('../fonts/VideoGame.woff?f4g8qi') format('woff'),
+    url('../fonts/VideoGame.svg?f4g8qi#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change ../fonts VideoGament-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-piranha_plant:before {
+  content: "\e903";
+}
+

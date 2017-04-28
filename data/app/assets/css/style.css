@@ -218,6 +218,23 @@ body {
   height: 100vh;
 }
 
+.download-wrapper {
+  display: table;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+.download-data {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.download-data-content {
+  margin-left: auto;
+  margin-right: auto; 
+  width: 100%;
+}
+
 #btn-back, #btn-launch {
   border-radius: 0;
   margin-right: 0;

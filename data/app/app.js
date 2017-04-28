@@ -28,6 +28,12 @@ $("#folder-select-game").click(function(event) {
     ipcRenderer.send('change_folder', 'game');
 });
 
+$("#check-for-update").click(function(event) {
+    ipcRenderer.send('checkForUpdate');
+});
+
+
+
 $(".btn-window-option-minimize").click(function(event) {
 	ipcRenderer.send('btn-window-option-minimize');
 });
@@ -63,7 +69,12 @@ ipcRenderer.on('update_play_time', function(event, data) {
             return false;
         }
     });
+});
 
+ipcRenderer.on('download_update_percent', function(event, data) {
+    $("#download-value").html(data['percentage'].toFixed(2)+'%');
+    $("#download-progress").css('width', data['percentage']+'%');
+    $("#download-progress").attr('aria-valuenow', data['percentage']);
 });
 
 
@@ -172,11 +183,6 @@ $("body").on("click", ".game-loaded-info", function() {
 
     $("#btn-launch").attr('game-path', $(this).attr('game-path'));
 
-    $('#details-overview').css('font-size', '1em');
-    
-    while($('#details-overview').height() > $('#overview-wrapper').height()) {
-        $('#details-overview').css('font-size', (parseInt($('#details-overview').css('font-size')) - 1) + "px" );
-    }
 
     $(".game-loaded-info.hide").fadeOut(200);
 });
