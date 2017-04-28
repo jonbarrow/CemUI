@@ -4,7 +4,6 @@
 A small launcher for the Cemu WiiU emulator made with Electron.
 You can reach us (the developers) on Discord [here.][1]
 
-## What is it?
 CemUI is a small launcher "hub" that stores your Cemu games in a nice easy-to-access fashion.
  
 [![Announcing CemUI](https://img.youtube.com/vi/ulQVvROdeVo/0.jpg)](https://www.youtube.com/watch?v=ulQVvROdeVo)
@@ -20,6 +19,7 @@ If you have a suggestion, and do not know any of the required languages, you can
 Given that this project is still very early in development, bugs will probably be common, and vary from person to person. If you find a bug, we ask that you follow this format for reporting the bug on the `Issue` tracker on the repo:
 - A detailed name describing the bug (no "A bug happened" type titles!)
 - A detailed description of the bug
+
 - CemUI version
 - Exact steps to reproduce
 - A screenshot/video of the bug/error message

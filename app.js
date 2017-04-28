@@ -8,6 +8,7 @@
 
 var electron      = require('electron'),
 	fs            = require('fs'),
+	originalFs    = require('original-fs'),
 	exec          = require('child_process').exec,
 	dns           = require('dns'),
 	path          = require('path'),
@@ -15,7 +16,7 @@ var electron      = require('electron'),
 	XMLParser     = require('pixl-xml'),
 	async         = require('async'),
 	Stopwatch     = require("timer-stopwatch"),
-	decompress    = require('decompress-zip'),
+	unzipper      = require('unzipper'),
 	request       = require('request').defaults({ encoding: null }),
 	Entities      = require('html-entities').AllHtmlEntities,
 	entities      = new Entities(),
@@ -23,6 +24,16 @@ var electron      = require('electron'),
 	BrowserWindow = electron.BrowserWindow,
 	ipcMain       = electron.ipcMain,
 	app           = electron.app;
+
+var user_settings = {};
+
+user_settings["is_dark"] = false;
+user_settings["display_mode"] = 'box';
+
+app.setName("Cemu Manager");
+
+const APP_VERSION = '1.0.1';
+
 
 var user_settings = {};
 
@@ -85,7 +96,7 @@ ipcMain.on('change_folder', function(event, data) {
 				});
 
 				if (result == 0) {
-					downloadFile("https://files.sshnuke.net/cemuhook_174d_0403.zip", cemu_folder_path[0]);
+					downloadFile("https://files.sshnuke.net/cemuhook_174d_0403.zip", cemu_folder_path[0], 'cemuhook.zip');
 					// Is there a better way to do this besides scraping the site or hard-coding?
 				}
 			}
@@ -110,11 +121,8 @@ ipcMain.on('change_folder', function(event, data) {
 					});
 
 					if (result == 0) {
-						ApplicationWindow.loadURL(url.format({
-						    pathname: path.join(__dirname, '/data/app/index.html'), // Opens the application to load Cemu
-						    protocol: 'file:',
-						    slashes: true
-						}))
+						app.relaunch();
+						app.quit();
 					}
 				});
 			});
@@ -166,11 +174,8 @@ ipcMain.on('change_folder', function(event, data) {
 					});
 
 					if (result == 0) {
-						ApplicationWindow.loadURL(url.format({
-						    pathname: path.join(__dirname, '/data/app/index.html'),
-						    protocol: 'file:',
-						    slashes: true
-						}))
+						app.relaunch();
+						app.quit();
 					}
 				});
 			});
@@ -194,7 +199,14 @@ ipcMain.on('btn-window-option-close', function(event, data) {
 	ApplicationWindow.close();    // Button in the top right
 });
 
+ipcMain.on('checkForUpdate', function(event, data) {
+	checkForUpdate(true);
+});
+
 ipcMain.on('load_all_games_emulators', function(event, data) {
+
+	checkForUpdate();
+
 	var settings = JSON.parse(fs.readFileSync('data/cache/settings.json')),
 		emulators = JSON.parse(fs.readFileSync('data/cache/emulators.json')),
 		emulator_keys = Object.keys(emulators),
@@ -345,7 +357,7 @@ ipcMain.on('load_cemu_folder', function(event) {
 		});
 
 		if (result == 0) {
-			downloadFile("https://files.sshnuke.net/cemuhook_174d_0403.zip", cemu_folder_path[0]);
+			downloadFile("https://files.sshnuke.net/cemuhook_174d_0403.zip", cemu_folder_path[0], 'cemuhook.zip');
 			// Is there a better way to do this besides scraping the site or hard-coding?
 		}
 	}
@@ -465,6 +477,134 @@ function generalLoad() {
 		createWindow('index'); // Yes! Run as normal, set up must have been done.
 	}
 }
+
+function checkForUpdate(sendFeedback) {
+	checkConnection('www.cemui.com', function(isConnected) {
+    	if (!isConnected) {
+			dialog.showMessageBox({
+			  	type: 'question',
+			  	message: 'Could not check for update.'
+			});
+			return false;
+		}
+
+		request.get('https://cemui.com/api/LatestVersion', function (error, response, body) {
+
+			if (!error && response.statusCode == 200) {
+				var data = JSON.parse(body.toString());
+		    	if (data['error']) {
+		    		dialog.showMessageBox({
+					  	type: 'info',
+					  	message: data['error']
+					});
+		    	} else {
+		    		if (data['latest'] == APP_VERSION && sendFeedback) {
+		    			dialog.showMessageBox({
+						  	type: 'info',
+						  	message: 'You are using the latest version.'
+						});
+						return true;
+		    		}
+		    		if (data['latest'] > APP_VERSION) {
+		    			var result = dialog.showMessageBox({
+						  	type: 'question',
+						  	message: 'Update available! Latest version is '+data['latest']+'. Would you like to update now?',
+						  	buttons: ['Yes', 'No']
+						});
+
+						if (result == 0) {
+
+							process.noAsar = true;
+
+							ApplicationWindow.loadURL(url.format({
+							    pathname: path.join(__dirname, '/data/app/download_update.html'), // Opens main window normally
+							    protocol: 'file:',
+							    slashes: true
+							}));
+
+							startUpdate(data['latest'], function() {
+								process.noAsar = false;
+								app.relaunch();
+								app.quit();
+							});
+						}
+		    		}
+		    	}
+			}
+		});
+
+	})
+}
+
+function startUpdate(version, cb) {
+	async.waterfall([
+		function(callback) {
+			originalFs.createReadStream('resources/app.asar').pipe(fs.createWriteStream('resources/app_old.asar')).on('finish', function() {
+				callback(null);
+			});
+		},
+		function(callback) {
+			originalFs.createReadStream('resources/electron.asar').pipe(fs.createWriteStream('resources/electron_old.asar')).on('finish', function() {
+				callback(null);
+			});
+		},
+		function(callback) {
+
+			var received_bytes = 0,
+    			total_bytes = 0;
+
+			var req = request({
+		        method: 'GET',
+		        uri: 'https://cemui.com/api/releases/'+version+'/update_main.zip'
+		    });
+
+		    var out = originalFs.createWriteStream(path.join(__dirname, '../')+'/update_main.zip');
+		    req.pipe(out);
+
+		    req.on('response', function(data) {
+		        total_bytes = parseInt(data.headers['content-length' ]);
+		    });
+
+		    req.on('data', function(chunk) {
+		        received_bytes += chunk.length;
+		        showProgress(received_bytes, total_bytes);
+		    });
+
+		    req.on('end', function() {
+		    	callback(null);
+		    });
+		},
+		function(callback) {
+			unzip(path.join(__dirname, '../')+'/update_main.zip', path.join(__dirname, '../'), false, function() {
+				callback(null);
+	        });
+		},
+		function(callback) {
+			fs.unlink(path.join(__dirname, '../update_main.zip'), function() {
+	    		callback(null);
+	    	});
+		},
+		function(callback) {
+			fs.unlink(path.join(__dirname, '../app_old.asar'), function() {
+	    		callback(null);
+	    	});
+		},
+		function(callback) {
+			fs.unlink(path.join(__dirname, '../electron_old.asar'), function() {
+	    		callback(null);
+	    	});
+		}
+	], cb );
+}
+
+function showProgress(received, total) {
+    var percentage = (received * 100) / total;
+    if (ApplicationWindow) {
+    	ApplicationWindow.webContents.send("download_update_percent", {percentage: percentage});
+    }
+}
+
+
 function createDirectory(path) { // Makes dirs
 	fs.mkdir(path, function() {
 		console.log("Created `"+path+"` folder");
@@ -516,7 +656,6 @@ function isGame(folder) { // Checks if it's a game or not
 	if (!fs.existsSync(folder+"\\meta\\meta.xml")) {
 		return false;
 	}
-
 	return true;
 }
 
@@ -536,11 +675,12 @@ function loadGameData(gamePath, name, cb) {
 			if (!xml || typeof xml["title_id"] == 'undefined' || typeof xml["longname_en"] == 'undefined' || xml["longname_en"] === '') {
 				game["invalid"]     = 'true';
 				game["title"]       = 'Invalid Game';
+				game["playability"] = 'No playability data available for this title.';
 				game["path"]        = gamePath+"\\code\\"+rom;
 				game["folder"]      = gamePath;
 				game["platform"]    = "Unknown";
 		  		game["releaseDate"] = "Unknown";
-		  		game["overview"]    = "The game located at `"+gamePath+"` was found to be invalid or corrupted. This is caused by CemuManager not being able to find the required meta tags for the game. This issue is generally caused by a blank/incomplete/invalid `meta.xml` file. If a game is not in english, this will also occur (CemuManager only officially supports english titles). As such, this game has been flagged as invalid, and will not run properly. The `Launch` button has been disabled. If you believe this to be an error please report it at https://github.com/RedDuckss/CemuManager/issues";
+		  		game["overview"]    = "The game located at `"+gamePath+"` was found to be invalid or corrupted. This is caused by CemuManager not being able to find the required meta tags for the game. This issue is generally caused by a blank/incomplete/invalid `meta.xml` file. As such, this game has been flagged as invalid, and will not run properly. The `Launch` button has been disabled. If you believe this to be an error please report it at https://github.com/RedDuckss/CemuManager/issues";
 		  		game["ESRB"]        = "Unknown";
 		  		game["players"]     = "Unknown";
 		  		game["coop"]        = "Unknown";
@@ -557,15 +697,15 @@ function loadGameData(gamePath, name, cb) {
 			}
 		},
 	    function(xml, callback) {
-	        checkConnection('217.182.215.49', function(isConnected) {
+	        checkConnection('www.cemui.com', function(isConnected) {
 	        	if (!isConnected) {
 					dialog.showMessageBox({
 					  	type: 'question',
 					  	message: 'Failed to connect to API when downloading data for '+name+'. Switching to offline placeholders.'
 					});
-					//game["title"] = xml["longname_en"]["_Data"];
 					game["platform"]    = "Unknown";
 			  		game["releaseDate"] = "Unknown";
+			  		game["playability"] = 'No playability data available for this title.';
 			  		game["overview"]    = "An overview for this game cannot be displayed. This is because an overview/description could not be properly downloaded for found for this game.";
 			  		game["ESRB"]        = "Unknown";
 			  		game["players"]     = "Unknown";
@@ -583,7 +723,7 @@ function loadGameData(gamePath, name, cb) {
 	    },
 	    function(xml, callback) {
 	    	var title_id = [xml["title_id"]["_Data"].slice(0, 8), '-', xml["title_id"]["_Data"].slice(8)].join('');
-	    	request.get('http://217.182.215.49/api/GetGame/?title_id='+title_id, function (error, response, body) {
+	    	request.get('https://cemui.com/api/GetGame/?title_id='+title_id, function (error, response, body) {
 				if (error) {
 		    		callback(true);
 		    	}
@@ -640,6 +780,7 @@ function loadGameData(gamePath, name, cb) {
 	    }, function(data, callback) {
 
     		game["title"]       = entities.encode(data['game_title'].toString()),
+    		game["playability"] = entities.encode(data['game_playability'].toString()),
     		game["play_time"]   = 0,
 	  		game["releaseDate"] = entities.encode(data['game_release_date'].toString()),
 	  		game["overview"]    = entities.encode(data['game_overview'].toString()),
@@ -657,39 +798,42 @@ function loadGameData(gamePath, name, cb) {
 
 
 
-function downloadFile(url, target) { // I hope you understand this without me saying (PS, it downloads files)
+function downloadFile(url, target, fileName, cb) { // I hope you understand this without me saying (PS, it downloads files)
     var req = request({
         method: 'GET',
         uri: url
     });
 
-    var out = fs.createWriteStream(target+"/cemuhook.zip");
+    var out = fs.createWriteStream(target+'/'+fileName);
     req.pipe(out);
 
     req.on('end', function() {
-        unzip(target+"/cemuhook.zip", target);
+        unzip(target+'/'+fileName, target, function() {
+        	if (cb) {
+        		cb();
+        	}
+        });
     });
 }
+function unzip(file, target, alert, cb) { // Unzips
 
-function unzip(file, target) { // Unzips
-	var unzip = new decompress(file);
+	var out = fs.createReadStream(file);
+	out.pipe(unzipper.Extract({ path: target })).on('finish', function () {
 
-	unzip.on('error', function (err) {
-	    console.log('Caught an error', err);
-	});
-	unzip.on('extract', function (log) {
-	    dialog.showMessageBox({
-		  	type: 'question',
-		  	message: 'Cemuhook finished extracting to `'+target+'`'
-		});
-	});
-	unzip.extract({
-	    path: target
+		if (alert) {
+			dialog.showMessageBox({
+			  	type: 'question',
+			  	message: 'Finished extracting to `'+target+'`'
+			});
+		}
+		if (cb) {
+			cb();
+		}
 	});
 }
 
 function checkConnection(url, cb) {
-    dns.lookupService(url,80,function(err) {
+    dns.resolve(url, function(err) {
         if (err && err.code == "ENOTFOUND") {
             cb(false);
         } else {
