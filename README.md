@@ -1,4 +1,4 @@
-![CemuManager](http://i.imgur.com/lHCnhFE.png)
+![CemuManager](http://i.imgur.com/xoo1hvx.png)
 
 # CemUI
 A small launcher for the Cemu WiiU emulator made with Electron.
@@ -7,9 +7,7 @@ You can reach us (the developers) on Discord [here.][1]
 ## What is it?
 CemUI is a small launcher "hub" that stores your Cemu games in a nice easy-to-access fashion.
  
-<kbd>
-![A gif of CemUI in action](http://i.imgur.com/jOrxr9D.gif)
-</kbd>
+[![Announcing CemUI](https://img.youtube.com/vi/ulQVvROdeVo/0.jpg)](https://www.youtube.com/watch?v=ulQVvROdeVo)
  
 **IMPORTANT:** CemUI is still in heavy development and may be unstable. There are many features planned.
 
