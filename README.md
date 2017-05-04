@@ -56,48 +56,28 @@ To run CemUI, simply run `run-dev.bat` or `npm start` in the CemUI directory.
 
 To run CemUI, simply run `npm start` in the CemUI directory.
 
-# Releases
+# Latest Release
 
-# Version 1.0.0
-
-# The first official public build
+# Version 1.0.1 (**See Disclaimer below**)
 
 ## What's new?
 
-[v1.0.0](https://github.com/RedDuckss/CemUI/releases/tag/v1.0.0)
+[v1.0.1](https://github.com/RedDuckss/CemUI/releases/tag/v1.0.1)
 
-- Changed to using a new, custom game data API (**See Disclaimer below**)
-- Use game TitleID as reference rather than game title
-- Improved dark theme
-- Dark them slider toggle
-- User settings are saved and persist between sessions
-- Revamped settings menu
-- Added `Theme`, `Display` and `Folder` options to settings menu
-- Can now change the `Games` folder
-- Can now change the `Cemu` folder
-- List and box view mode options
-- Added `Play Time` counter (only visible in `list` mode)
-- New `minimize`, `maximize` and `close` icons
-- Proper build methods using NPM
-- Many bug fixes and performance improvements
+- SMM (Super Mario Maker) Level search/download support added
+- Improved alerts and notifications
 
 ## Disclaimer!
-### The custom API is _NOT_, I repeat _NOT_ 100% complete. Many pieces of information are missing for most of the games. There is a total of 3,113 games stored in the API, all of which have a TitleID and TitleName attribute. Many do not have data such as overviews, box art, background art, ESRB ratings, etc.
+### The custom API being used by CemUI is _NOT_, I repeat _NOT_ 100% complete. Many pieces of information are missing for most of the games. There is a total of 3,113 games stored in the API, all of which have a TitleID and TitleName attribute. Many do not have data such as overviews, box art, background art, ESRB ratings, etc.
 
 ### If you have a game which is missing data, please message us on Discord or create an issue report.
-
-## v0.1.2 - Second public release
-[v0.1.2](https://github.com/RedDuckss/CemUI/releases/tag/v0.1.2)
-This version fixes many bugs and redesigns the layout. This is the first production ready release.
-
-## v0.1.0 - First public release
-[v0.1.0](https://github.com/RedDuckss/CemUI/releases/tag/v0.1.0)
  
 
 ## Tasks to complete
 
 - [x] Launch games
 - [x] Launch games with other emulators
+- [x] SMM Support
 - [ ] Full screen mode option
 - [x] Change settings option
 - [x] Add cemu folder
