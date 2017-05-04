@@ -18,7 +18,7 @@ ipcRenderer.on('update_available', function(event, data) {
             warning: 'assets/sounds/notify/success-warning/5.mp3',
         },
     };
-    Notify.Warning('An update for CemUI has been found. <button class="notify-btn" onclick="startUpdate('+data.version+')">Download</button>', 86400000);
+    Notify.Warning('An update for CemUI has been found. <button class="notify-btn" onclick="startUpdate(\''+data.version+'\')">Download</button>', 86400000);
 });
 ipcRenderer.on('new_games', function(event, data) {
     Notify.Settings = {
@@ -26,7 +26,7 @@ ipcRenderer.on('new_games', function(event, data) {
             warning: 'assets/sounds/notify/success-warning/2.mp3',
         },
     };
-    Notify.Warning(data.number+' New games have been found. <button class="notify-btn" onclick="alert(\"Test\")">Download</button>', 86400000);
+    Notify.Warning(data.number+' New games have been found. <button class="notify-btn" onclick="alert(\'Test\')">Download</button>', 86400000);
 });
 
 
