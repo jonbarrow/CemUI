@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////
 
 var electron      = require('electron'),
-	fs            = require('fs'),
+	fs            = require('fs-extra'),
 	originalFs    = require('original-fs'),
 	exec          = require('child_process').exec,
 	dns           = require('dns'),
@@ -17,20 +17,17 @@ var electron      = require('electron'),
 	async         = require('async'),
 	Stopwatch     = require("timer-stopwatch"),
 	unzipper      = require('unzipper'),
+	zipFolder     = require('zip-folder'),
+	_7zip         = require("7zip-standalone"),
 	request       = require('request').defaults({ encoding: null }),
 	Entities      = require('html-entities').AllHtmlEntities,
+	smm_api       = require('smm-api'),
 	entities      = new Entities(),
 	dialog        = electron.dialog,
 	BrowserWindow = electron.BrowserWindow,
 	ipcMain       = electron.ipcMain,
 	app           = electron.app;
 
-var user_settings = {};
-
-user_settings["is_dark"] = false;
-user_settings["display_mode"] = 'box';
-
-app.setName("Cemu Manager");
 
 const APP_VERSION = '1.0.1';
 
@@ -40,7 +37,7 @@ var user_settings = {};
 user_settings["is_dark"] = false;
 user_settings["display_mode"] = 'box';
 
-app.setName("Cemu Manager");
+app.setName("CemUI");
 
 let ApplicationWindow; // Main application window
 
@@ -51,8 +48,8 @@ function createWindow(file) { // Creates window from file
   		frame: false             // Borderless
   	});
   	ApplicationWindow.loadURL(url.format({ // Makes the window
-  		pathname: path.join(__dirname, '/data/app/'+file+'.html'),
-  		//pathname: path.join(__dirname, '/data/app/test.html'),
+  		pathname: path.join(__dirname, '/app/'+file+'.html'),
+  		//pathname: path.join(__dirname, '/app/test.html'),
     	protocol: 'file:',
     	slashes: true
   	}));
@@ -62,8 +59,14 @@ function createWindow(file) { // Creates window from file
   	});
 }
 
+
+
 app.on('ready', function() {
 	generalLoad(); // Load things when the app is ready
+	ApplicationWindow.webContents.on('new-window', function(e, url) {
+  		e.preventDefault();
+	  	electron.shell.openExternal(url);
+	});
 })
 
 app.on('window-all-closed', () => {
@@ -130,7 +133,7 @@ ipcMain.on('change_folder', function(event, data) {
 		case 'game':
 
 			ApplicationWindow.loadURL(url.format({
-			    pathname: path.join(__dirname, '/data/app/load_new_games.html'),
+			    pathname: path.join(__dirname, '/app/load_new_games.html'),
 			    protocol: 'file:',
 			    slashes: true
 			}));
@@ -235,6 +238,7 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
   		}
   	}
 
+
   	if (game_list.length < i) {
   		var result = dialog.showMessageBox({
 		  	type: 'question',
@@ -251,7 +255,7 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
 				if (valid_paths.indexOf(settings["game_folder_path"].replace(/\\/g,"/")+'/'+games_directory[k]) < 0 && isGame(settings["game_folder_path"]+'\\'+games_directory[k])) {
 
 					ApplicationWindow.loadURL(url.format({
-					    pathname: path.join(__dirname, '/data/app/load_new_games.html'),
+					    pathname: path.join(__dirname, '/app/load_new_games.html'),
 					    protocol: 'file:',
 					    slashes: true
 					}));
@@ -264,7 +268,7 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
 						game_list.push(result);
 						fs.writeFileSync('data/cache/games.json', JSON.stringify(game_list));
 						ApplicationWindow.loadURL(url.format({
-						    pathname: path.join(__dirname, '/data/app/index.html'),
+						    pathname: path.join(__dirname, '/app/index.html'),
 						    protocol: 'file:',
 						    slashes: true
 						}));
@@ -337,7 +341,7 @@ ipcMain.on('load_game_folder', function(event) {
 
 ipcMain.on('load_window_cemu_load', function(event, data) {
 	ApplicationWindow.loadURL(url.format({
-	    pathname: path.join(__dirname, '/data/app/load_cemu.html'), // Opens the application to load Cemu
+	    pathname: path.join(__dirname, '/app/load_cemu.html'), // Opens the application to load Cemu
 	    protocol: 'file:',
 	    slashes: true
 	}))
@@ -382,7 +386,7 @@ ipcMain.on('load_cemu_folder', function(event) {
 
 ipcMain.on('load_main_window', function(event, data) {
 	ApplicationWindow.loadURL(url.format({
-	    pathname: path.join(__dirname, '/data/app/index.html'), // Opens main window normally
+	    pathname: path.join(__dirname, '/app/index.html'), // Opens main window normally
 	    protocol: 'file:',
 	    slashes: true
 	}));
@@ -458,6 +462,106 @@ ipcMain.on('launch_game_rom', function(event, data) {
 	});
 });
 
+ipcMain.on('smm_dl_level', function(event, data) {
+	var SMMLevelFolder = pickSMMLevelFolder()[0];
+
+	async.waterfall([
+		function(callback) {
+			event.sender.send("smm_level_dl_start");
+			zipFolder(SMMLevelFolder, SMMLevelFolder + '/backup.zip', function(err) {
+			    if(err) {
+			        console.log(err);
+			        callback(null);
+			    } else {
+			        callback(null);
+			    }
+			});
+		},
+		function(callback) {
+
+			var received_bytes = 0,
+				total_bytes = 0;
+
+			var req = request({
+		        method: 'GET',
+		        uri: 'http://smmdb.ddns.net/courses/'+data
+		    });
+
+		    var out = fs.createWriteStream(SMMLevelFolder+'/new_level.zip');
+		    req.pipe(out);
+
+		    req.on('response', function(data) {
+		        total_bytes = parseInt(data.headers['content-length']);
+		    });
+
+		    req.on('data', function(chunk) {
+		        received_bytes += chunk.length;
+		        var percent = (received_bytes * 100) / total_bytes;
+		        event.sender.send("smm_level_progress", {progress: percent});
+		    });
+
+		    req.on('end', function() {
+		    	callback(null);
+		    });
+		},
+		function(callback) {
+			event.sender.send("smm_level_extract");
+			_7zip.extract(SMMLevelFolder+'\\new_level.zip', SMMLevelFolder).then(function() {
+				callback(null);
+			});
+		},
+		function(callback) {
+			fs.unlink(SMMLevelFolder+'/new_level.zip', function() {
+	    		callback(null);
+	    	});
+		},
+		function(callback) {
+			var dir = getDirectories(SMMLevelFolder)[0];
+			fs.readdir(SMMLevelFolder+'\\'+dir, (err, files) => {
+				for (var i = 0; i < files.length; i++) {
+					var file_data = fs.readFileSync(SMMLevelFolder+'\\'+dir+'\\'+files[i]);
+					fs.writeFileSync(SMMLevelFolder+'\\'+files[i], file_data);
+				}
+			})
+			callback(null, dir);
+		},
+		function(dir, callback) {
+			fs.remove(SMMLevelFolder+'\\'+dir, err => {
+			  	if (err) {
+			  		console.error(err);
+			  		callback(null);
+			  	}
+			  	callback(null);
+			})
+			
+		},
+	], function() {
+		event.sender.send("smm_level_dl_end");
+	});
+
+});
+
+ipcMain.on('smm_search', function(event, data) {
+	smm_api.search(data, function(response) {
+		var response = JSON.parse(response);
+		event.sender.send("smm_search_results", response.courses);
+	});
+});
+
+ipcMain.on('start_update', function(event, version) {
+	process.noAsar = true;
+	ApplicationWindow.loadURL(url.format({
+	    pathname: path.join(__dirname, '/app/download_update.html'), // Opens main window normally
+	    protocol: 'file:',
+	    slashes: true
+	}));
+
+	startUpdate(version, function() {
+		process.noAsar = false;
+		app.relaunch();
+		app.quit();
+	});
+});
 
 
 function generalLoad() {
@@ -506,28 +610,9 @@ function checkForUpdate(sendFeedback) {
 						return true;
 		    		}
 		    		if (data['latest'] > APP_VERSION) {
-		    			var result = dialog.showMessageBox({
-						  	type: 'question',
-						  	message: 'Update available! Latest version is '+data['latest']+'. Would you like to update now?',
-						  	buttons: ['Yes', 'No']
-						});
-
-						if (result == 0) {
-
-							process.noAsar = true;
-
-							ApplicationWindow.loadURL(url.format({
-							    pathname: path.join(__dirname, '/data/app/download_update.html'), // Opens main window normally
-							    protocol: 'file:',
-							    slashes: true
-							}));
-
-							startUpdate(data['latest'], function() {
-								process.noAsar = false;
-								app.relaunch();
-								app.quit();
-							});
-						}
+		    			if (ApplicationWindow) {
+					    	ApplicationWindow.webContents.send("update_available", {version: data['latest']});
+					    }
 		    		}
 		    	}
 			}
@@ -628,6 +713,18 @@ function pickEmuFolder() { // Picks dir
 	}
 	return emuFolder;
 }
+function pickSMMLevelFolder() { // Picks dir
+	var SMMLevelFolder = dialog.showOpenDialog({
+		title: 'Select a Super Mario Maker level to overwrite.',
+		defaultPath: user_settings['cemu_folder_path']+'\\mlc01\\emulatorSave',
+		properties: ['openDirectory']
+	});
+
+	if (!SMMLevelFolder) {
+		return pickSMMLevelFolder();
+	}
+	return SMMLevelFolder;
+}
 function loadGame(game) {
 	// Currently unused. Will use later
 }
@@ -650,12 +747,16 @@ function isGame(folder) { // Checks if it's a game or not
 	var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.rpx$/i);
 
 	if (!codeFile || codeFile.length < 0) {
-		return false;
+		var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.wud$/i);
+		if (!codeFile || codeFile.length < 0) {
+			return false;
+		}
 	}
 
 	if (!fs.existsSync(folder+"\\meta\\meta.xml")) {
 		return false;
 	}
+
 	return true;
 }
 
@@ -664,7 +765,13 @@ function isGame(folder) { // Checks if it's a game or not
 function loadGameData(gamePath, name, cb) {
 
 	var files = fs.readdirSync(gamePath+"\\code"), // scans code dir
-		rom   = files.filter(/./.test, /\.rpx$/i)[0]; // finds the rpx file
+		rom   = files.filter(/./.test, /\.rpx$/i); // finds the rpx file
+
+	if (!rom || rom.length < 0) {
+		rom = files.filter(/./.test, /\.wud$/i); // finds the rpx file
+	}
+
+	var rom = rom[0];
 
 	var game = {}; // new key in the games object
 
@@ -818,7 +925,13 @@ function downloadFile(url, target, fileName, cb) { // I hope you understand this
 function unzip(file, target, alert, cb) { // Unzips
 
 	var out = fs.createReadStream(file);
-	out.pipe(unzipper.Extract({ path: target })).on('finish', function () {
+	out.pipe(
+		unzipper.Extract({ path: target }).on('error', function(error) {
+			dialog.showMessageBox({
+			  	type: 'error',
+			  	message: 'There was an error unzipping file. Perhaps the file is corrupted?'
+			});
+		})).on('finish', function () {
 
 		if (alert) {
 			dialog.showMessageBox({
