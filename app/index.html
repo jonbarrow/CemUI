@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    
+    <title>CemUI</title>
+
+    <link href="./assets/css/fonts.css" rel="stylesheet">
+    <link href="./assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./assets/css/mdb.min.css" rel="stylesheet">
+    <link href="./assets/css/collapsible.css" rel="stylesheet">
+    <link href="./assets/css/animate.css" rel="stylesheet">
+    <link href="./assets/css/notify.css" rel="stylesheet">
+    <link href="./assets/css/style.css" rel="stylesheet">
+</head>
+
+<body class="dark-themeable">
+    <div class="loader-container">
+        <div class="loader">
+            <span class="dot dot_1"></span>
+            <span class="dot dot_2"></span>
+            <span class="dot dot_3"></span>
+            <span class="dot dot_4"></span>
+        </div>
+    </div>
+
+    <nav class="controls fixed-top navbar navbar-toggleable-xl navbar-inverse bg-faded dark-themeable">
+        <a class="navbar-brand dark-themeable" style="color: black;" href="#">CemUI</a>
+        <div class="collapse navbar-collapse dark-themeable" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a data-toggle="modal" data-target="#userSettingsModal" class="nav-link dark-themeable" style="color: black;" href="#">Settings</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <!--li class="nav-item">
+                    <a id="newgame" class="nav-link dark-themeable" style="color: black;" href="#">newgame</a>
+                </li>
+                <li class="nav-item">
+                    <a id="update" class="nav-link dark-themeable" style="color: black;" href="#">update</a>
+                </li-->
+                <li class="nav-item">
+                    <a id="smm-toggle" class="nav-link dark-themeable" style="color: black;" href="#"><i style="font-size: 24px;" id="smm-modal-trigger" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="SSM" class="icon-piranha_plant"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link dark-themeable" style="color: black;" href="#"><i id="check-for-update" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Check for update" class="material-icons">swap_vert</i></a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn-window-option btn-window-option-minimize"><i class="icon-window-item-minimize dark-themeable" style="color: black" aria-hidden="true"></i></button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn-window-option btn-window-option-maximize"><i class="icon-window-item-maximize dark-themeable" style="color: black"></i></button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn-window-option btn-window-option-close"><i class="icon-window-item-close dark-themeable" style="color: black"></i></button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="smm-level-download-popup">
+        <h1>Downloading Level 0%</h1>
+    </div>
+
+    <div class="container-fluid">
+        <div class="content-main">
+            <div style="padding-top:3em;" class="container-fluid flex-column animated fadeIn">
+                <div class="row" id="game-holder"></div>
+            </div>
+        </div>
+        <div class="display-text-rows">
+            <ul class="collapsible popout" data-collapsible="accordion">
+            </ul>
+        </div>
+
+        <div class="content-smm">
+            <button data-toggle="modal" data-target="#smmHowToModal" class="btn btn-primary">How To Use?</button><br>
+            <div class="smm-search-wrapper container top-padding-5">
+                <div class="card card-block bg-faded smm-search-options">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="md-form">
+                                <input type="text" id="smm-search-title" class="form-control">
+                                <label for="smm-search" class="">Title</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>
+                                Order<br>
+                                <select class="search-select" id="smm-search-order">
+                                    <option>Last Modified</option>
+                                    <option>Upload Date</option>
+                                    <option>Title</option>
+                                    <option>Stars</option>
+                                    <option>Downloads</option>
+                                    <option>Completions</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="col-md-3">
+                            <label>
+                                Direction<br>
+                                <select class="search-select" id="smm-search-dir">
+                                    <option>Ascending</option>
+                                    <option>Descending</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="col-md-3">
+                            <label>
+                                Course Type<br>
+                                <select class="search-select" id="smm-search-coursetype">
+                                    <option>Own Creation</option>
+                                    <option>Recreation</option>
+                                    <option>WiiU Dump</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>
+                                Difficulty From<br>
+                                <select class="search-select" id="smm-search-difficultyfrom">
+                                    <option>Easy</option>
+                                    <option>Normal</option>
+                                    <option>Expert</option>
+                                    <option>Super Expert</option>
+                                    <option>Mixed</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="col-md-3">
+                            <label>
+                                Difficulty To<br>
+                                <select class="search-select" id="smm-search-difficultyto">
+                                    <option>Mixed</option>
+                                    <option>Super Expert</option>
+                                    <option>Expert</option>
+                                    <option>Normal</option>
+                                    <option>Easy</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="checkbox">
+                                <label>
+                                    <input id="smm-search-ispackage" type="checkbox">
+                                    <svg width="20" height="20">
+                                        <path class="checked" d="M16,0H2C0.9,0,0,0.9,0,2v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V2C18,0.9,17.1,0,16,0z M7,14L2,9l1.4-1.4L7,11.2l7.6-7.6L16,5L7,14z"/>
+                                        <path class="indeterminate" d="M16,0H2C0.9,0,0,0.9,0,2v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V2C18,0.9,17.1,0,16,0z M14,10H4V8h10V10z"/>
+                                        <path class="unchecked" d="M16,2v14H2V2H16 M16,0H2C0.9,0,0,0.9,0,2v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V2C18,0.9,17.1,0,16,0z"/>
+                                    </svg>
+                                    Is package
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="" id="smm-search-btn" class="btn btn-primary btn-lg">Search</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="smm-search-results-title-wrapper">
+                    <div class="smm-search-results-title">
+                        <center>
+                            <h3>SELECT A COURSE</h3>
+                        </center>
+                    </div>
+                </div>
+                <div class="smm-search-results-wrapper">
+                    <ul class="smm-search-results row">
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="content-details">
+            <div style="padding-top:3em;" class="container-fluid flex-column">
+                <h3 id="details-title"></h3>
+                <div class="row">
+                    <div class="col-md-3">
+                        <button id="btn-back" type="button" class="btn btn-danger btn-circle btn-lg"><i class="fa fa-arrow-left"></i> Back</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button game-path="" launch-with="cemu" id="btn-launch" type="button" class="btn btn-success btn-circle btn-lg launch"><i class="fa fa-gamepad"></i> Launch</button>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="card card-inverse" style="background-color: #333; border-color: #333;">
+                            <div class="card-block">
+                                <h3 class="card-title">Game Compatibility</h3>
+                                <p id="game-compatibility" class="card-text"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span>ESRB: <span id="details-ESRB"></span></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span>Co-op: <span id="details-coop"></span></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span>Players: <span id="details-players"></span></span>
+                    </div>
+                </div>
+                <div class="row top-padding-5" id="game-details">
+                    <div id="overview-wrapper">
+                        <div class="col-md-12" id="details-overview"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <img src="" class="bg-image">
+
+    <div class="modal fade" id="smmHowToModal" tabindex="-1" role="dialog" aria-labelledby="smmHowToModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content dark-themeable">
+                <div class="modal-header dark-themeable">
+                    <h5 class="modal-title" id="smmHowToModalTitle">SMM Cemu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body dark-themeable">
+                    <div class="row dark-themeable container top-padding-5">
+                        <p>To use SMM (Super Mario Maker) levels in Cemu, you must first create a level in-game. Then download the level you wish to play and replace the files inside your in-game created level with the downloaded level files. For more information, please visit the official Reddit post about how to use SMM in Cemu.
+                        <br><button class="btn btn-primary btn-circle"><a style="color: #fff;" href="https://www.reddit.com/r/CemuMarioMaker/comments/5pviim/27_faq_please_read_regarding_all_questions/" target="_blank">Visit Reddit Post</a></button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="smmLevelModal" tabindex="-1" role="dialog" aria-labelledby="smmLevelModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content dark-themeable">
+                <div class="modal-header dark-themeable">
+                    <h5 class="modal-title" id="smmLevelModalTitle">SMM Cemu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body dark-themeable container">
+                    <div class="row dark-themeable top-padding-5">
+                        <div class="col-md-6">
+                            <h2>Creator: <span class="smm-level-data-creator"></span></h2><br>
+                            <button class="btn btn-primary btn-circle" id="smm-level-data-download">Download</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card card-inverse" style="background-color: #333; border-color: #333;">
+                                <div class="card-block">
+                                    <h3 class="card-title">Difficulty</h3>
+                                    <p id="smm-level-difficulty" class="card-text">sss</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row dark-themeable top-padding-5">
+                        <div class="col-md-6">
+                            <div class="smm-level-data-video">
+                                <iframe width="100%" src="https://www.youtube.com/embed/dkEVTnRZqSc" frameborder="0"></iframe>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <center>
+                                <h3>Stats</h3>
+                            </center>
+                            <div class="row">
+                                <div class="col-md-12"><i class="fa fa-trophy" aria-hidden="true"></i> Points <span class="smm-level-data-points"></span></div>
+                                <div class="col-md-12"><i class="fa fa-star" aria-hidden="true"></i> Stars <span class="smm-level-data-stars"></span></div>
+                                <div class="col-md-12"><i class="fa fa-download" aria-hidden="true"></i> Downloads <span class="smm-level-data-downloads"></span></div>
+                                <div class="col-md-12"><i class="fa fa-flag" aria-hidden="true"></i> Completions <span  class="smm-level-data-completions"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="userSettingsModal" tabindex="-1" role="dialog" aria-labelledby="userSettingsModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content dark-themeable">
+                <div class="modal-header dark-themeable">
+                    <h5 class="modal-title" id="userSettingsModalTitle">Settings</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body dark-themeable">
+                    <div class="row dark-themeable settings-wrapper">
+                        <div class="col-lg-2 col-md-2 col-sm-4 col-xs-4 settings-tabs">
+                            <nav class="nav flex-column" role="tablist">
+                                <a class="nav-link active" data-toggle="tab" href="#settings-theme" role="tab">Theme</a>
+                                <a class="nav-link" data-toggle="tab" href="#settings-display" role="tab">Display</a>
+                                <a class="nav-link" data-toggle="tab" href="#settings-folders" role="tab">Folders</a>
+                            </nav>
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-sm-8 col-xs-8 settings-content">
+                            <div class="tab-content">
+                                <div class="tab-pane active float-left" id="settings-theme" role="tabpanel">
+                                    <h2>Theme</h2><br>
+                                    <h4>Toggle Dark Theme</h4>
+                                    <div class="material-switch">
+                                        <input id="dark-theme-toggle" name="dark-theme-toggle" type="checkbox">
+                                        <label for="dark-theme-toggle" class="label-default"></label>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="settings-display" role="tabpanel">
+                                    <h2>Display</h2><br>
+                                    <h4>Game Display Mode</h4>
+                                    <div class="row display-options">
+                                        <div class="col-md-3 display-option"><i id="list-display-option" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="List" class="material-icons">view_headline</i></div>
+                                        <div class="col-md-3 display-option"><i id="box-display-option" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="Box" class="material-icons">view_module</i></div>
+                                    </div>
+                                </div>
+                                <div style="width: 100%" class="tab-pane float-left" id="settings-folders" role="tabpanel">
+                                    <h2>Folders</h2><br>
+                                    <h4>Change Folder Locations</h4><br>
+
+                                    <h5>Cemu Folder</h5><br>
+                                    <div class="md-form input-group">
+                                        <input id="folder-select-cemu-input" readonly type="text" style="width: 100%" class="form-control input-alternate" aria-describedby="folder-select-cemu">
+                                        <span class="input-group-addon btn-success" id="folder-select-cemu">Pick</span>
+                                    </div>
+                                    <h5>Game Folder</h5><br>
+                                    <div class="md-form input-group">
+                                        <input id="folder-select-game-input" readonly type="text" style="width: 100%" class="form-control input-alternate" aria-describedby="folder-select-game">
+                                        <span class="input-group-addon btn-success" id="folder-select-game">Pick</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script type="text/javascript" src="./assets/js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="./assets/js/tether.min.js"></script>
+    <script type="text/javascript" src="./assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./assets/js/mdb.min.js"></script>
+    <script type="text/javascript" src="./assets/js/materialize.min.js"></script>
+    <script type="text/javascript" src="./assets/js/notify.js"></script>
+    <script type="text/javascript" src="./assets/js/moment.min.js"></script>
+    <script type="text/javascript" src="./assets/js/selection.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="gamepad.js"></script>
+    <script type="text/javascript">ipcRenderer.send('load_all_games_emulators');</script>
+    <script>if (window.module) module = window.module;</script>
+</body>
+
+</html>

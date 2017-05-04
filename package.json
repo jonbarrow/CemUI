@@ -4,15 +4,19 @@
   "version": "0.1.0",
   "main": "app.js",
   "dependencies": {
+    "7zip-standalone": "0.0.2",
     "async": "^2.3.0",
     "electron": "^1.6.2",
+    "electron-basic-updater": "*",
     "electron-packager": "^8.6.0",
+    "fs-extra": "^3.0.0",
     "html-entities": "^1.2.1",
     "pixl-xml": "*",
-    "electron-basic-updater": "*",
-    "unzipper": "*",
     "request": "^2.81.0",
-    "timer-stopwatch": "^0.2.0"
+    "smm-api": "^1.0.1",
+    "timer-stopwatch": "^0.2.0",
+    "unzipper": "*",
+    "zip-folder": "^1.0.0"
   },
   "scripts": {
     "start": "electron .",
