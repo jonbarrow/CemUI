@@ -16,6 +16,7 @@
     "smm-api": "^1.0.1",
     "timer-stopwatch": "^0.2.0",
     "unzipper": "*",
+    "winston": "^2.3.1",
     "zip-folder": "^1.0.0"
   },
   "scripts": {

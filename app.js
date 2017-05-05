@@ -22,12 +22,28 @@ var electron      = require('electron'),
 	request       = require('request').defaults({ encoding: null }),
 	Entities      = require('html-entities').AllHtmlEntities,
 	smm_api       = require('smm-api'),
+	winston       = require('winston'),
 	entities      = new Entities(),
 	dialog        = electron.dialog,
 	BrowserWindow = electron.BrowserWindow,
 	ipcMain       = electron.ipcMain,
 	app           = electron.app;
 
+winston.emitErrs = true;
+
+var logger = new (winston.Logger)({
+	level: 'verbose',
+	exitOnError: false,
+    transports: [
+      	new winston.transports.Console({ colorize: true }),
+      	new (winston.transports.File)({
+      		handleExceptions: true,
+      		colorize: false,
+      		json: false,
+      		filename: 'data/errors/error.log'
+      	})
+    ]
+});
 
 const APP_VERSION = '1.1.0';
 
@@ -111,11 +127,11 @@ ipcMain.on('change_folder', function(event, data) {
 			fs.writeFile('data/cache/emulators.json', JSON.stringify({"cemu": cemu}), function(error) {
 				// Saves it as `cemu` (More emulators can be added with their own options. Cemu is default)
 			    if (error) {
-			        console.log(error);
+			        logger.log('error', error);
 			    }
 			    fs.writeFile('data/cache/settings.json', JSON.stringify(settings), function(error) {
 				    if (error) {
-				        console.log(error);
+				        logger.log('error', error);
 				    }
 				    var result = dialog.showMessageBox({
 					  	type: 'question',
@@ -154,9 +170,9 @@ ipcMain.on('change_folder', function(event, data) {
 			    	return;
 				}
 
-				loadGameData(gamePath, game_index, function (err, result) {
-					if (err && !result) {
-						console.log("ERROR");
+				loadGameData(gamePath, game_index, function (error, result) {
+					if (error && !result) {
+						logger.log('error', error);
 						callback();
 						return;
 					}
@@ -168,7 +184,7 @@ ipcMain.on('change_folder', function(event, data) {
 				fs.writeFileSync('data/cache/settings.json', JSON.stringify(settings));
 			    fs.writeFile('data/cache/games.json', JSON.stringify(games), function(error) {
 				    if (error) {
-				        return console.log(error);
+				        return logger.log('error', error);
 				    }
 				    var result = dialog.showMessageBox({
 					  	type: 'question',
@@ -259,9 +275,9 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
 					    protocol: 'file:',
 					    slashes: true
 					}));
-					loadGameData(settings["game_folder_path"]+'\\'+games_directory[k], games_directory[k], function (err, result) {
-						if (err && !result) {
-							console.log("ERROR");
+					loadGameData(settings["game_folder_path"]+'\\'+games_directory[k], games_directory[k], function (error, result) {
+						if (error && !result) {
+							logger.log('error', error);
 							return;
 						}
 						console.log('Error with '+settings["game_folder_path"].replace(/\\/g,"/")+'/'+games_directory[k]);
@@ -287,7 +303,7 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
   		}
   		fs.writeFile('data/cache/games.json', JSON.stringify(game_list), function(error) { // Saves the games object to a file
 		    if (error) {
-		        return console.log(error);
+		        return logger.log('error', error);
 		    }
 		});
 		dialog.showMessageBox({
@@ -319,9 +335,9 @@ ipcMain.on('load_game_folder', function(event) {
 	    	return;
 		}
 
-		loadGameData(gamePath, game_index, function (err, result) {
-			if (err && !result) {
-				console.log("ERROR");
+		loadGameData(gamePath, game_index, function (error, result) {
+			if (error && !result) {
+				logger.log('error', error);
 				callback();
 				return;
 			}
@@ -332,7 +348,7 @@ ipcMain.on('load_game_folder', function(event) {
 	}, function () {
 	    fs.writeFile('data/cache/games.json', JSON.stringify(games), function(error) { // Saves the games object to a file
 		    if (error) {
-		        return console.log(error);
+		        return logger.log('error', error);
 		    }
 		    event.sender.send("game_folder_loaded", {game_path:game_folder_path[0]}); // Tells application we're done
 		});
@@ -373,11 +389,11 @@ ipcMain.on('load_cemu_folder', function(event) {
 	fs.writeFile('data/cache/emulators.json', JSON.stringify({"cemu": cemu}), function(error) {
 		// Saves it as `cemu` (More emulators can be added with their own options. Cemu is default)
 	    if (error) {
-	        console.log(error);
+	        logger.log('error', error);
 	    }
 	    fs.writeFile('data/cache/settings.json', JSON.stringify(user_settings), function(error) {
 		    if (error) {
-		        console.log(error);
+		        logger.log('error', error);
 		    }
 		    event.sender.send("cemu_folder_loaded", cemu); // Done
 		});
@@ -403,7 +419,7 @@ ipcMain.on('change_theme', function(event, data) {
 	}
 	fs.writeFile('data/cache/settings.json', JSON.stringify(settings), function(error) {
 	    if (error) {
-	        console.log(error);
+	        logger.log('error', error);
 	    }
 	    event.sender.send("theme_changed", data); // Done
 	});
@@ -416,7 +432,7 @@ ipcMain.on('change_display', function(event, display) {
 	settings['display_mode'] = display;
 	fs.writeFile('data/cache/settings.json', JSON.stringify(settings), function(error) {
 	    if (error) {
-	        console.log(error);
+	        logger.log('error', error);
 	    }
 	    event.sender.send("display_changed", {game_list:game_list, emulator_list: emulators_list, display:display}); // Done
 	});
@@ -428,7 +444,7 @@ ipcMain.on('launch_game_rom', function(event, data) {
 
 	fs.readFile("data/cache/emulators.json", function (error, json) { // Read the emulators file
 	  	if (error) {
-	    	return console.log(error);
+	    	return logger.log('error', error);
 	  	}
 	  	json = JSON.parse(json.toString()); // Parse the shit
 	  	emulator = json[emulator]; // Grab the emulator object
@@ -440,7 +456,7 @@ ipcMain.on('launch_game_rom', function(event, data) {
 	  	exec('"'+emulator["exe_path"]+'" '+emulator["params"]+' '+'"'+game+'"', (error, stdout, stderr) => {
 	  	// Launch game with the emulator and params
 		  	if (error) {
-			    console.error(error);
+			    logger.log('error', error);
 			    return;
 		  	}
 
@@ -468,9 +484,9 @@ ipcMain.on('smm_dl_level', function(event, data) {
 	async.waterfall([
 		function(callback) {
 			event.sender.send("smm_level_dl_start");
-			zipFolder(SMMLevelFolder, SMMLevelFolder + '/backup.zip', function(err) {
-			    if(err) {
-			        console.log(err);
+			zipFolder(SMMLevelFolder, SMMLevelFolder + '/backup.zip', function(error) {
+			    if(error) {
+			        logger.log('error', error);
 			        callback(null);
 			    } else {
 			        callback(null);
@@ -517,7 +533,10 @@ ipcMain.on('smm_dl_level', function(event, data) {
 		},
 		function(callback) {
 			var dir = getDirectories(SMMLevelFolder)[0];
-			fs.readdir(SMMLevelFolder+'\\'+dir, (err, files) => {
+			fs.readdir(SMMLevelFolder+'\\'+dir, (error, files) => {
+				if (error) {
+					logger.log('error', error);
+				}
 				for (var i = 0; i < files.length; i++) {
 					var file_data = fs.readFileSync(SMMLevelFolder+'\\'+dir+'\\'+files[i]);
 					fs.writeFileSync(SMMLevelFolder+'\\'+files[i], file_data);
@@ -526,9 +545,9 @@ ipcMain.on('smm_dl_level', function(event, data) {
 			callback(null, dir);
 		},
 		function(dir, callback) {
-			fs.remove(SMMLevelFolder+'\\'+dir, err => {
-			  	if (err) {
-			  		console.error(err);
+			fs.remove(SMMLevelFolder+'\\'+dir, error => {
+			  	if (error) {
+			  		logger.log('error', error);
 			  		callback(null);
 			  	}
 			  	callback(null);
@@ -565,14 +584,19 @@ ipcMain.on('start_update', function(event, version) {
 
 
 function generalLoad() {
-	fs.stat("data", function (err, stats) { // is `data` a thing?
-  		if (err) {
+	fs.stat("data", function (error, stats) { // is `data` a thing?
+  		if (error) {
   			createDirectory("data"); // Nope! make it.
 	  	}
 	});
-	fs.stat("data/cache", function (err, stats) { // is `data/cache` a thing?
-  		if (err) {
+	fs.stat("data/cache", function (error, stats) { // is `data/cache` a thing?
+  		if (error) {
   			createDirectory("data/cache"); // Nope! make it.
+	  	}
+	});
+	fs.stat("data/errors", function (error, stats) { // is `data/cache` a thing?
+  		if (error) {
+  			createDirectory("data/errors"); // Nope! make it.
 	  	}
 	});
 	if (!fs.existsSync('data/cache/emulators.json')) { // Is there an emualtors file? 
@@ -597,6 +621,9 @@ function checkForUpdate(sendFeedback) {
 			if (!error && response.statusCode == 200) {
 				var data = JSON.parse(body.toString());
 		    	if (data['error']) {
+		    		
+		    		logger.log('error', data['error']);
+
 		    		dialog.showMessageBox({
 					  	type: 'info',
 					  	message: data['error']
@@ -615,6 +642,8 @@ function checkForUpdate(sendFeedback) {
 					    }
 		    		}
 		    	}
+			} else if (error) {
+				logger.log('error', error);
 			}
 		});
 
@@ -832,6 +861,7 @@ function loadGameData(gamePath, name, cb) {
 	    	var title_id = [xml["title_id"]["_Data"].slice(0, 8), '-', xml["title_id"]["_Data"].slice(8)].join('');
 	    	request.get('https://cemui.com/api/GetGame/?title_id='+title_id, function (error, response, body) {
 				if (error) {
+					logger.log('error', error);
 		    		callback(true);
 		    	}
 		    	if (response.statusCode != 200) {
@@ -840,6 +870,7 @@ function loadGameData(gamePath, name, cb) {
 
 		    	var data = JSON.parse(body.toString());
 		    	if (data['error']) {
+		    		logger.log('error', data['error']);
 		    		callback(true);
 		    	}
 
@@ -853,6 +884,7 @@ function loadGameData(gamePath, name, cb) {
 		    } else {
 		    	request.get(data['game_boxart_url'], function (error, response, body) { // Pulls game data from online API
 					if (error) {
+						logger.log('error', error);
 			    		callback(true);
 			    	}
 			    	if (response.statusCode != 200) {
@@ -872,6 +904,7 @@ function loadGameData(gamePath, name, cb) {
 		    } else {
 		    	request.get(data['game_background_url'], function (error, response, body) { // Pulls game data from online API
 					if (error) {
+						logger.log('error', error);
 			    		callback(true);
 			    	}
 			    	if (response.statusCode != 200) {
@@ -927,6 +960,9 @@ function unzip(file, target, alert, cb) { // Unzips
 	var out = fs.createReadStream(file);
 	out.pipe(
 		unzipper.Extract({ path: target }).on('error', function(error) {
+			
+			logger.log('error', error);
+
 			dialog.showMessageBox({
 			  	type: 'error',
 			  	message: 'There was an error unzipping file. Perhaps the file is corrupted?'
@@ -946,8 +982,9 @@ function unzip(file, target, alert, cb) { // Unzips
 }
 
 function checkConnection(url, cb) {
-    dns.resolve(url, function(err) {
-        if (err && err.code == "ENOTFOUND") {
+    dns.resolve(url, function(error) {
+        if (error && error.code == "ENOTFOUND") {
+        	logger.log('error', error);
             cb(false);
         } else {
             cb(true);
