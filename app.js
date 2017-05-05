@@ -40,7 +40,7 @@ var logger = new (winston.Logger)({
       		handleExceptions: true,
       		colorize: false,
       		json: false,
-      		filename: 'data/errors/error.log'
+      		filename: 'cemui.error.log'
       	})
     ]
 });
@@ -586,17 +586,14 @@ ipcMain.on('start_update', function(event, version) {
 function generalLoad() {
 	fs.stat("data", function (error, stats) { // is `data` a thing?
   		if (error) {
+  			logger.log('error', error);
   			createDirectory("data"); // Nope! make it.
 	  	}
 	});
 	fs.stat("data/cache", function (error, stats) { // is `data/cache` a thing?
   		if (error) {
+  			logger.log('error', error);
   			createDirectory("data/cache"); // Nope! make it.
-	  	}
-	});
-	fs.stat("data/errors", function (error, stats) { // is `data/cache` a thing?
-  		if (error) {
-  			createDirectory("data/errors"); // Nope! make it.
 	  	}
 	});
 	if (!fs.existsSync('data/cache/emulators.json')) { // Is there an emualtors file? 
@@ -720,9 +717,13 @@ function showProgress(received, total) {
 
 
 function createDirectory(path) { // Makes dirs
-	fs.mkdir(path, function() {
-		console.log("Created `"+path+"` folder");
-	});
+	try {
+		fs.mkdir(path, function() {
+			console.log("Created `"+path+"` folder");
+		});
+	} catch(error) {
+		logger.log('error', error);
+	}
 }
 function pickGameFolder() { // Picks dir
 	var gameFolder = dialog.showOpenDialog({
