@@ -135,7 +135,7 @@ ipcMain.on('change_folder', function(event, data) {
 				    }
 				    var result = dialog.showMessageBox({
 					  	type: 'question',
-					  	message: 'Setting changed. Restart required, Would you like to restart now?',
+					  	message: 'Setting changed. Restart required, Would you like to restart CemUI now?',
 					  	buttons: ['Yes', 'No']
 					});
 
@@ -179,7 +179,7 @@ ipcMain.on('change_folder', function(event, data) {
 					games.push(result);
 					callback();
 				});
-				
+
 			}, function () {
 				fs.writeFileSync('data/cache/settings.json', JSON.stringify(settings));
 			    fs.writeFile('data/cache/games.json', JSON.stringify(games), function(error) {
@@ -344,7 +344,7 @@ ipcMain.on('load_game_folder', function(event) {
 			games.push(result);
 			callback();
 		});
-		
+
 	}, function () {
 	    fs.writeFile('data/cache/games.json', JSON.stringify(games), function(error) { // Saves the games object to a file
 		    if (error) {
@@ -552,7 +552,7 @@ ipcMain.on('smm_dl_level', function(event, data) {
 			  	}
 			  	callback(null);
 			})
-			
+
 		},
 	], function() {
 		event.sender.send("smm_level_dl_end");
@@ -596,7 +596,7 @@ function generalLoad() {
   			createDirectory("data/cache"); // Nope! make it.
 	  	}
 	});
-	if (!fs.existsSync('data/cache/emulators.json')) { // Is there an emualtors file? 
+	if (!fs.existsSync('data/cache/emulators.json')) { // Is there an emulators file?
 		createWindow('load_game_folder'); // Nope! Lets run the set up then!
 	} else {
 		createWindow('index'); // Yes! Run as normal, set up must have been done.
@@ -618,7 +618,7 @@ function checkForUpdate(sendFeedback) {
 			if (!error && response.statusCode == 200) {
 				var data = JSON.parse(body.toString());
 		    	if (data['error']) {
-		    		
+
 		    		logger.log('error', data['error']);
 
 		    		dialog.showMessageBox({
@@ -764,7 +764,53 @@ function loadEmulator(path) {
 function getDirectories(src) {  // Gets dirs
   	return fs.readdirSync(src).filter(file => fs.statSync(path.join(src, file)).isDirectory());
 }
+function getProductCode(file, cb) {
+	fs.open(file, 'r', function(status, fd) {
+		if (status) {
+				logger.log("error", "status.message = " + status.message);
+				return;
+		}
+		// Gets first 10 bytes of file. Product code is 10 bytes
+		var buffer = new Buffer(10);
+		fs.read(fd, buffer, 0, 10, 0, function(err, num) {
+			var productCode = buffer.toString('utf8', 0, num);
+			return cb(productCode);
+		});
+	});
+}
 function isGame(folder) { // Checks if it's a game or not
+
+ /*
+
+		Temporary, gets the product code if it's a wud file. Otherwise, it
+		loads everything normally. Product code is printed as an error.
+
+		In the future, instead of just printing it as an error, we'll search
+		what game the code corresponds to.
+
+ */
+
+var codeFile = fs.readdirSync(folder).filter(/./.test, /\.wud$/i);
+if (!codeFile || codeFile.length < 0) {
+	var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.rpx$/i);
+
+	if (!codeFile || codeFile.length < 0) {
+		return false;
+	}
+} else {
+	var codeFile = fs.readdirSync(folder).filter(/./.test, /\.wud$/i);
+	if (codeFile[0]) {
+
+		getProductCode(folder + "\\" + codeFile[0].toString(), function(productCode) {
+			logger.log("error", "Product Code: " + productCode);
+		});
+
+
+
+		return true;
+	}
+}
+
 	var subDirs = getDirectories(folder);
 	if (typeof subDirs === undefined || subDirs.length < 0) {
 	    return false;
@@ -772,15 +818,6 @@ function isGame(folder) { // Checks if it's a game or not
 
 	if (Object.values(subDirs).indexOf('code') <= -1 || Object.values(subDirs).indexOf('content') <= -1 || Object.values(subDirs).indexOf('meta') <= -1) {
 		return false;
-	}
-
-	var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.rpx$/i);
-
-	if (!codeFile || codeFile.length < 0) {
-		var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.wud$/i);
-		if (!codeFile || codeFile.length < 0) {
-			return false;
-		}
 	}
 
 	if (!fs.existsSync(folder+"\\meta\\meta.xml")) {
@@ -794,11 +831,14 @@ function isGame(folder) { // Checks if it's a game or not
 
 function loadGameData(gamePath, name, cb) {
 
+	var isWud = false;
+
 	var files = fs.readdirSync(gamePath+"\\code"), // scans code dir
 		rom   = files.filter(/./.test, /\.rpx$/i); // finds the rpx file
 
 	if (!rom || rom.length < 0) {
-		rom = files.filter(/./.test, /\.wud$/i); // finds the rpx file
+		rom = files.filter(/./.test, /\.wud$/i); // finds the wud file
+		isWud = true;
 	}
 
 	var rom = rom[0];
@@ -807,17 +847,27 @@ function loadGameData(gamePath, name, cb) {
 
 	async.waterfall([
 		function(callback) {
-			var xml = XMLParser.parse(gamePath+"\\meta\\meta.xml");
+			if (!isWud) {
+				var xml = XMLParser.parse(gamePath+"\\meta\\meta.xml");
+			} else {
+				// TODO: wud meta equivalent
+			}
+
 
 			if (!xml || typeof xml["title_id"] == 'undefined' || typeof xml["longname_en"] == 'undefined' || xml["longname_en"] === '') {
 				game["invalid"]     = 'true';
 				game["title"]       = 'Invalid Game';
 				game["playability"] = 'No playability data available for this title.';
-				game["path"]        = gamePath+"\\code\\"+rom;
+				// Sorry I made it ugly
+				if (isWud) {
+					game["path"] = gamePath+"\\"+rom;
+				} else {
+					game["path"] = gamePath+"\\code\\"+rom;
+				}
 				game["folder"]      = gamePath;
 				game["platform"]    = "Unknown";
 		  		game["releaseDate"] = "Unknown";
-		  		game["overview"]    = "The game located at `"+gamePath+"` was found to be invalid or corrupted. This is caused by CemuManager not being able to find the required meta tags for the game. This issue is generally caused by a blank/incomplete/invalid `meta.xml` file. As such, this game has been flagged as invalid, and will not run properly. The `Launch` button has been disabled. If you believe this to be an error please report it at https://github.com/RedDuckss/CemuManager/issues";
+		  		game["overview"]    = "The game located at `"+gamePath+"` was found to be invalid or corrupted. This is caused by CemUI not being able to find the required meta tags for the game. This issue is generally caused by a blank/incomplete/invalid `meta.xml` file. As such, this game has been flagged as invalid, and will not run properly. The `Launch` button has been disabled. If you believe this to be an error please report it at https://github.com/RedDuckss/CemuManager/issues";
 		  		game["ESRB"]        = "Unknown";
 		  		game["players"]     = "Unknown";
 		  		game["coop"]        = "Unknown";
@@ -828,7 +878,12 @@ function loadGameData(gamePath, name, cb) {
 
 			    callback(true, game);
 			} else {
-				game["path"] = gamePath+"\\code\\"+rom; // Sets the full path to the game
+				if (isWud) {
+					game["path"] = gamePath+"\\"+rom; // Sets the full path to the game
+				} else {
+					game["path"] = gamePath+"\\code\\"+rom; // Sets the full path to the game
+				}
+
 				game["folder"] = gamePath;
 				callback(null, xml);
 			}
@@ -859,7 +914,11 @@ function loadGameData(gamePath, name, cb) {
 	        })
 	    },
 	    function(xml, callback) {
-	    	var title_id = [xml["title_id"]["_Data"].slice(0, 8), '-', xml["title_id"]["_Data"].slice(8)].join('');
+				if (isWud) {
+					// TODO: wud title_id
+				} else {
+	    		var title_id = [xml["title_id"]["_Data"].slice(0, 8), '-', xml["title_id"]["_Data"].slice(8)].join('');
+			  }
 	    	request.get('https://cemui.com/api/GetGame/?title_id='+title_id, function (error, response, body) {
 				if (error) {
 					logger.log('error', error);
@@ -961,7 +1020,7 @@ function unzip(file, target, alert, cb) { // Unzips
 	var out = fs.createReadStream(file);
 	out.pipe(
 		unzipper.Extract({ path: target }).on('error', function(error) {
-			
+
 			logger.log('error', error);
 
 			dialog.showMessageBox({
