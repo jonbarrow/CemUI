@@ -778,10 +778,10 @@ function getProductCode(file, cb) {
 		});
 	});
 }
+
 function isGame(folder) { // Checks if it's a game or not
 
  /*
-
 		Temporary, gets the product code if it's a wud file. Otherwise, it
 		loads everything normally. Product code is printed as an error.
 
@@ -792,21 +792,17 @@ function isGame(folder) { // Checks if it's a game or not
 
 var codeFile = fs.readdirSync(folder).filter(/./.test, /\.wud$/i);
 if (!codeFile || codeFile.length < 0) {
-	var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.rpx$/i);
+	codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.rpx$/i);
 
 	if (!codeFile || codeFile.length < 0) {
 		return false;
 	}
 } else {
-	var codeFile = fs.readdirSync(folder).filter(/./.test, /\.wud$/i);
+	codeFile = fs.readdirSync(folder).filter(/./.test, /\.wud$/i);
 	if (codeFile[0]) {
-
 		getProductCode(folder + "\\" + codeFile[0].toString(), function(productCode) {
 			logger.log("error", "Product Code: " + productCode);
 		});
-
-
-
 		return true;
 	}
 }
