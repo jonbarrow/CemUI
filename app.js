@@ -15,7 +15,7 @@ var electron      = require('electron'),
 	url           = require('url'),
 	XMLParser     = require('pixl-xml'),
 	async         = require('async'),
-	Stopwatch     = require("timer-stopwatch"),
+	moment        = require('moment'),
 	unzipper      = require('unzipper'),
 	zipFolder     = require('zip-folder'),
 	_7zip         = require("7zip-standalone"),
@@ -48,7 +48,7 @@ const APP_VERSION = '1.1.1';
 
 var user_settings = {
 	is_dark: false,
-	display_code: 'box'
+	display_mode: 'box'
 }
 
 app.setName("CemUI");
@@ -328,6 +328,8 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
 		  	message: (games.length - i) + ' game(s) were removed from the games folder. Their data has been removed. Game list updated, display order of games may have changed as a result.'
 		});
   	}
+  	console.log('sss');
+  	console.log(settings);
 
   	event.sender.send("games_emulators_loaded", {game_list:game_list, emulator_list: emulators_list, display:settings['display_mode'], settings:settings});
 });
@@ -473,8 +475,7 @@ ipcMain.on('launch_game_rom', function(event, data) {
 	  	emulator = json[emulator]; // Grab the emulator object
 	  	var games = JSON.parse(fs.readFileSync('data/cache/games.json'));
 
-	  	var stopwatch = new Stopwatch();
-		stopwatch.start();
+		var then = moment();
 
 	  	exec('"'+emulator["exe_path"]+'" '+emulator["params"]+' '+'"'+game+'"', (error, stdout, stderr) => {
 	  	// Launch game with the emulator and params
@@ -483,14 +484,15 @@ ipcMain.on('launch_game_rom', function(event, data) {
 			    return;
 		  	}
 
-		  	stopwatch.stop();
-		  	console.log("Played game for "+stopwatch.ms / 1000.0+" seconds.");
-		  	console.log("Played game for "+stopwatch.ms+" milliseconds.");
+		  	var now = moment();
+
+		  	var time = now.diff(then, 'milliseconds');
+		  	console.log(time);
 
 			for (var i = games.length - 1; i >= 0; i--) {
 				if (games[i]['path'] == game) {
 					var current_time = games[i]['play_time'],
-						new_time = current_time += stopwatch.ms;
+						new_time = current_time += time;
 					games[i]['play_time'] = new_time;
 					try {
 						fs.writeFileSync('data/cache/games.json', JSON.stringify(games));
