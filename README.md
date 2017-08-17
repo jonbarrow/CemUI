@@ -1,5 +1,9 @@
 ![CemuManager](http://i.imgur.com/xoo1hvx.png)
 
+# NOT UNDER CURRENT DEVELOPMENT
+Due to several reasons, development on CemUI has stopped for now. We plan to pick the project up again in the future, but as of now it is not under development. The main reason for this is the host which housed the custom API, along with the database it used, went through recent updates and lost the entire database. I (RedDuckss, main developer) also had a PC roll back, and I lost my backup of the database. The database had over 3k entries, which cannot be easily remade. We have also moved on to other, bigger projects including game development and our overall interest in Cemu itself has dropped a lot. The CemUI discord has been revamped to display these changes.
+
+
 # CemUI
 A small launcher for the Cemu WiiU emulator made with Electron.
 You can reach us (the developers) on Discord [here.][1]
