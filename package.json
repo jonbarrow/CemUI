@@ -1,33 +1,15 @@
 {
-  "name": "CemuManager",
-  "description": "A small launcher for the Cemu WiiU emulator made with Electron",
-  "version": "0.1.0",
+  "name": "cemui2.0",
+  "version": "1.0.0",
+  "description": "",
   "main": "app.js",
-  "dependencies": {
-    "7zip-standalone": "0.0.2",
-    "async": "^2.3.0",
-    "electron": "^1.6.2",
-    "electron-basic-updater": "*",
-    "electron-packager": "^8.6.0",
-    "fs-extra": "^3.0.0",
-    "html-entities": "^1.2.1",
-    "pixl-xml": "*",
-    "request": "^2.81.0",
-    "smm-api": "^1.0.1",
-    "timer-stopwatch": "^0.2.0",
-    "unzipper": "*",
-    "zip-folder": "^1.0.0"
-  },
   "scripts": {
-    "start": "electron .",
-    "build": "node build.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RedDuckss/CemuManager.git"
-  },
-  "bugs": {
-    "url": "https://github.com/RedDuckss/CemuManager/issues"
-  },
-  "homepage": "https://github.com/RedDuckss/CemuManager#readme"
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "request": "^2.81.0"
+  }
 }
