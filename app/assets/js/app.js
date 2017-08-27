@@ -3,8 +3,16 @@ var {ipcRenderer, remote} = require('electron'),
     url = require('url'),
     BrowserWindow = remote.BrowserWindow;
 
+
+window.addEventListener('load', function() {
+    ipcRenderer.send('init');
+});
+
 (function() {
-    var gamepad_window = new BrowserWindow({
+
+    
+
+    /*var gamepad_window = new BrowserWindow({
         width: 775,
         height: 450,
         resizable: false,
@@ -20,5 +28,5 @@ var {ipcRenderer, remote} = require('electron'),
         pathname: path.join(__dirname, 'gamepad.html'),
         protocol: 'file:',
         slashes: true
-    }));
+    }));*/
 })()

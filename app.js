@@ -1,43 +1,49 @@
 var electron = require('electron'),
-	fs = require('fs-extra'),
+    fs = require('fs-extra'),
 	fs_o = require('original-fs'),
 	async = require('async'),
 	XMLParser = require('pixl-xml'),
 	low = require('lowdb'),
 	FileSync = require('lowdb/adapters/FileSync'),
 	game_storage,
-	path = require('path'),
+    path = require('path'),
 	url = require('url'),
 	tga2png = require('tga2png'),
-	png2ico = require('png-to-ico'),
-	request = require('request'),
-	dialog = electron.dialog,
-	BrowserWindow = electron.BrowserWindow,
-	ipcMain = electron.ipcMain,
-	app = electron.app;
+    png2ico = require('png-to-ico'),
+    request = require('request'),
+    dialog = electron.dialog,
+    BrowserWindow = electron.BrowserWindow,
+    ipcMain = electron.ipcMain,
+    app = electron.app;
 
-let ApplicationWindow; // Main application window
+let ApplicationWindow;
 
-function createWindow(file) { // Creates window from file
+function createWindow(file) {
   	ApplicationWindow = new BrowserWindow({
   		icon: './ico.png'
-  	});
-  	ApplicationWindow.loadURL(url.format({ // Makes the window
+	});
+
+	ApplicationWindow.setMenu(null);
+	ApplicationWindow.maximize();
+	  
+	ApplicationWindow.webContents.on('did-finish-load', () => {
+        ApplicationWindow.show();
+		ApplicationWindow.focus();
+    });
+
+  	ApplicationWindow.loadURL(url.format({
   		pathname: path.join(__dirname, '/app/'+file+'.html'),
-		protocol: 'file:',
-		slashes: true
+    	protocol: 'file:',
+    	slashes: true
   	}));
 	
 	ApplicationWindow.on('closed', () => {
-		ApplicationWindow = null;
+    	ApplicationWindow = null;
 	});
-	ApplicationWindow.maximize();
-	ApplicationWindow.setMenu(null);
 }
 
 app.on('ready', function() {
-	init();
-	createWindow('index');
+    createWindow('index');
 	ApplicationWindow.webContents.on('new-window', function(event, url) {
   		event.preventDefault();
 	  	electron.shell.openExternal(url);
@@ -46,8 +52,12 @@ app.on('ready', function() {
 
 app.on('window-all-closed', () => {
   	if (process.platform !== 'darwin') {
-		app.quit(); // OSX shit
+    	app.quit(); // OSX shit
   	}
+})
+
+ipcMain.on('init', () => {
+	init();
 })
 
 function init() {
@@ -56,9 +66,23 @@ function init() {
 	if (!fs.existsSync(path.join(__dirname, '/cache/json/games.json'))) {
 		fs.createFileSync(path.join(__dirname, '/cache/json/games.json'));
 	}
+	if (!fs.existsSync(path.join(__dirname, '/cache/json/settings.json'))) {
+		fs.createFileSync(path.join(__dirname, '/cache/json/settings.json'));
+	}
 	game_storage = low(new FileSync(path.join(__dirname, '/cache/json/games.json')));
 	game_storage.defaults({games: []}).write();
-	loadGames('C:/Users/halol/Documents/Games/WiiU');
+	settings_storage = low(new FileSync(path.join(__dirname, '/cache/json/settings.json')));
+	settings_storage.defaults({}).write();
+
+	if (!settings_storage.get('cemu_path').value()) {
+		settings_storage.set('cemu_path', pickEmuFolder()).write();
+	}
+
+	if (!settings_storage.get('games_path').value()) {
+		settings_storage.set('games_path', pickGameFolder()).write();
+	}
+
+	loadGames(settings_storage.get('games_path').value());
 }
 
 function loadGames(dir) {
@@ -191,6 +215,34 @@ function loadGames(dir) {
 	});
 }
 
+function pickGameFolder() {
+	var gameFolder = dialog.showOpenDialog({
+		title: 'Select your games folder',
+		message: 'Select your games folder',
+		properties: ['openDirectory']
+	});
+
+	if (!gameFolder) {
+		return pickGameFolder();
+	}
+	return gameFolder[0];
+}
+function pickEmuFolder() {
+	var emuFolder = dialog.showOpenDialog({
+		title: 'Select your Cemu executable',
+		message: 'Select your Cemu executable',
+		properties: ['openFile'],
+		filters: [
+			{name: 'All Executables', extensions: ['exe']}
+		]
+	});
+
+	if (!emuFolder) {
+		return pickEmuFolder();
+	}
+	return emuFolder[0];
+}
+
 function isRPX(game_path) {
 	var stats = fs.lstatSync(game_path);
 	if (!stats) return false;
@@ -214,7 +266,6 @@ function getGameData(game_path, is_wud, callback) {
 	if (is_wud) {
 		post_type = 'product_code';
 		post_code = getProductCode(game_path);
-		console.log(post_code)
 	} else {
 		xml = XMLParser.parse(game_path + '/meta/meta.xml');
 		post_type = 'title_id';
@@ -236,5 +287,5 @@ function getProductCode(file, cb) {
 }
 
 Array.prototype.contains = function(el) {
-	return this.indexOf(el) > -1;
+    return this.indexOf(el) > -1;
 }
