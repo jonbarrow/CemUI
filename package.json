@@ -9,7 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2",
-    "request": "^2.81.0"
+    "async": "^2.5.0",
+    "fs-extra": "^4.0.1",
+    "lowdb": "^0.17.2",
+    "pixl-xml": "^1.0.13",
+    "png-to-ico": "^1.0.3",
+    "request": "^2.81.0",
+    "tga2png": "^0.1.3"
   }
 }
