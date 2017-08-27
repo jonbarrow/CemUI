@@ -1,6 +1,7 @@
 const {ipcRenderer} = require('electron'); // Gets ipcRenderer
 
 var isDarkTheme = false;
+var isSMM = false;
 
 $(function() {
     $('.loader-container').hide();
@@ -259,7 +260,11 @@ ipcRenderer.on('display_changed', function(event, data) {
 
     switch(display) {
         case 'box':
-            $("#game-holder").css('display', 'flex');
+
+            if (!isSMM) {
+                $("#game-holder").css('display', 'flex');
+            }
+            
             for (var g = games.length - 1; g >= 0; g--) {
                 var invalid = "";
                 if (games[g]["invalid"]) invalid = 'disabled';
@@ -276,7 +281,11 @@ ipcRenderer.on('display_changed', function(event, data) {
             }
             break;
         case 'list':
-            $(".display-text-rows").css('display', 'block');
+
+            if (!isSMM) {
+                $(".display-text-rows").css('display', 'block');
+            }
+
             for (var g = games.length - 1; g >= 0; g--) {
                 var invalid = "";
                 if (games[g]["invalid"]) invalid = 'disabled';
@@ -381,9 +390,19 @@ ipcRenderer.on('smm_level_extract', function(event, data) {
 });
 
 $("#box-display-option").click(function() {
+    
+    if (isSMM) {
+        return;
+    }
+
     loadGameDisplay('box');
 });
 $("#list-display-option").click(function() {
+
+    if (isSMM) {
+        return;
+    }
+
     $('html, body').css({
         overflow: 'auto',
         height: 'auto'
@@ -493,6 +512,9 @@ $('#smm-search-btn').click(function(e) {
 $('#smm-toggle').click(function(e) {
     e.preventDefault();
     if (!$(this).hasClass('active')) {
+
+        isSMM = true;
+
         if ($('body').hasClass('dark')) {
             $('body').addClass('dark-tmp');
             $('body').removeClass('dark-themeable');
@@ -504,6 +526,9 @@ $('#smm-toggle').click(function(e) {
         $(".bg-image").css('display', 'none');
         $(".content-smm").css('display', 'block');
     } else {
+
+        isSMM = false;
+
         if ($('body').hasClass('dark-tmp')) {
             $('body').addClass('dark');
             $('body').addClass('dark-themeable');

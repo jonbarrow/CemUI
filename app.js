@@ -15,27 +15,41 @@ var electron      = require('electron'),
 	url           = require('url'),
 	XMLParser     = require('pixl-xml'),
 	async         = require('async'),
-	Stopwatch     = require("timer-stopwatch"),
+	moment        = require('moment'),
 	unzipper      = require('unzipper'),
 	zipFolder     = require('zip-folder'),
 	_7zip         = require("7zip-standalone"),
 	request       = require('request').defaults({ encoding: null }),
 	Entities      = require('html-entities').AllHtmlEntities,
 	smm_api       = require('smm-api'),
+	winston       = require('winston'),
 	entities      = new Entities(),
 	dialog        = electron.dialog,
 	BrowserWindow = electron.BrowserWindow,
 	ipcMain       = electron.ipcMain,
 	app           = electron.app;
 
+winston.emitErrs = true;
 
-const APP_VERSION = '1.1.0';
+var logger = new (winston.Logger)({
+	level: 'verbose',
+    transports: [
+      	new winston.transports.Console({ colorize: true }),
+      	new (winston.transports.File)({
+      		colorize: false,
+      		json: false,
+      		filename: 'cemui.error.log'
+      	})
+    ]
+});
+
+const APP_VERSION = '1.1.1';
 
 
-var user_settings = {};
-
-user_settings["is_dark"] = false;
-user_settings["display_mode"] = 'box';
+var user_settings = {
+	is_dark: false,
+	display_mode: 'box'
+}
 
 app.setName("CemUI");
 
@@ -111,11 +125,11 @@ ipcMain.on('change_folder', function(event, data) {
 			fs.writeFile('data/cache/emulators.json', JSON.stringify({"cemu": cemu}), function(error) {
 				// Saves it as `cemu` (More emulators can be added with their own options. Cemu is default)
 			    if (error) {
-			        console.log(error);
+			        logger.log('error', error);
 			    }
 			    fs.writeFile('data/cache/settings.json', JSON.stringify(settings), function(error) {
 				    if (error) {
-				        console.log(error);
+				        logger.log('error', error);
 				    }
 				    var result = dialog.showMessageBox({
 					  	type: 'question',
@@ -149,26 +163,33 @@ ipcMain.on('change_folder', function(event, data) {
 			async.forEachOf(gameDirs, function (game_index, i, callback) {
 
 				var gamePath = game_folder_path+"\\"+game_index;
-		    	if (!isGame(gamePath)) {
-			    	callback();
-			    	return;
-				}
 
-				loadGameData(gamePath, game_index, function (err, result) {
-					if (err && !result) {
-						console.log("ERROR");
-						callback();
-						return;
+				isGame(gamePath, function(game, wud, productCode) {
+					if (!game) {
+				    	callback();
+				    	return;
 					}
-					games.push(result);
-					callback();
-				});
-				
+
+					loadGameData(gamePath, game_index, wud, productCode, function(error, result) {
+						if (error && !result) {
+							logger.log('error', error);
+							callback();
+							return;
+						}
+						games.push(result);
+						callback();
+					});
+				})
 			}, function () {
-				fs.writeFileSync('data/cache/settings.json', JSON.stringify(settings));
+				try {
+					fs.writeFileSync('data/cache/settings.json', JSON.stringify(settings));
+				} catch(error) {
+					logger.log('error', error);
+				}
+				
 			    fs.writeFile('data/cache/games.json', JSON.stringify(games), function(error) {
 				    if (error) {
-				        return console.log(error);
+				        return logger.log('error', error);
 				    }
 				    var result = dialog.showMessageBox({
 					  	type: 'question',
@@ -233,9 +254,11 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
   	var i = 0,
   		games_directory = getDirectories(settings["game_folder_path"]);
   	for (var j = 0; j < games_directory.length; j++) {
-  		if (isGame(settings["game_folder_path"]+'\\'+games_directory[j])) {
-  			i++;
-  		}
+  		isGame(settings["game_folder_path"]+'\\'+games_directory[j], function(game, wud, productCode) {
+  			if (game) {
+	  			i++;
+	  		}
+  		});
   	}
 
 
@@ -252,28 +275,37 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
 				valid_paths.push(game_list[k]["folder"].replace(/\\/g, "/"));
 			}
 			for (var k = 0; k < games_directory.length; k++) {
-				if (valid_paths.indexOf(settings["game_folder_path"].replace(/\\/g,"/")+'/'+games_directory[k]) < 0 && isGame(settings["game_folder_path"]+'\\'+games_directory[k])) {
+				isGame(settings["game_folder_path"]+'\\'+games_directory[k], function(game, wud, productCode) {
+					if (valid_paths.indexOf(settings["game_folder_path"].replace(/\\/g,"/")+'/'+games_directory[k]) < 0 && game) {
 
-					ApplicationWindow.loadURL(url.format({
-					    pathname: path.join(__dirname, '/app/load_new_games.html'),
-					    protocol: 'file:',
-					    slashes: true
-					}));
-					loadGameData(settings["game_folder_path"]+'\\'+games_directory[k], games_directory[k], function (err, result) {
-						if (err && !result) {
-							console.log("ERROR");
-							return;
-						}
-						console.log('Error with '+settings["game_folder_path"].replace(/\\/g,"/")+'/'+games_directory[k]);
-						game_list.push(result);
-						fs.writeFileSync('data/cache/games.json', JSON.stringify(game_list));
 						ApplicationWindow.loadURL(url.format({
-						    pathname: path.join(__dirname, '/app/index.html'),
+						    pathname: path.join(__dirname, '/app/load_new_games.html'),
 						    protocol: 'file:',
 						    slashes: true
 						}));
-					});
-				}
+						loadGameData(settings["game_folder_path"]+'\\'+games_directory[k], games_directory[k], wud, productCode, function (error, result) {
+							if (error && !result) {
+								logger.log('error', error);
+								return;
+							}
+							console.log('Error with '+settings["game_folder_path"].replace(/\\/g,"/")+'/'+games_directory[k]);
+							game_list.push(result);
+
+							try {
+								fs.writeFileSync('data/cache/games.json', JSON.stringify(game_list));
+							} catch(error) {
+								logger.log('error', error);
+							}
+
+							
+							ApplicationWindow.loadURL(url.format({
+							    pathname: path.join(__dirname, '/app/index.html'),
+							    protocol: 'file:',
+							    slashes: true
+							}));
+						});
+					}
+				});
 			}
 		}
   	}
@@ -281,13 +313,14 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
   		for (var i = 0; i < game_list.length; i++) {
   			try {
 				fs.statSync(game_list[i]['path']);
-			} catch(e) {
+			} catch(error) {
+				logger.log('error', error);
 				game_list.splice(i, 1);
 			}
   		}
   		fs.writeFile('data/cache/games.json', JSON.stringify(game_list), function(error) { // Saves the games object to a file
 		    if (error) {
-		        return console.log(error);
+		        return logger.log('error', error);
 		    }
 		});
 		dialog.showMessageBox({
@@ -295,6 +328,8 @@ ipcMain.on('load_all_games_emulators', function(event, data) {
 		  	message: (games.length - i) + ' game(s) were removed from the games folder. Their data has been removed. Game list updated, display order of games may have changed as a result.'
 		});
   	}
+  	console.log('sss');
+  	console.log(settings);
 
   	event.sender.send("games_emulators_loaded", {game_list:game_list, emulator_list: emulators_list, display:settings['display_mode'], settings:settings});
 });
@@ -305,6 +340,8 @@ ipcMain.on('load_game_folder', function(event) {
 		games = [], // Object storing the games
 		game_errors = []; // Object storing errors
 
+	console.log(':========Loading Game Folder========:');
+
 	user_settings["game_folder_path"] = game_folder_path[0];
 
 	event.sender.send("game_folder_loading");
@@ -314,25 +351,29 @@ ipcMain.on('load_game_folder', function(event) {
 	async.forEachOf(gameDirs, function (game_index, i, callback) {
 
 		var gamePath = game_folder_path+"\\"+game_index;
-    	if (!isGame(gamePath)) { // verifies that it's a game
-	    	callback();
-	    	return;
-		}
-
-		loadGameData(gamePath, game_index, function (err, result) {
-			if (err && !result) {
-				console.log("ERROR");
-				callback();
-				return;
-			}
-			games.push(result);
-			callback();
-		});
 		
+		isGame(gamePath, function(game, wud, productCode) {
+			if (!game) { // verifies that it's a game
+		    	callback();
+		    	return;
+			}
+
+			console.log(game_index)
+
+			loadGameData(gamePath, game_index, wud, productCode, function (error, result) {
+				if (error && !result) {
+					logger.log('error', error);
+					callback();
+					return;
+				}
+				games.push(result);
+				callback();
+			});
+		});
 	}, function () {
 	    fs.writeFile('data/cache/games.json', JSON.stringify(games), function(error) { // Saves the games object to a file
 		    if (error) {
-		        return console.log(error);
+		        return logger.log('error', error);
 		    }
 		    event.sender.send("game_folder_loaded", {game_path:game_folder_path[0]}); // Tells application we're done
 		});
@@ -373,11 +414,11 @@ ipcMain.on('load_cemu_folder', function(event) {
 	fs.writeFile('data/cache/emulators.json', JSON.stringify({"cemu": cemu}), function(error) {
 		// Saves it as `cemu` (More emulators can be added with their own options. Cemu is default)
 	    if (error) {
-	        console.log(error);
+	        logger.log('error', error);
 	    }
 	    fs.writeFile('data/cache/settings.json', JSON.stringify(user_settings), function(error) {
 		    if (error) {
-		        console.log(error);
+		        logger.log('error', error);
 		    }
 		    event.sender.send("cemu_folder_loaded", cemu); // Done
 		});
@@ -403,7 +444,7 @@ ipcMain.on('change_theme', function(event, data) {
 	}
 	fs.writeFile('data/cache/settings.json', JSON.stringify(settings), function(error) {
 	    if (error) {
-	        console.log(error);
+	        logger.log('error', error);
 	    }
 	    event.sender.send("theme_changed", data); // Done
 	});
@@ -416,7 +457,7 @@ ipcMain.on('change_display', function(event, display) {
 	settings['display_mode'] = display;
 	fs.writeFile('data/cache/settings.json', JSON.stringify(settings), function(error) {
 	    if (error) {
-	        console.log(error);
+	        logger.log('error', error);
 	    }
 	    event.sender.send("display_changed", {game_list:game_list, emulator_list: emulators_list, display:display}); // Done
 	});
@@ -428,32 +469,36 @@ ipcMain.on('launch_game_rom', function(event, data) {
 
 	fs.readFile("data/cache/emulators.json", function (error, json) { // Read the emulators file
 	  	if (error) {
-	    	return console.log(error);
+	    	return logger.log('error', error);
 	  	}
 	  	json = JSON.parse(json.toString()); // Parse the shit
 	  	emulator = json[emulator]; // Grab the emulator object
 	  	var games = JSON.parse(fs.readFileSync('data/cache/games.json'));
 
-	  	var stopwatch = new Stopwatch();
-		stopwatch.start();
+		var then = moment();
 
 	  	exec('"'+emulator["exe_path"]+'" '+emulator["params"]+' '+'"'+game+'"', (error, stdout, stderr) => {
 	  	// Launch game with the emulator and params
 		  	if (error) {
-			    console.error(error);
+			    logger.log('error', error);
 			    return;
 		  	}
 
-		  	stopwatch.stop();
-		  	console.log("Played game for "+stopwatch.ms / 1000.0+" seconds.");
-		  	console.log("Played game for "+stopwatch.ms+" milliseconds.");
+		  	var now = moment();
+
+		  	var time = now.diff(then, 'milliseconds');
+		  	console.log(time);
 
 			for (var i = games.length - 1; i >= 0; i--) {
 				if (games[i]['path'] == game) {
 					var current_time = games[i]['play_time'],
-						new_time = current_time += stopwatch.ms;
+						new_time = current_time += time;
 					games[i]['play_time'] = new_time;
-					fs.writeFileSync('data/cache/games.json', JSON.stringify(games));
+					try {
+						fs.writeFileSync('data/cache/games.json', JSON.stringify(games));
+					} catch(error) {
+						logger.log('error', error);
+					}
 					event.sender.send("update_play_time", {new_time:new_time,game_path:game});
 					break;
 				}
@@ -468,9 +513,9 @@ ipcMain.on('smm_dl_level', function(event, data) {
 	async.waterfall([
 		function(callback) {
 			event.sender.send("smm_level_dl_start");
-			zipFolder(SMMLevelFolder, SMMLevelFolder + '/backup.zip', function(err) {
-			    if(err) {
-			        console.log(err);
+			zipFolder(SMMLevelFolder, SMMLevelFolder + '/backup.zip', function(error) {
+			    if(error) {
+			        logger.log('error', error);
 			        callback(null);
 			    } else {
 			        callback(null);
@@ -517,7 +562,10 @@ ipcMain.on('smm_dl_level', function(event, data) {
 		},
 		function(callback) {
 			var dir = getDirectories(SMMLevelFolder)[0];
-			fs.readdir(SMMLevelFolder+'\\'+dir, (err, files) => {
+			fs.readdir(SMMLevelFolder+'\\'+dir, (error, files) => {
+				if (error) {
+					logger.log('error', error);
+				}
 				for (var i = 0; i < files.length; i++) {
 					var file_data = fs.readFileSync(SMMLevelFolder+'\\'+dir+'\\'+files[i]);
 					fs.writeFileSync(SMMLevelFolder+'\\'+files[i], file_data);
@@ -526,9 +574,9 @@ ipcMain.on('smm_dl_level', function(event, data) {
 			callback(null, dir);
 		},
 		function(dir, callback) {
-			fs.remove(SMMLevelFolder+'\\'+dir, err => {
-			  	if (err) {
-			  		console.error(err);
+			fs.remove(SMMLevelFolder+'\\'+dir, error => {
+			  	if (error) {
+			  		logger.log('error', error);
 			  		callback(null);
 			  	}
 			  	callback(null);
@@ -565,13 +613,15 @@ ipcMain.on('start_update', function(event, version) {
 
 
 function generalLoad() {
-	fs.stat("data", function (err, stats) { // is `data` a thing?
-  		if (err) {
+	fs.stat("data", function (error, stats) { // is `data` a thing?
+  		if (error) {
+  			logger.log('error', error);
   			createDirectory("data"); // Nope! make it.
 	  	}
 	});
-	fs.stat("data/cache", function (err, stats) { // is `data/cache` a thing?
-  		if (err) {
+	fs.stat("data/cache", function (error, stats) { // is `data/cache` a thing?
+  		if (error) {
+  			logger.log('error', error);
   			createDirectory("data/cache"); // Nope! make it.
 	  	}
 	});
@@ -597,6 +647,9 @@ function checkForUpdate(sendFeedback) {
 			if (!error && response.statusCode == 200) {
 				var data = JSON.parse(body.toString());
 		    	if (data['error']) {
+		    		
+		    		logger.log('error', data['error']);
+
 		    		dialog.showMessageBox({
 					  	type: 'info',
 					  	message: data['error']
@@ -615,6 +668,8 @@ function checkForUpdate(sendFeedback) {
 					    }
 		    		}
 		    	}
+			} else if (error) {
+				logger.log('error', error);
 			}
 		});
 
@@ -689,11 +744,14 @@ function showProgress(received, total) {
     }
 }
 
-
 function createDirectory(path) { // Makes dirs
-	fs.mkdir(path, function() {
-		console.log("Created `"+path+"` folder");
-	});
+	try {
+		fs.mkdir(path, function() {
+			console.log("Created `"+path+"` folder");
+		});
+	} catch(error) {
+		logger.log('error', error);
+	}
 }
 function pickGameFolder() { // Picks dir
 	var gameFolder = dialog.showOpenDialog({
@@ -734,41 +792,64 @@ function loadEmulator(path) {
 function getDirectories(src) {  // Gets dirs
   	return fs.readdirSync(src).filter(file => fs.statSync(path.join(src, file)).isDirectory());
 }
-function isGame(folder) { // Checks if it's a game or not
-	var subDirs = getDirectories(folder);
-	if (typeof subDirs === undefined || subDirs.length < 0) {
-	    return false;
-	}
-
-	if (Object.values(subDirs).indexOf('code') <= -1 || Object.values(subDirs).indexOf('content') <= -1 || Object.values(subDirs).indexOf('meta') <= -1) {
-		return false;
-	}
-
-	var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.rpx$/i);
-
-	if (!codeFile || codeFile.length < 0) {
-		var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.wud$/i);
-		if (!codeFile || codeFile.length < 0) {
-			return false;
+function getProductCode(file, cb) {
+	fs.open(file, 'r', function(status, fd) {
+		if (status) {
+				logger.log("error", "status.message = " + status.message);
+				return;
 		}
-	}
+		// Gets first 10 bytes of file. Product code is 10 bytes
+		var buffer = new Buffer(10);
+		fs.read(fd, buffer, 0, 10, 0, function(err, num) {
+			var productCode = buffer.toString('utf8', 0, num);
+			return cb(productCode);
+		});
+	});
+}
 
-	if (!fs.existsSync(folder+"\\meta\\meta.xml")) {
-		return false;
-	}
+function isGame(folder, cb) { // Checks if it's a game or not
 
-	return true;
+	var codeFile = fs.readdirSync(folder).filter(/./.test, /\.wud$/i);
+	if (codeFile && codeFile.length > 0) {
+		getProductCode(folder + "\\" + codeFile[0].toString(), function(productCode) {
+			return cb(true, true, productCode);
+		});
+	} else {
+		var subDirs = getDirectories(folder);
+		if (typeof subDirs === undefined || subDirs.length < 0) {
+			return cb(false, false, null);
+		}
+
+		if (Object.values(subDirs).indexOf('code') <= -1 || Object.values(subDirs).indexOf('content') <= -1 || Object.values(subDirs).indexOf('meta') <= -1) {
+			return cb(false, false, null);
+		}
+
+		var codeFile = fs.readdirSync(folder+"\\code").filter(/./.test, /\.rpx$/i);
+
+		if (!codeFile || codeFile.length <= 0) {
+			return cb(false, false, null);
+		}
+
+		if (!fs.existsSync(folder+"\\meta\\meta.xml")) {
+			return cb(false, false, null);
+		}
+
+		return cb(true, false, null);
+	}
 }
 
 
 
-function loadGameData(gamePath, name, cb) {
+function loadGameData(gamePath, name, wud, productCode, cb) {
 
-	var files = fs.readdirSync(gamePath+"\\code"), // scans code dir
-		rom   = files.filter(/./.test, /\.rpx$/i); // finds the rpx file
-
-	if (!rom || rom.length < 0) {
-		rom = files.filter(/./.test, /\.wud$/i); // finds the rpx file
+	if (wud) {
+		var files = fs.readdirSync(gamePath),
+			rom = files.filter(/./.test, /\.wud$/i), // finds the wud file
+			dlPath = 'https://cemui.com/api/GetGame/?product_code=';
+	} else {
+		var files = fs.readdirSync(gamePath+"\\code"), // scans code dir
+			rom   = files.filter(/./.test, /\.rpx$/i), // finds the rpx file
+			dlPath = 'https://cemui.com/api/GetGame/?title_id=';
 	}
 
 	var rom = rom[0];
@@ -777,31 +858,38 @@ function loadGameData(gamePath, name, cb) {
 
 	async.waterfall([
 		function(callback) {
-			var xml = XMLParser.parse(gamePath+"\\meta\\meta.xml");
+			if (!wud) {
+				var xml = XMLParser.parse(gamePath+"\\meta\\meta.xml");
 
-			if (!xml || typeof xml["title_id"] == 'undefined' || typeof xml["longname_en"] == 'undefined' || xml["longname_en"] === '') {
-				game["invalid"]     = 'true';
-				game["title"]       = 'Invalid Game';
-				game["playability"] = 'No playability data available for this title.';
-				game["path"]        = gamePath+"\\code\\"+rom;
-				game["folder"]      = gamePath;
-				game["platform"]    = "Unknown";
-		  		game["releaseDate"] = "Unknown";
-		  		game["overview"]    = "The game located at `"+gamePath+"` was found to be invalid or corrupted. This is caused by CemuManager not being able to find the required meta tags for the game. This issue is generally caused by a blank/incomplete/invalid `meta.xml` file. As such, this game has been flagged as invalid, and will not run properly. The `Launch` button has been disabled. If you believe this to be an error please report it at https://github.com/RedDuckss/CemuManager/issues";
-		  		game["ESRB"]        = "Unknown";
-		  		game["players"]     = "Unknown";
-		  		game["coop"]        = "Unknown";
-		  		game["publisher"]   = "Unknown";
-		  		game["developer"]   = "Unknown";
-		  		game["background"]  = "data:png;base64," + base64_encode(path.join(__dirname, './cemumanagerlogo.png'));
-		  		game["image"]       = "data:png;base64," + base64_encode(path.join(__dirname, './WiiU-box-generic.png'));
+				if (!xml || typeof xml["title_id"] == 'undefined') {
+					game["invalid"]     = 'true';
+					game["title"]       = 'Invalid Game';
+					game["playability"] = 'No playability data available for this title.';
+					game["path"]        = gamePath+"\\code\\"+rom;
+					game["folder"]      = gamePath;
+					game["platform"]    = "Unknown";
+			  		game["releaseDate"] = "Unknown";
+			  		game["overview"]    = "The game located at `"+gamePath+"` was found to be invalid or corrupted. This is caused by CemuManager not being able to find the required meta tags for the game. This issue is generally caused by a blank/incomplete/invalid `meta.xml` file. As such, this game has been flagged as invalid, and will not run properly. The `Launch` button has been disabled. If you believe this to be an error please report it at https://github.com/RedDuckss/CemuManager/issues";
+			  		game["ESRB"]        = "Unknown";
+			  		game["players"]     = "Unknown";
+			  		game["coop"]        = "Unknown";
+			  		game["publisher"]   = "Unknown";
+			  		game["developer"]   = "Unknown";
+			  		game["background"]  = "data:png;base64," + base64_encode(path.join(__dirname, './cemumanagerlogo.png'));
+			  		game["image"]       = "data:png;base64," + base64_encode(path.join(__dirname, './WiiU-box-generic.png'));
 
-			    callback(true, game);
+				    callback(true, game);
+				} else {
+					game["path"] = gamePath+"\\code\\"+rom; // Sets the full path to the game
+					game["folder"] = gamePath;
+					callback(null, xml);
+				}
 			} else {
-				game["path"] = gamePath+"\\code\\"+rom; // Sets the full path to the game
+				game["path"] = gamePath+"\\"+rom; // Sets the full path to the game
 				game["folder"] = gamePath;
-				callback(null, xml);
+				callback(null, false);
 			}
+				
 		},
 	    function(xml, callback) {
 	        checkConnection('www.cemui.com', function(isConnected) {
@@ -829,9 +917,17 @@ function loadGameData(gamePath, name, cb) {
 	        })
 	    },
 	    function(xml, callback) {
-	    	var title_id = [xml["title_id"]["_Data"].slice(0, 8), '-', xml["title_id"]["_Data"].slice(8)].join('');
-	    	request.get('https://cemui.com/api/GetGame/?title_id='+title_id, function (error, response, body) {
+
+	    	if (wud) {
+				var key = productCode;
+			} else {
+				var key = [xml["title_id"]["_Data"].slice(0, 8), '-', xml["title_id"]["_Data"].slice(8)].join('');
+			}
+
+	    	
+	    	request.get(dlPath+key, function (error, response, body) {
 				if (error) {
+					logger.log('error', error);
 		    		callback(true);
 		    	}
 		    	if (response.statusCode != 200) {
@@ -840,6 +936,7 @@ function loadGameData(gamePath, name, cb) {
 
 		    	var data = JSON.parse(body.toString());
 		    	if (data['error']) {
+		    		logger.log('error', data['error']);
 		    		callback(true);
 		    	}
 
@@ -853,6 +950,7 @@ function loadGameData(gamePath, name, cb) {
 		    } else {
 		    	request.get(data['game_boxart_url'], function (error, response, body) { // Pulls game data from online API
 					if (error) {
+						logger.log('error', error);
 			    		callback(true);
 			    	}
 			    	if (response.statusCode != 200) {
@@ -872,6 +970,7 @@ function loadGameData(gamePath, name, cb) {
 		    } else {
 		    	request.get(data['game_background_url'], function (error, response, body) { // Pulls game data from online API
 					if (error) {
+						logger.log('error', error);
 			    		callback(true);
 			    	}
 			    	if (response.statusCode != 200) {
@@ -927,6 +1026,9 @@ function unzip(file, target, alert, cb) { // Unzips
 	var out = fs.createReadStream(file);
 	out.pipe(
 		unzipper.Extract({ path: target }).on('error', function(error) {
+			
+			logger.log('error', error);
+
 			dialog.showMessageBox({
 			  	type: 'error',
 			  	message: 'There was an error unzipping file. Perhaps the file is corrupted?'
@@ -946,8 +1048,9 @@ function unzip(file, target, alert, cb) { // Unzips
 }
 
 function checkConnection(url, cb) {
-    dns.resolve(url, function(err) {
-        if (err && err.code == "ENOTFOUND") {
+    dns.resolve(url, function(error) {
+        if (error && error.code == "ENOTFOUND") {
+        	logger.log('error', error);
             cb(false);
         } else {
             cb(true);

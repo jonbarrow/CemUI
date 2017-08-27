@@ -14,8 +14,9 @@
     "pixl-xml": "*",
     "request": "^2.81.0",
     "smm-api": "^1.0.1",
-    "timer-stopwatch": "^0.2.0",
+    "moment": "*",
     "unzipper": "*",
+    "winston": "^2.3.1",
     "zip-folder": "^1.0.0"
   },
   "scripts": {
