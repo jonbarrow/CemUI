@@ -1,20 +1,20 @@
 var electron = require('electron'),
-    fs = require('fs-extra'),
+	fs = require('fs-extra'),
 	fs_o = require('original-fs'),
 	async = require('async'),
 	XMLParser = require('pixl-xml'),
 	low = require('lowdb'),
 	FileSync = require('lowdb/adapters/FileSync'),
 	game_storage,
-    path = require('path'),
+	path = require('path'),
 	url = require('url'),
 	tga2png = require('tga2png'),
-    png2ico = require('png-to-ico'),
-    request = require('request'),
-    dialog = electron.dialog,
-    BrowserWindow = electron.BrowserWindow,
-    ipcMain = electron.ipcMain,
-    app = electron.app;
+	png2ico = require('png-to-ico'),
+	request = require('request'),
+	dialog = electron.dialog,
+	BrowserWindow = electron.BrowserWindow,
+	ipcMain = electron.ipcMain,
+	app = electron.app;
 
 let ApplicationWindow; // Main application window
 
@@ -24,12 +24,12 @@ function createWindow(file) { // Creates window from file
   	});
   	ApplicationWindow.loadURL(url.format({ // Makes the window
   		pathname: path.join(__dirname, '/app/'+file+'.html'),
-    	protocol: 'file:',
-    	slashes: true
+		protocol: 'file:',
+		slashes: true
   	}));
 	
 	ApplicationWindow.on('closed', () => {
-    	ApplicationWindow = null;
+		ApplicationWindow = null;
 	});
 	ApplicationWindow.maximize();
 	ApplicationWindow.setMenu(null);
@@ -37,7 +37,7 @@ function createWindow(file) { // Creates window from file
 
 app.on('ready', function() {
 	init();
-    createWindow('index');
+	createWindow('index');
 	ApplicationWindow.webContents.on('new-window', function(event, url) {
   		event.preventDefault();
 	  	electron.shell.openExternal(url);
@@ -46,7 +46,7 @@ app.on('ready', function() {
 
 app.on('window-all-closed', () => {
   	if (process.platform !== 'darwin') {
-    	app.quit(); // OSX shit
+		app.quit(); // OSX shit
   	}
 })
 
@@ -236,5 +236,5 @@ function getProductCode(file, cb) {
 }
 
 Array.prototype.contains = function(el) {
-    return this.indexOf(el) > -1;
+	return this.indexOf(el) > -1;
 }
