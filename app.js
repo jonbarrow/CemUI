@@ -130,19 +130,26 @@ function loadGames(dir) {
 						});
 					},
 					function(data, name, is_wud, cb) {
-						if (data.game_background_url && data.game_background_url !== '') {
+						if (data.game_screenshot_urls && data.game_screenshot_urls !== '') {
 							fs.ensureDirSync(path.join(__dirname, '/cache/images/' + data.game_title_id + '/screenshots'));
-							request(data.game_background_url)
-								.on('error', () => {
-									return cb(true);
-								})
-								.pipe(fs.createWriteStream(path.join(__dirname, '/cache/images/' + data.game_title_id + '/screenshots/1.jpg')))
-								.on('error', () => {
-									return cb(true);
-								})
-								.on('close', () => {
-									cb(null, data, name, is_wud)
-								});
+							var urls = data.game_screenshot_urls.split('|');
+							for (var j=0;j<urls.length;j++) {
+								var iteration = 0;
+								request(urls[j])
+									.on('error', () => {
+										return cb(true);
+									})
+									.pipe(fs.createWriteStream(path.join(__dirname, '/cache/images/' + data.game_title_id + '/screenshots/' + j + '.jpg')))
+									.on('error', () => {
+										return cb(true);
+									})
+									.on('close', () => {
+										iteration++;
+										if (iteration == urls.length) {
+											cb(null, data, name, is_wud);
+										}
+									});								
+							}
 						} else {
 							cb(null, data, name, is_wud);
 						}
@@ -198,6 +205,7 @@ function loadGames(dir) {
 						path: dir + '/' + name,
 						name: data.game_title,
 						name_clean: data.game_title_clean,
+						genres: data.game_genres.split('|'),
 						release_date: data.game_release_date,
 						publisher: data.game_publisher,
 						developer: data.game_developer,
