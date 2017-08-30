@@ -11,10 +11,14 @@
   "dependencies": {
     "async": "^2.5.0",
     "fs-extra": "^4.0.1",
+    "fsmonitor": "^0.2.4",
     "lowdb": "^0.17.2",
     "pixl-xml": "^1.0.13",
     "png-to-ico": "^1.0.3",
     "request": "^2.81.0",
-    "tga2png": "^0.1.3"
+    "tga2png": "^0.1.3",
+    "watch": "^1.0.2",
+    "win-shortcut": "^1.0.1",
+    "windows-shortcuts": "^0.1.5"
   }
 }

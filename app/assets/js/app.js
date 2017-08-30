@@ -1,32 +1,29 @@
-var {ipcRenderer, remote} = require('electron'),
-    path = require('path'),
-    url = require('url'),
-    BrowserWindow = remote.BrowserWindow;
+const {ipcRenderer} = require('electron'); // Gets ipcRenderer
+var games_lib = document.getElementById('games-lib');
 
+ipcRenderer.on('init_complete', function(event, data) {
+    for (var i=0;i<data.length;i++) {
+        var game = data[i],
+            wrapper = document.createElement('div'),
+            box = document.createElement('img');
+        
+        wrapper.className = 'game';
+        box.src = '../cache/images/' + game.title_id + '/box.jpg';
+        wrapper.appendChild(box);
+        //
+        
+        games_lib.appendChild(wrapper);
+    }
+});
 
-window.addEventListener('load', function() {
+addEvent(window, 'load', function() {
     ipcRenderer.send('init');
 });
 
 (function() {
-
-    
-
-    /*var gamepad_window = new BrowserWindow({
-        width: 775,
-        height: 450,
-        resizable: false,
-        frame: false
-    });
-
-    gamepad_window.webContents.on('did-finish-load', ()=>{
-        gamepad_window.show();
-        gamepad_window.focus();
-    });
-
-    gamepad_window.loadURL(url.format({ // Makes the window
-        pathname: path.join(__dirname, 'gamepad.html'),
-        protocol: 'file:',
-        slashes: true
-    }));*/
 })()
+
+
+function addEvent(object, event, func) {
+    object.addEventListener(event, func, true);
+}

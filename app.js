@@ -1,6 +1,7 @@
 var electron = require('electron'),
     fs = require('fs-extra'),
 	fs_o = require('original-fs'),
+	fsmonitor = require('fsmonitor'),
 	async = require('async'),
 	XMLParser = require('pixl-xml'),
 	low = require('lowdb'),
@@ -20,7 +21,9 @@ let ApplicationWindow;
 
 function createWindow(file) {
   	ApplicationWindow = new BrowserWindow({
-  		icon: './ico.png'
+		icon: './ico.png',
+		minHeight: 600,
+  		minWidth: 400
 	});
 
 	ApplicationWindow.setMenu(null);
@@ -29,6 +32,7 @@ function createWindow(file) {
 	ApplicationWindow.webContents.on('did-finish-load', () => {
         ApplicationWindow.show();
 		ApplicationWindow.focus();
+		//ApplicationWindow.webContents.openDevTools(); // debug stuff
     });
 
   	ApplicationWindow.loadURL(url.format({
@@ -88,23 +92,26 @@ function init() {
 function loadGames(dir) {
 	fs.readdir(dir, (error, files) => {
 		if (error) throw error;
-		for (var i=0;i<files.length;i++) {
-			var test = game_storage.get('games').find({ path: dir + '/' + files[i] }).value(),
-				is_wud = false;
-			if (test) {
-				continue;
-			}
 
-			if (path.extname(dir + '/' + files[i]) == '.wud') {
-				is_wud = true;
-			}
-
-			if (isRPX(dir + '/' + files[i]) || is_wud) {
+		async.each(files, (file, callback) => {
+			if (isGame(dir + '/' + file)) {
 				async.waterfall([
 					function(cb) {
+						var test = game_storage.get('games').find({ path: dir + '/' + file }).value(),
+							is_wud = false;
+						if (test) {
+							return cb(true);
+						}
+			
+						if (path.extname(dir + '/' + file) == '.wud') {
+							is_wud = true;
+						}
+						cb(null, is_wud);
+					},
+					function(is_wud, cb) {
 						try {
 							if (!is_wud) {
-								var xml = XMLParser.parse(dir + '/' + files[i] + '/meta/meta.xml');
+								var xml = XMLParser.parse(dir + '/' + file + '/meta/meta.xml');
 							}
 						} catch (error) {
 							return cb(true);
@@ -120,8 +127,8 @@ function loadGames(dir) {
 						cb(null, is_wud);
 					},
 					function(is_wud, cb) {
-						var name = files[i];
-						getGameData(dir + '/' + files[i], is_wud, (error, data) => {
+						var name = file;
+						getGameData(dir + '/' + file, is_wud, (error, data) => {
 							if (error) {
 								return cb(true);
 							}
@@ -196,13 +203,23 @@ function loadGames(dir) {
 						}
 					}
 				], function(error, data, name, is_wud) {
-					if (error) return;
+					if (error) {
+						return callback(null);
+					}
+
+					var rom;
+					if (is_wud) {
+						rom = dir + '/' + name;
+					} else {
+						rom = fs.readdirSync(dir + '/' + name + '/code').filter(/./.test, /\.rpx$/i)[0];
+					}
 
 					var game_data = {
 						is_wud: is_wud,
 						title_id: data.game_title_id,
 						product_code: data.game_product_code,
 						path: dir + '/' + name,
+						rom: rom,
 						name: data.game_title,
 						name_clean: data.game_title_clean,
 						genres: data.game_genres.split('|'),
@@ -216,10 +233,27 @@ function loadGames(dir) {
 						co_op: data.game_coop,
 						description: data.game_overview
 					}
+					
 					game_storage.get('games').push(game_data).write();
+
+					callback(null);
 				});
+			} else {
+				callback(null);
 			}
-		}
+		}, (error) => {
+			if (error) return;
+
+			ApplicationWindow.webContents.send('init_complete', game_storage.get('games').value());
+			/*fsmonitor.watch(settings_storage.get('games_path').value(), null, (event) => {
+				if (event.addedFiles || event.addedFolders) {
+					console.log(event)
+				}
+				if (event.removedFiles || event.removedFolders) {
+					checkInvalidGames();
+				}
+			})*/
+		});
 	});
 }
 
@@ -251,7 +285,9 @@ function pickEmuFolder() {
 	return emuFolder[0];
 }
 
-function isRPX(game_path) {
+function isGame(game_path) {
+	if (path.extname(game_path) == '.wud') return true;
+
 	var stats = fs.lstatSync(game_path);
 	if (!stats) return false;
 
