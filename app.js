@@ -398,11 +398,11 @@ function createShortcut(id) {
 		} else {
 			rom = game.path + game.rom;
 		}
-		/*ws.edit(require('os').homedir() + '/Desktop/' + name_clean + '.lnk', {
+		ws.edit(require('os').homedir() + '/Desktop/' + game.name_clean + '.lnk', {
 			args: '-g "' + rom + '"'
 		}, () => {
 			console.log('d')
-		});*/
+		});
 	})
 }
 
