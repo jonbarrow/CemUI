@@ -93,4 +93,4 @@ To run CemUI, simply run `npm start` in the CemUI directory.
 - [ ] ~Load new game (single)~ Scrapped in favor of setting loading
 - [ ] ~Remove game (single)~ Scrapped in favor of setting loading
 
-[1]: https://discord.gg/WYVnFEQ
+[1]: https://discord.gg/EKn8HnW
