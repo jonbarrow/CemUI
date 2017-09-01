@@ -1,4 +1,3 @@
-
 const {ipcRenderer} = require('electron'); // Gets ipcRenderer
 var games_lib = document.getElementById('games-grid');
 
@@ -13,7 +12,7 @@ ipcRenderer.on('init_complete', function(event, data) {
             wrapper = document.createElement('div'),
             box = document.createElement('img');
         
-        wrapper.className = 'item';
+        wrapper.className = 'grid-item';
         if (i == 0) {
             wrapper.classList.add('highlight');
         }
@@ -51,10 +50,19 @@ function openModal(id) {
 var modalList = document.getElementsByClassName('modal');
 for(var i = 0, length = modalList.length; i < length; i++)
 {
-    modalList.item(i).onclick = function() {
+    modalList.item(i).onclick = function(event) {
         closeModal();
     }
 }
+
+var modalchildList = document.getElementsByClassName('modal-content');
+for(var i = 0, length = modalchildList.length; i < length; i++)
+{
+    modalchildList.item(i).onclick = function(event) {
+        event.stopPropagation();
+    }
+}
+
 
 var closeList = document.getElementsByClassName('close');
 for(var i = 0, length = closeList.length; i < length; i++)
