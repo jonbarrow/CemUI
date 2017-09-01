@@ -58,6 +58,9 @@ h2 {
     padding: 15px;
     transition: filter 1s;
 }
+#games-grid {
+    top: 0;
+}
 .grid-cont {
     width: 100%;
     font-size: 0;
@@ -161,6 +164,12 @@ h2 {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+.controller-active {
+    /*
+    stuff
+    */
 }
 
 .txt-c-blue {

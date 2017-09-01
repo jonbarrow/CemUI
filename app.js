@@ -1,4 +1,6 @@
 var electron = require('electron'),
+	electron_reload = require('electron-reload')(__dirname),
+	ssl = require('ssl-root-cas').inject(),
     fs = require('fs-extra'),
 	fs_o = require('original-fs'),
 	fsmonitor = require('fsmonitor'),
@@ -10,7 +12,8 @@ var electron = require('electron'),
     path = require('path'),
 	url = require('url'),
 	tga2png = require('tga2png'),
-    png2ico = require('png-to-ico'),
+	png2ico = require('png-to-ico'),
+	jimp = require('jimp'),
     request = require('request'),
     dialog = electron.dialog,
     BrowserWindow = electron.BrowserWindow,
@@ -32,7 +35,7 @@ function createWindow(file) {
 	ApplicationWindow.webContents.on('did-finish-load', () => {
         ApplicationWindow.show();
 		ApplicationWindow.focus();
-		//ApplicationWindow.webContents.openDevTools(); // debug stuff
+		ApplicationWindow.webContents.openDevTools(); // debug stuff
     });
 
   	ApplicationWindow.loadURL(url.format({
@@ -195,7 +198,47 @@ function loadGames(dir) {
 							}, (error) => {
 								return cb(true);
 							});
+						} else if (data.game_icon_url) {
+							request({
+								rejectUnauthorized: false,
+								url: data.game_icon_url,
+								method: "GET"
+							})
+							.on('error', (error) => {
+								console.log(error)
+								return cb(true);
+							})
+							.pipe(fs.createWriteStream(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.jpg')))
+							.on('error', (error) => {
+								console.log(error)
+								return cb(true);
+							})
+							.on('close', () => {
+								jimp.read(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.jpg'), (error, icon) => {
+									if (error) {
+										console.log(error);
+										return cb(true);
+									}
+									icon.write(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.png'), (error) => {
+										if (error) {
+											console.log(error);
+											return cb(true);
+										}
+										fs.removeSync(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.jpg'));
+
+										png2ico(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.png')).then((buffer) => {
+											fs.removeSync(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.png'));
+											fs.writeFileSync(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.ico'), buffer);
+											cb(null, data, name, is_wud);
+										}).catch((error) => {
+											console.log(error)
+											return cb(true);
+										});
+									});
+								})
+							});
 						} else {
+							console.log('No icon found for ' + data.game_title + '. Defaulting to default icon')
 							fs.createReadStream('./defaults/icon.ico')
 								.pipe(fs.createWriteStream(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.ico')));
 							

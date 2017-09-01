@@ -2,7 +2,12 @@
 const {ipcRenderer} = require('electron'); // Gets ipcRenderer
 var games_lib = document.getElementById('games-grid');
 
+function addEvent(object, event, func) {
+    object.addEventListener(event, func, true);
+}
+
 ipcRenderer.on('init_complete', function(event, data) {
+    console.log(data)
     for (var i=0;i<data.length;i++) {
         var game = data[i],
             wrapper = document.createElement('div'),
@@ -58,6 +63,7 @@ for(var i = 0, length = closeList.length; i < length; i++)
         closeModal();
     }
 }
+
 
 //TODO insert games into grid
 //TODO create a modal inserting function. see code below.
