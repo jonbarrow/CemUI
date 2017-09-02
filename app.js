@@ -290,7 +290,7 @@ function loadGames(dir) {
 			if (error) return;
 
 			ApplicationWindow.webContents.send('init_complete', game_storage.get('games').value());
-			createShortcut('00050000-10180700');
+			//createShortcut('00050000-10180700');
 			/*fsmonitor.watch(settings_storage.get('games_path').value(), null, (event) => {
 				if (event.addedFiles || event.addedFolders) {
 					console.log(event)
