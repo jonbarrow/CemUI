@@ -70,13 +70,25 @@ window.addEventListener('gc.button.press', function(event) {
             var pos = carry.getBoundingClientRect(),
                 next = document.elementFromPoint(pos.left + 20, carry.scrollTop + pos.top + carry.clientHeight + 20);
 
+
+            /* // Testing positons
+            var tst = document.createElement('div');
+            tst.style.position = 'absolute';
+            tst.style.backgroundColor = 'red';
+            tst.style.width = tst.style.height = carry.clientWidth/2 + 20 + 'px';
+            tst.style.top = pos.top + carry.clientHeight + 20 + 'px';
+            tst.style.left = pos.left + 20 + 'px';
+            document.body.appendChild(tst);*/
+
+
+
             if (!next) {
                 sound_switch_error.pause();
                 sound_switch_error.currentTime = 0.0;
                 sound_switch_error.play();
                 return;
             }
-            if (next.tagName == 'IMG') {
+            if (next.classList == 'boxart') {
                 next = next.parentElement;
             }
             if (!next.classList.contains('grid-item')) {
@@ -89,17 +101,6 @@ window.addEventListener('gc.button.press', function(event) {
             for (var i=current_selected.length-1;i>=0;i--) {
                 current_selected[i].classList.remove('controller-active');
             }
-
-            /* // Testing positons
-            var tst = document.createElement('div');
-            tst.style.position = 'absolute';
-            tst.style.backgroundColor = 'red';
-            tst.style.width = tst.style.height = carry.clientWidth/2 + 20 + 'px';
-            tst.style.top = pos.top + carry.clientHeight + 20 + 'px';
-            tst.style.left = pos.left + 20 + 'px';
-            document.body.appendChild(tst);
-            */
-            
             
             next.classList.add('controller-active');
             sound_switch.play();
@@ -113,15 +114,27 @@ window.addEventListener('gc.button.press', function(event) {
                 carry = current_selected[0];
     
             var pos = carry.getBoundingClientRect();
-                next = document.elementFromPoint(pos.left + 20, carry.scrollTop + pos.top - carry.clientHeight + 20);
+                next = document.elementFromPoint(pos.left + 20, pos.top - carry.clientHeight + 20);
             
+
+            /* // Testing positons
+            var tst = document.createElement('div');
+            tst.style.position = 'absolute';
+            tst.style.backgroundColor = 'red';
+            tst.style.width = tst.style.height = carry.clientWidth/2 + 20 + 'px';
+            tst.style.top = pos.top - carry.clientHeight + 20 + 'px';
+            tst.style.left = pos.left + 20 + 'px';
+            document.body.appendChild(tst);
+            console.log(next)*/
+            
+
             if (!next) {
                 sound_switch_error.pause();
                 sound_switch_error.currentTime = 0.0;
                 sound_switch_error.play();
                 return;
             }
-            if (next.tagName == 'IMG') {
+            if (next.classList == 'boxart') {
                 next = next.parentElement;
             }
             if (!next.classList.contains('grid-item')) {
@@ -134,15 +147,6 @@ window.addEventListener('gc.button.press', function(event) {
             for (var i=current_selected.length-1;i>=0;i--) {
                 current_selected[i].classList.remove('controller-active');
             }
-
-            /* // Testing positons
-            var tst = document.createElement('div');
-            tst.style.position = 'absolute';
-            tst.style.backgroundColor = 'red';
-            tst.style.width = tst.style.height = carry.clientWidth/2 + 20 + 'px';
-            tst.style.top = pos.top - carry.clientHeight + 20 + 'px';
-            tst.style.left = pos.left + 20 + 'px';
-            document.body.appendChild(tst);*/
             
             next.classList.add('controller-active');
             sound_switch.play();

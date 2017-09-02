@@ -84,10 +84,12 @@ h2, p {
 
 /* main layout styles */
 #main {
+
+    display: none;
+
     height: 100vh;
     width: 100%;
 
-    display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 10fr 2fr 38fr 2fr 36fr 12fr;
     grid-template-areas:
@@ -303,8 +305,8 @@ h2, p {
 }
 .modal-grid-game > .art {
     grid-area: art;
-    height: calc(50vw / 2 * 1.43);
-    width: calc(50vw / 2);
+    height: calc(50vw / 3);
+    width: calc(50vw / 4.5);
 }
 .art > img {
     border-radius: 10px;
@@ -321,6 +323,8 @@ h2, p {
 .modal-grid-game > .desc {
     grid-area: desc;
     padding-right: 100px;
+    max-height: 55%;
+    overflow: auto;
 }
 .modal-grid-game > .ssT {
     grid-area: ssT;

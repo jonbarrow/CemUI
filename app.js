@@ -1,5 +1,6 @@
 var electron = require('electron'),
 	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
+	exec = require('child_process').exec,
 	ssl = require('ssl-root-cas').inject(),
     fs = require('fs-extra'),
 	fs_o = require('original-fs'),
@@ -37,7 +38,7 @@ function createWindow(file) {
 	ApplicationWindow.webContents.on('did-finish-load', () => {
         ApplicationWindow.show();
 		ApplicationWindow.focus();
-		ApplicationWindow.webContents.openDevTools(); // debug stuff
+		//ApplicationWindow.webContents.openDevTools(); // debug stuff
     });
 
   	ApplicationWindow.loadURL(url.format({
@@ -67,7 +68,46 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('init', () => {
 	init();
-})
+});
+
+ipcMain.on('load_cemu_folder', () => {
+	settings_storage.set('cemu_path', pickEmuFolder()).write();
+	ApplicationWindow.webContents.send('cemu_folder_loaded');
+});
+
+ipcMain.on('load_games_folder', () => {
+	var g_path = pickGameFolder();
+	ApplicationWindow.webContents.send('game_folder_loading');
+	loadGames(g_path, () => {
+		settings_storage.set('games_path', g_path).write();
+		ApplicationWindow.webContents.send('games_folder_loaded');
+	});
+});
+
+ipcMain.on('play_rom', (event, id) => {
+	var game = game_storage.get('games').find({title_id: id}).value(),
+		game_path;
+	if (game.is_wud) {
+		game_path = game.path;
+	} else {
+		game_path = game.path + '/code/' + game.rom;
+	}
+
+	console.log(game_path);
+
+	exec('"' + settings_storage.get('cemu_path').value() + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
+		if (error) {
+			console.error(error);
+			return;
+		}
+
+		game_storage.get('games').find(game).set('plays', game.plays+=1).write();
+	  });
+});
+
+ipcMain.on('make_shortcut', (event, id) => {
+	createShortcut(id);
+});
 
 function init() {
 	fs.ensureDirSync(path.join(__dirname, '/cache/images'));
@@ -84,17 +124,26 @@ function init() {
 	settings_storage.defaults({}).write();
 
 	if (!settings_storage.get('cemu_path').value()) {
-		settings_storage.set('cemu_path', pickEmuFolder()).write();
+		ApplicationWindow.webContents.send('show_screen', {cemu: true});
+		return;
 	}
 
 	if (!settings_storage.get('games_path').value()) {
-		settings_storage.set('games_path', pickGameFolder()).write();
+		ApplicationWindow.webContents.send('show_screen', {games: true});
+		return;
 	}
 
-	loadGames(settings_storage.get('games_path').value());
+	if (!game_storage.get('games').value() || game_storage.get('games').value().length <= 0) {
+		ApplicationWindow.webContents.send('show_screen', {games: true});
+		return;
+	}
+
+	loadGames(settings_storage.get('games_path').value(), () => {
+		ApplicationWindow.webContents.send('init_complete', game_storage.get('games').value());
+	});
 }
 
-function loadGames(dir) {
+function loadGames(dir, master_callback) {
 	fs.readdir(dir, (error, files) => {
 		if (error) throw error;
 
@@ -260,6 +309,7 @@ function loadGames(dir) {
 					}
 
 					var game_data = {
+						plays: 0,
 						is_wud: is_wud,
 						title_id: data.game_title_id,
 						product_code: data.game_product_code,
@@ -287,10 +337,9 @@ function loadGames(dir) {
 				callback(null);
 			}
 		}, (error) => {
-			if (error) return;
+			if (error) return master_callback(true);
+			return master_callback(null);
 
-			ApplicationWindow.webContents.send('init_complete', game_storage.get('games').value());
-			//createShortcut('00050000-10180700');
 			/*fsmonitor.watch(settings_storage.get('games_path').value(), null, (event) => {
 				if (event.addedFiles || event.addedFolders) {
 					console.log(event)
@@ -396,7 +445,7 @@ function createShortcut(id) {
 		if (game.is_wud) {
 			rom = game.path;
 		} else {
-			rom = game.path + game.rom;
+			rom = game.path + '/code/' + game.rom;
 		}
 		ws.edit(require('os').homedir() + '/Desktop/' + game.name_clean + '.lnk', {
 			args: '-g "' + rom + '"'
