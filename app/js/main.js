@@ -10,13 +10,13 @@ ipcRenderer.on('init_complete', function(event, data) {
     for (var i=0;i<data.length;i++) {
         var game = data[i],
             wrapper = document.createElement('div'),
-            box = document.createElement('img');
+            box = document.createElement('div');
         
         wrapper.className = 'grid-item';
         if (i == 0) {
             wrapper.classList.add('highlight');
         }
-        box.src = '../cache/images/' + game.title_id + '/box.jpg';
+        box.style.background-image = 'url("../cache/images/' + game.title_id + '/box.jpg")';
         wrapper.appendChild(box);
         
         games_lib.appendChild(wrapper);
@@ -37,6 +37,7 @@ function closeModal() {
     document.getElementById('main').style.filter = 'blur(0px)';
 }
 function openModal(id) {
+    if (document.getElementsByClassName('selected-modal').length > 0) closeModal();
     var modal = document.getElementById(id);
     modal.style.opacity = "0";
     modal.style.display = "block";
@@ -46,6 +47,28 @@ function openModal(id) {
     },250);
     document.getElementById('main').style.filter = 'blur(3px)';
 }
+function closeScreen(el) {
+    el.parentElement.style.opacity = "0";
+    setTimeout(function () {
+        el.parentElement.parentElement.style.opacity = "0";
+        setTimeout(function () {
+            el.parentElement.parentElement.style.display = "none";
+            el.parentElement.style.opacity = "1";
+        },1000);
+    },750);
+}
+function openScreen(id) {
+    var el = document.getElementById(id);
+    el.style.display = "inline-block";
+    setTimeout(function () {
+        el.style.opacity = "1";
+    },100);
+}
+
+
+
+
+
 
 var modalList = document.getElementsByClassName('modal');
 for(var i = 0, length = modalList.length; i < length; i++)
@@ -71,7 +94,6 @@ for(var i = 0, length = closeList.length; i < length; i++)
         closeModal();
     }
 }
-
 
 //TODO insert games into grid
 //TODO create a modal inserting function. see code below.

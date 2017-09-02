@@ -1,19 +1,16 @@
 /*
 TODO:
 
-- change font to segoe
+- change font to segoe (make it a webfont)
 - fix settings button look.
 - fix cemUI logo look (UI to top.)
 - add "+" to add games.
 - modal layouts:
-    - game modal.
+    - game modal (screenshot styling and box art size fixing)
     - game settings modal
     - settings modal
     - input settings modal
-- before launch:
-    - update screen.
-    - first start select games folder.
-    - first start select cemu folder.
+- screens (only background left);
 - super mario maker:
     - first start api key.
     - main courses layout.
@@ -66,7 +63,14 @@ body, html {
     padding: 0;
     margin: 0;
     overflow: hidden;
-    font-family: 'wlm';
+    font-family: Segoe, 'wlm';
+    font-family: Segoe UI,Frutiger,Frutiger Linotype,Dejavu Sans,Helvetica Neue,Arial,sans-serif; 
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 body {
     background: -webkit-linear-gradient(top, rgb(100, 224, 133) 0%, rgb(252, 255, 232) 0%, rgba(96,130,185,1) 100%);
@@ -156,7 +160,7 @@ h2, p {
     border-radius: 20px;
     overflow: hidden;
     box-shadow: inset 0px 0px 39px 0px rgba(0,0,0,0);
-    transition: box-shadow .35s;
+    transition: box-shadow .15s;
     height: calc(50vw / 6 * 1.43); /* WARNING SAME VALUE AS GRID ROW HEIGHT*/
 }
 .grid-item:hover {
@@ -165,13 +169,14 @@ h2, p {
 .alt {
     height: auto;
 }
-.grid-item img {
+.grid-item > div {
     height: 100%;
     width: 100%;
     opacity: 1;
-    transition: opacity .35s;
+    background-size: cover;
+    transition: opacity .15s;
 }
-.grid-item img:hover, .controller-active {
+.grid-item > div:hover, .controller-active {
     opacity: 0.65;
 }
 .highlight {
@@ -181,6 +186,57 @@ h2, p {
     grid-row-end: span 2;
     height: auto;
 }
+
+/* screen styles */
+
+.screen {
+    display: none;
+    position: fixed;
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    opacity: 1;
+    transition: opacity 1s;
+    background: linear-gradient(170deg, rgba(154,48,207,1) 0%, rgba(166,67,186,1) 33%, rgba(230,0,77,1) 100%);
+}
+.screen-content {
+    margin: auto; 
+    position: relative;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 20px;
+    border-radius: 30px;
+    z-index: 4;
+    text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    transition: opacity 1s;
+}
+.button {
+    display: inline-block;
+    background-color: #fff;
+    padding: 10px 40px;
+    color: #000;
+    border-color: #989898;
+    border-width: 0px;
+    border-style: solid;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0px 5px 15px 0px rgba(0,0,0,0.05);
+}
+.button:hover {
+    background-color: #d3d3d3;
+}
+.button:active {
+    background-color: #c1c1c1;
+    box-shadow: 0px 5px 15px 0px rgba(0,0,0,0);
+}
+.button-small {
+    padding: 10px;
+}
+
 
 /* modal styles */
 .modal {
@@ -229,6 +285,50 @@ h2, p {
     cursor: pointer;
 }
 
+.modal-grid-game {
+    width: 100%;
+    height: 100%;
+    
+    display: grid;
+    grid-template-columns: 1fr 9fr;
+    grid-template-rows: 5fr 5fr 40fr 10fr 40fr;
+    grid-gap: 15px;
+    
+    grid-template-areas:
+        "art title"
+        "art buttons"
+        "art desc"
+        "ssT ssT"
+        "ss ss";
+}
+.modal-grid-game > .art {
+    grid-area: art;
+    height: calc(50vw / 2 * 1.43);
+    width: calc(50vw / 2);
+}
+.art > img {
+    border-radius: 10px;
+    height: 100%;
+    width: 100%;
+}
+.modal-grid-game > .title {
+    grid-area: title;
+    padding: 0;
+}
+.modal-grid-game > .buttons {
+    grid-area: buttons;
+}
+.modal-grid-game > .desc {
+    grid-area: desc;
+    padding-right: 100px;
+}
+.modal-grid-game > .ssT {
+    grid-area: ssT;
+}
+.modal-grid-game > .ss {
+    grid-area: ss;
+}
+
 /* typography styles */
 .txt-c-blue {
     color: #0099FF;
@@ -249,7 +349,12 @@ h2, p {
 .txt-up {
     text-transform: uppercase;
 }
-
+.txt-margin {
+    margin: 25px;
+}
+.txt-bold {
+    font-weight: bold;
+}
 .txt-s-64 {
     font-size: 64px;
 }
@@ -271,8 +376,6 @@ h2, p {
 .txt-s-12 {
     font-size: 12px;
 }
-
-
 
 
 /* comment out because I may need it later.
