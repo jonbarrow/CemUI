@@ -1,5 +1,5 @@
 var electron = require('electron'),
-	electron_reload = require('electron-reload')(__dirname),
+	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
 	ssl = require('ssl-root-cas').inject(),
     fs = require('fs-extra'),
 	fs_o = require('original-fs'),
@@ -14,7 +14,9 @@ var electron = require('electron'),
 	tga2png = require('tga2png'),
 	png2ico = require('png-to-ico'),
 	jimp = require('jimp'),
-    request = require('request'),
+	request = require('request'),
+	shortcut = require('win-shortcut'),
+    ws = require('windows-shortcuts'),
     dialog = electron.dialog,
     BrowserWindow = electron.BrowserWindow,
     ipcMain = electron.ipcMain,
@@ -288,6 +290,7 @@ function loadGames(dir) {
 			if (error) return;
 
 			ApplicationWindow.webContents.send('init_complete', game_storage.get('games').value());
+			//createShortcut('00050000-10180700');
 			/*fsmonitor.watch(settings_storage.get('games_path').value(), null, (event) => {
 				if (event.addedFiles || event.addedFolders) {
 					console.log(event)
@@ -371,6 +374,36 @@ function getProductCode(file, cb) {
 		buffer = new Buffer(10),
 		productCode = fs.readSync(fd, buffer, 0, 10, 0);
 	return buffer.toString('utf8', 0, productCode);
+}
+
+function createShortcut(id) {
+	/*
+	God I fucking hate Node support for lnk files, and lnk files in general. 00050000-10143500
+	*/
+	var game = game_storage.get('games').find({ title_id: id }).value(),
+		cemu = settings_storage.get('cemu_path').value();
+	if (!game) return;
+	shortcut.create({
+		target_file: cemu,
+		target_folder: require('os').homedir() + '/Desktop',
+		title: game.name_clean,
+		icon: __dirname + '/cache/images/' + id + '/icon.ico'
+	}, (error) => {
+		if (error) {
+			throw error;
+		}
+		var rom;
+		if (game.is_wud) {
+			rom = game.path;
+		} else {
+			rom = game.path + game.rom;
+		}
+		ws.edit(require('os').homedir() + '/Desktop/' + game.name_clean + '.lnk', {
+			args: '-g "' + rom + '"'
+		}, () => {
+			console.log('d')
+		});
+	})
 }
 
 Array.prototype.contains = function(el) {
