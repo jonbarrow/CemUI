@@ -5,7 +5,7 @@ Controller.search({
 });
 
 window.addEventListener('gc.controller.found', function(event) {
-    var games = document.getElementById('games-grid').getElementsByClassName('item');
+    var games = document.getElementById('games-grid').getElementsByClassName('grid-item');
     if (!games[0]) return;
 
     games[0].classList.add('controller-active');
@@ -38,23 +38,64 @@ window.addEventListener('gc.button.press', function(event) {
             carry.previousElementSibling.classList.add('controller-active');
             break;
         case 'DPAD_DOWN':
-            /* // NEEDS WORK
+            // NEEDS WORK
             var current_selected = document.getElementsByClassName('controller-active'),
                 carry = current_selected[0];
+            
+            var pos = carry.getBoundingClientRect(),
+                next = document.elementFromPoint(pos.left + 20, carry.scrollTop + pos.top + carry.clientHeight + 20);
+
+            if (!next) return;
+            if (next.tagName == 'IMG') {
+                next = next.parentElement;
+            }
+            if (!next.classList.contains('grid-item')) return;
+
             for (var i=current_selected.length-1;i>=0;i--) {
                 current_selected[i].classList.remove('controller-active');
             }
-            var pos = carry.getBoundingClientRect(),
-                next = document.elementFromPoint(pos.left, carry.scrollTop + carry.clientHeight + carry.clientHeight/2);
+
+            /* // Testing positons
+            var tst = document.createElement('div');
+            tst.style.position = 'absolute';
+            tst.style.backgroundColor = 'red';
+            tst.style.width = tst.style.height = carry.clientWidth/2 + 20 + 'px';
+            tst.style.top = pos.top + carry.clientHeight + 20 + 'px';
+            tst.style.left = pos.left + 20 + 'px';
+            document.body.appendChild(tst);
+            */
             
-            if (next.tagName == 'img') {
+            
+            next.classList.add('controller-active');
+            break;
+        case 'DPAD_UP':
+            // NEEDS WORK
+            var current_selected = document.getElementsByClassName('controller-active'),
+                carry = current_selected[0];
+    
+            var pos = carry.getBoundingClientRect();
+                next = document.elementFromPoint(pos.left + 20, carry.scrollTop + pos.top - carry.clientHeight + 20);
+            
+            if (!next) return;
+            if (next.tagName == 'IMG') {
                 next = next.parentElement;
             }
+            if (!next.classList.contains('grid-item')) return;
+
+            for (var i=current_selected.length-1;i>=0;i--) {
+                current_selected[i].classList.remove('controller-active');
+            }
+
+            /* // Testing positons
+            var tst = document.createElement('div');
+            tst.style.position = 'absolute';
+            tst.style.backgroundColor = 'red';
+            tst.style.width = tst.style.height = carry.clientWidth/2 + 20 + 'px';
+            tst.style.top = pos.top - carry.clientHeight + 20 + 'px';
+            tst.style.left = pos.left + 20 + 'px';
+            document.body.appendChild(tst);*/
             
-            if (!next.classList.contains('game')) return;
-            next.classList.add('controller-active');*/
-            break;
-    
+            next.classList.add('controller-active');
         default:
             break;
     }

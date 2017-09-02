@@ -6,7 +6,6 @@ function addEvent(object, event, func) {
 }
 
 ipcRenderer.on('init_complete', function(event, data) {
-    console.log(data)
     for (var i=0;i<data.length;i++) {
         var game = data[i],
             wrapper = document.createElement('div'),
