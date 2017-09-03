@@ -63,8 +63,7 @@ body, html {
     padding: 0;
     margin: 0;
     overflow: hidden;
-    font-family: Segoe, 'wlm';
-    font-family: Segoe UI,Frutiger,Frutiger Linotype,Dejavu Sans,Helvetica Neue,Arial,sans-serif; 
+    font-family: Segoe UI,'wlm',Frutiger,Frutiger Linotype,Dejavu Sans,Helvetica Neue,Arial,sans-serif; 
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -108,7 +107,26 @@ h2, p {
 }
 .settings {
     grid-area: settings;
+    display: flex;
+    align-items: center;
     text-align: right;
+    justify-content:flex-end;
+    padding-right: 20px;
+}
+.settings-container {
+    color: #746c7b;
+    display: flex;
+    align-items: center;
+    text-align: right;
+    justify-content:flex-end;
+    cursor: pointer;
+}
+.settings-container:hover {
+    color: #000;
+}
+.txt-settings {
+    display: inline-block;
+    margin-right: 10px;
 }
 .gamesT {
     grid-area: gamesT;
@@ -125,7 +143,6 @@ h2, p {
     padding: 10px;
     margin-right: 10px;
     overflow-y: scroll;
-    /*box-shadow: inset 15px 10px 82px -35px rgba(0,0,0,0.75), inset 15px -10px 82px -35px rgba(0,0,0,0.75);*/
 }
 .mostT {
     grid-area: mostT;
@@ -275,11 +292,6 @@ h2, p {
     background-color: rgba(0,0,0,0.4); 
     
 }
-.settings {
-    position: absolute;
-    right: 15px;
-    top: 30px;
-}
 .modal-content {
     background-color: #D8E1E3;
     margin: auto; 
@@ -399,76 +411,3 @@ h2, p {
 .txt-s-12 {
     font-size: 12px;
 }
-
-
-/* comment out because I may need it later.
-#main {
-    height: 100vh;
-    width: calc(100vw - 30px);
-    padding: 15px;
-    transition: filter 1s;
-}
-#games-grid {
-    top: 0;
-}
-.grid-cont {
-    width: 100%;
-    font-size: 0;
-}
-.grid1 {
-    font-size: 16px;
-    display: inline-block;
-    width: calc(50% - 20px);
-    padding: 10px;
-    margin: 0;
-    overflow: hidden;
-}
-.grid1 > h2 {
-    padding-top: 10px;
-}
-.grid1 .icon {
-    float: right;
-    padding-top: 0px;
-}
-.suggested {
-    margin-bottom: 10vh;
-    grid-template-rows: repeat(1, calc(50vw / 6 * 1.43)) !important;
-}
-.grid2 {
-    overflow: hidden;
-}
-.grid1 .grid {
-    width: 100%;
-    max-height: 70vh;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, calc(50vw / 6));
-    grid-template-rows: repeat(auto-fill, calc(50vw / 6 * 1.43));
-    grid-gap: 15px;
-    justify-content: center;
-}
-.grid .item {
-    background-color: rgba(255, 255, 255, 0.43);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: inset 0px 0px 39px 0px rgba(0,0,0,0);
-    transition: box-shadow .35s;
-}
-.grid .item:hover {
-    box-shadow: inset 0px 0px 39px 0px rgba(0,0,0,0.11);
-}
-.grid .highlight {
-    grid-column-start: 1;
-    grid-column-end: span 2;
-    grid-row-start: 1;
-    grid-row-end: span 2;
-}
-.grid .item img {
-    height: 100%;
-    width: 100%;
-    opacity: 1;
-    transition: opacity .35s;
-}
-.grid .item img:hover {
-    opacity: 0.65;
-}
-*/
