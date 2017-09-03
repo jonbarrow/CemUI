@@ -110,17 +110,17 @@ ipcMain.on('make_shortcut', (event, id) => {
 });
 
 function init() {
-	fs.ensureDirSync(path.join(__dirname, '/cache/images'));
-	fs.ensureDirSync(path.join(__dirname, '/cache/json'));
-	if (!fs.existsSync(path.join(__dirname, '/cache/json/games.json'))) {
-		fs.createFileSync(path.join(__dirname, '/cache/json/games.json'));
+	fs.ensureDirSync('cache/images');
+	fs.ensureDirSync('cache/json');
+	if (!fs.existsSync('cache/json/games.json')) {
+		fs.createFileSync('cache/json/games.json');
 	}
-	if (!fs.existsSync(path.join(__dirname, '/cache/json/settings.json'))) {
-		fs.createFileSync(path.join(__dirname, '/cache/json/settings.json'));
+	if (!fs.existsSync('cache/json/settings.json')) {
+		fs.createFileSync('cache/json/settings.json');
 	}
-	game_storage = low(new FileSync(path.join(__dirname, '/cache/json/games.json')));
+	game_storage = low(new FileSync('cache/json/games.json'));
 	game_storage.defaults({games: []}).write();
-	settings_storage = low(new FileSync(path.join(__dirname, '/cache/json/settings.json')));
+	settings_storage = low(new FileSync('cache/json/settings.json'));
 	settings_storage.defaults({}).write();
 
 	if (!settings_storage.get('cemu_path').value()) {
@@ -192,7 +192,7 @@ function loadGames(dir, master_callback) {
 					},
 					function(data, name, is_wud, cb) {
 						if (data.game_screenshot_urls && data.game_screenshot_urls !== '') {
-							fs.ensureDirSync(path.join(__dirname, '/cache/images/' + data.game_title_id + '/screenshots'));
+							fs.ensureDirSync('cache/images/' + data.game_title_id + '/screenshots');
 							var urls = data.game_screenshot_urls.split('|');
 							for (var j=0;j<urls.length;j++) {
 								var iteration = 0;
@@ -200,7 +200,7 @@ function loadGames(dir, master_callback) {
 									.on('error', () => {
 										return cb(true);
 									})
-									.pipe(fs.createWriteStream(path.join(__dirname, '/cache/images/' + data.game_title_id + '/screenshots/' + j + '.jpg')))
+									.pipe(fs.createWriteStream('cache/images/' + data.game_title_id + '/screenshots/' + j + '.jpg'))
 									.on('error', () => {
 										return cb(true);
 									})
@@ -222,7 +222,7 @@ function loadGames(dir, master_callback) {
 								.on('error', () => {
 									return cb(true);
 								})
-								.pipe(fs.createWriteStream(path.join(__dirname, '/cache/images/' + data.game_title_id + '/box.jpg')))
+								.pipe(fs.createWriteStream('cache/images/' + data.game_title_id + '/box.jpg'))
 								.on('error', () => {
 									return cb(true);
 								})
@@ -231,7 +231,7 @@ function loadGames(dir, master_callback) {
 								});
 						} else {
 							fs.createReadStream('./defaults/box.jpg')
-								.pipe(fs.createWriteStream(path.join(__dirname, '/cache/images/' + data.game_title_id + '/box.jpg')));
+								.pipe(fs.createWriteStream('cache/images/' + data.game_title_id + '/box.jpg'));
 							
 							cb(null, data, name, is_wud);
 						}
@@ -241,7 +241,7 @@ function loadGames(dir, master_callback) {
 						if (!is_wud) {
 							tga2png(dir + '/' + name + '/meta/iconTex.tga').then(buffer=> {
 								png2ico(buffer).then((buffer) => {
-									fs.writeFileSync(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.ico'), buffer);
+									fs.writeFileSync('cache/images/' + data.game_title_id + '/icon.ico', buffer);
 									cb(null, data, name, is_wud);
 								}).catch(() => {
 									return cb(true);
@@ -259,27 +259,27 @@ function loadGames(dir, master_callback) {
 								console.log(error)
 								return cb(true);
 							})
-							.pipe(fs.createWriteStream(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.jpg')))
+							.pipe(fs.createWriteStream('cache/images/' + data.game_title_id + '/icon.jpg'))
 							.on('error', (error) => {
 								console.log(error)
 								return cb(true);
 							})
 							.on('close', () => {
-								jimp.read(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.jpg'), (error, icon) => {
+								jimp.read('cache/images/' + data.game_title_id + '/icon.jpg', (error, icon) => {
 									if (error) {
 										console.log(error);
 										return cb(true);
 									}
-									icon.write(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.png'), (error) => {
+									icon.write('cache/images/' + data.game_title_id + '/icon.png', (error) => {
 										if (error) {
 											console.log(error);
 											return cb(true);
 										}
-										fs.removeSync(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.jpg'));
+										fs.removeSync('cache/images/' + data.game_title_id + '/icon.jpg');
 
-										png2ico(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.png')).then((buffer) => {
-											fs.removeSync(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.png'));
-											fs.writeFileSync(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.ico'), buffer);
+										png2ico('cache/images/' + data.game_title_id + '/icon.png').then((buffer) => {
+											fs.removeSync('cache/images/' + data.game_title_id + '/icon.png');
+											fs.writeFileSync('cache/images/' + data.game_title_id + '/icon.ico', buffer);
 											cb(null, data, name, is_wud);
 										}).catch((error) => {
 											console.log(error)
@@ -291,7 +291,7 @@ function loadGames(dir, master_callback) {
 						} else {
 							console.log('No icon found for ' + data.game_title + '. Defaulting to default icon')
 							fs.createReadStream('./defaults/icon.ico')
-								.pipe(fs.createWriteStream(path.join(__dirname, '/cache/images/' + data.game_title_id + '/icon.ico')));
+								.pipe(fs.createWriteStream('cache/images/' + data.game_title_id + '/icon.ico'));
 							
 							cb(null, data, name, is_wud);
 						}
