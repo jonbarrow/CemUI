@@ -38,7 +38,7 @@ function createWindow(file) {
 	ApplicationWindow.webContents.on('did-finish-load', () => {
         ApplicationWindow.show();
 		ApplicationWindow.focus();
-		//ApplicationWindow.webContents.openDevTools(); // debug stuff
+		ApplicationWindow.webContents.openDevTools(); // debug stuff
     });
 
   	ApplicationWindow.loadURL(url.format({
