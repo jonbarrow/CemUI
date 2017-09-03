@@ -60,24 +60,48 @@ ipcRenderer.on('init_complete', function(event, data) {
     for (var i=0;i<data.length;i++) {
         var game = data[i],
             wrapper = document.createElement('div'),
+            fav = document.createElement('i'),
             box = document.createElement('div');
 
         createModal(game);
 
         wrapper.setAttribute('data-modal-id', game.title_id);
-        wrapper.onclick = function() {
-            openModal(this.getAttribute('data-modal-id'));
-        }
         wrapper.className = 'grid-item';
+        
         if (i == 0) {
             wrapper.classList.add('highlight');
+            fav.classList = 'txt-s-24 fa fa-times grid-icon';
+        } else {
+            fav.classList = 'txt-s-16 fa fa-star grid-icon';
         }
+        fav.setAttribute('aria-hidden','true');
+        fav.onclick = function () {
+            updateFavorite(this);
+        }
+        
         box.style.backgroundImage = 'url("../cache/images/' + game.title_id + '/box.jpg")';
         box.classList = 'boxart';
+        box.onclick = function() {
+            openModal(this.getAttribute('data-modal-id'));
+        }
+        
+        wrapper.appendChild(fav);
         wrapper.appendChild(box);
         
         games_lib.appendChild(wrapper);
     }
+    var count = data.length;
+    var high = document.getElementsByClassName('highlight')[0];
+        if (typeof high != 'undefined') {
+            count = count + 3;
+        }
+    count = 15 - count;
+    for (var i=0;i<count;i++) {
+        var item = document.createElement('div');
+        item.className = "grid-item";
+        games_lib.appendChild(item);
+    }
+    
     document.getElementById('main').style.display = 'grid';
 });
 
@@ -205,10 +229,36 @@ function openScreen(id) {
     },100);
 }
 
+function updateFavorite(el) {
+    if(el.parentElement.classList.contains('highlight')) {
+        removeFavorite(el);
+        //TODO FOR RED: remove saved favorite.
+    } else {
+        var high = document.getElementsByClassName('highlight')[0];
+        if (typeof high != 'undefined') {
+            var icon = high.children[0];
+            removeFavorite(icon);
+        }
+        setFavorite(el);
+        //TODO FOR RED: udpate saved favorite. (can also not exist yet)
+    }
+}
 
+function removeFavorite(el) {
+    el.classList.remove('fa-times');
+    el.classList.remove('txt-s-24');
+    el.classList.add('fa-star');
+    el.classList.remove('txt-s-16');
+    el.parentElement.classList.remove('highlight');
+}
 
-
-
+function setFavorite(el) {
+    el.classList.remove('fa-star');
+    el.classList.remove('txt-s-16');
+    el.classList.add('fa-times');
+    el.classList.add('txt-s-24');
+    el.parentElement.classList.add('highlight');
+}
 
 var modalList = document.getElementsByClassName('modal');
 for(var i = 0, length = modalList.length; i < length; i++)

@@ -164,9 +164,13 @@ h2, p {
     box-shadow: inset 0px 0px 39px 0px rgba(0,0,0,0);
     transition: box-shadow .15s;
     height: calc(50vw / 6 * 1.43); /* WARNING SAME VALUE AS GRID ROW HEIGHT*/
+    position: relative;
 }
 .grid-item:hover {
     box-shadow: inset 0px 0px 39px 0px rgba(0,0,0,0.21);
+}
+.grid-item:hover > .grid-icon {
+    display: inline-block;
 }
 .alt {
     height: auto;
@@ -188,7 +192,20 @@ h2, p {
     grid-row-end: span 2;
     height: auto;
 }
-
+.grid-icon {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    padding: 5px;
+    display: none;
+    color: #565656;
+    cursor: pointer;
+    z-index: 5;
+    text-shadow: 0px 0px 6px rgba(255, 255, 255, 1);
+}
+.grid-icon:hover {
+    color: #222;
+}
 /* screen styles */
 
 .screen {
