@@ -38,7 +38,7 @@ function createWindow(file) {
 	ApplicationWindow.webContents.on('did-finish-load', () => {
         ApplicationWindow.show();
 		ApplicationWindow.focus();
-		ApplicationWindow.webContents.openDevTools(); // debug stuff
+		//ApplicationWindow.webContents.openDevTools(); // debug stuff
     });
 
   	ApplicationWindow.loadURL(url.format({
@@ -107,6 +107,14 @@ ipcMain.on('play_rom', (event, id) => {
 
 ipcMain.on('make_shortcut', (event, id) => {
 	createShortcut(id);
+});
+
+ipcMain.on('set_favorite', (event, id) => {
+	game_storage.get('games').find({title_id: id}).set('is_favorite', true).write();
+});
+
+ipcMain.on('remove_favorite', (event, id) => {
+	game_storage.get('games').find({title_id: id}).set('is_favorite', false).write();
 });
 
 function init() {
@@ -309,6 +317,7 @@ function loadGames(dir, master_callback) {
 					}
 
 					var game_data = {
+						is_favorite: false,
 						plays: 0,
 						is_wud: is_wud,
 						title_id: data.game_title_id,

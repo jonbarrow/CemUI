@@ -10,6 +10,7 @@ builder.build({
         "appId": "com.cemui.app",
         "productName": "CemUI",
         "asar": true,
+        "icon": "icon.ico",
         "directories": {
           "output": "builds"
         }

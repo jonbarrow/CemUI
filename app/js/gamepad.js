@@ -17,7 +17,16 @@ window.addEventListener('gc.controller.found', function(event) {
 }, false);
 
 window.addEventListener('gc.button.press', function(event) {
+    console.log(event.detail.name)
 	switch (event.detail.name) {
+        case 'FACE_1':
+            var current_selected = document.getElementsByClassName('controller-active')[0];
+            if (!current_selected) return;
+            openModal(current_selected.getAttribute('data-modal-id'));
+            break;
+        case 'FACE_2':
+            closeModal();
+            break;
         case 'DPAD_RIGHT':
         case 'RIGHT_SHOULDER':
         case 'RIGHT_SHOULDER_BOTTOM':

@@ -1,6 +1,7 @@
 const {ipcRenderer} = require('electron'); // Gets ipcRenderer
 var games_lib = document.getElementById('games-grid'),
-    modal_list  = document.getElementById('modal-content-list');
+    modal_list  = document.getElementById('modal-content-list'),
+    modal_open = false;
 
 function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
@@ -68,7 +69,7 @@ ipcRenderer.on('init_complete', function(event, data) {
         wrapper.setAttribute('data-modal-id', game.title_id);
         wrapper.className = 'grid-item';
         
-        if (i == 0) {
+        if (game.is_favorite) {
             wrapper.classList.add('highlight');
             fav.classList = 'txt-s-24 fa fa-times grid-icon';
         } else {
@@ -199,6 +200,7 @@ function closeModal() {
         document.getElementsByClassName('selected-modal')[0].classList.remove('selected-modal');
     },500);
     document.getElementById('main').style.filter = 'blur(0px)';
+    modal_open = false;
 }
 function openModal(id) {
     if (document.getElementsByClassName('selected-modal').length > 0) closeModal();
@@ -210,6 +212,7 @@ function openModal(id) {
         modal.style.opacity = "1";
     },250);
     document.getElementById('main').style.filter = 'blur(3px)';
+    modal_open = true;
 }
 function closeScreen(el) {
     el.parentElement.style.opacity = "0";
@@ -230,9 +233,9 @@ function openScreen(id) {
 }
 
 function updateFavorite(el) {
+    console.log(el);
     if(el.parentElement.classList.contains('highlight')) {
         removeFavorite(el);
-        //TODO FOR RED: remove saved favorite.
     } else {
         var high = document.getElementsByClassName('highlight')[0];
         if (typeof high != 'undefined') {
@@ -240,7 +243,6 @@ function updateFavorite(el) {
             removeFavorite(icon);
         }
         setFavorite(el);
-        //TODO FOR RED: update saved favorite. (can also not exist yet)
     }
 }
 
@@ -256,6 +258,7 @@ function removeFavorite(el) {
         item.classList = "grid-item filler-grid-item";
         games_lib.appendChild(item);
     }
+    ipcRenderer.send('remove_favorite', el.parentElement.getAttribute('data-modal-id'));
 }
 
 function setFavorite(el) {
@@ -266,9 +269,10 @@ function setFavorite(el) {
     el.parentElement.classList.add('highlight');
     var items = document.getElementsByClassName('filler-grid-item');
     try {
-    games_lib.removeChild(items[0]);
-    games_lib.removeChild(items[1]);
-    games_lib.removeChild(items[2]);
+        games_lib.removeChild(items[0]);
+        games_lib.removeChild(items[1]);
+        games_lib.removeChild(items[2]);
+        ipcRenderer.send('set_favorite', el.parentElement.getAttribute('data-modal-id'));
     } catch(ex) {}
 }
 
