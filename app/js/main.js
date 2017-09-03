@@ -106,7 +106,13 @@ function createModal(game) {
 
     modal.id = game.title_id;
     modal.classList = 'modal';
+    modal.onclick = function(event) {
+        closeModal();
+    }
     modal_content.classList= 'modal-content';
+    modal_content.onclick = function(event) {
+        event.stopPropagation();
+    }
     close.classList = 'close';
     close.onclick = function() {
         closeModal();
@@ -228,20 +234,3 @@ for(var i = 0, length = closeList.length; i < length; i++)
         closeModal();
     }
 }
-
-//TODO insert games into grid
-//TODO create a modal inserting function. see code below.
-
-/*
-    //INSERT THIS CODE INTO ID: 'modal-content-list'
-
-    <div id="modal1" class="modal">
-
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>the content</p>
-        </div>
-
-    </div>
-
-*/
