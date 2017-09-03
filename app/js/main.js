@@ -82,7 +82,7 @@ ipcRenderer.on('init_complete', function(event, data) {
         box.style.backgroundImage = 'url("../cache/images/' + game.title_id + '/box.jpg")';
         box.classList = 'boxart';
         box.onclick = function() {
-            openModal(this.getAttribute('data-modal-id'));
+            openModal(this.parentElement.getAttribute('data-modal-id'));
         }
         
         wrapper.appendChild(fav);
@@ -98,7 +98,7 @@ ipcRenderer.on('init_complete', function(event, data) {
     count = 15 - count;
     for (var i=0;i<count;i++) {
         var item = document.createElement('div');
-        item.className = "grid-item";
+        item.classList = "grid-item filler-grid-item";
         games_lib.appendChild(item);
     }
     
@@ -240,7 +240,7 @@ function updateFavorite(el) {
             removeFavorite(icon);
         }
         setFavorite(el);
-        //TODO FOR RED: udpate saved favorite. (can also not exist yet)
+        //TODO FOR RED: update saved favorite. (can also not exist yet)
     }
 }
 
@@ -250,6 +250,12 @@ function removeFavorite(el) {
     el.classList.add('fa-star');
     el.classList.remove('txt-s-16');
     el.parentElement.classList.remove('highlight');
+    var count = 15 - games_lib.children.length;
+    for (var i=0;i<count;i++) {
+        var item = document.createElement('div');
+        item.classList = "grid-item filler-grid-item";
+        games_lib.appendChild(item);
+    }
 }
 
 function setFavorite(el) {
@@ -258,6 +264,12 @@ function setFavorite(el) {
     el.classList.add('fa-times');
     el.classList.add('txt-s-24');
     el.parentElement.classList.add('highlight');
+    var items = document.getElementsByClassName('filler-grid-item');
+    try {
+    games_lib.removeChild(items[0]);
+    games_lib.removeChild(items[1]);
+    games_lib.removeChild(items[2]);
+    } catch(ex) {}
 }
 
 var modalList = document.getElementsByClassName('modal');
