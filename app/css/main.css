@@ -1,23 +1,3 @@
-/*
-TODO:
-
-- change font to segoe (make it a webfont)
-- fix settings button look.
-- fix cemUI logo look (UI to top.)
-- add "+" to add games.
-- modal layouts:
-    - game modal (screenshot styling and box art size fixing)
-    - game settings modal
-    - settings modal
-    - input settings modal
-- screens (only background left);
-- super mario maker:
-    - first start api key.
-    - main courses layout.
-
-*/
-
-
 /* global styles */
 
 @font-face {
