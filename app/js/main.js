@@ -58,8 +58,9 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
 });
 
 ipcRenderer.on('init_complete', function(event, data) {
-    for (var i=0;i<data.length;i++) {
-        var game = data[i],
+    var games = data.library;
+    for (var i=0;i<games.length;i++) {
+        var game = games[i],
             wrapper = document.createElement('div'),
             fav = document.createElement('i'),
             box = document.createElement('div');
@@ -91,7 +92,7 @@ ipcRenderer.on('init_complete', function(event, data) {
         
         games_lib.appendChild(wrapper);
     }
-    var count = data.length;
+    var count = games.length;
     var high = document.getElementsByClassName('highlight')[0];
         if (typeof high != 'undefined') {
             count = count + 3;

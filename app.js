@@ -1,6 +1,7 @@
 var electron = require('electron'),
 	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
 	exec = require('child_process').exec,
+	_ = require('lodash'),
 	ssl = require('ssl-root-cas').inject(),
     fs = require('fs-extra'),
 	fs_o = require('original-fs'),
@@ -148,8 +149,34 @@ function init() {
 
 	verifyGames(() => {
 		loadGames(settings_storage.get('games_path').value(), () => {
-			ApplicationWindow.webContents.send('init_complete', game_storage.get('games').value());
+			var games = game_storage.get('games').value(),
+				most_played = getMostPlayed(games);
+			
+			getSuggested(most_played, (error, suggested) => {
+				if (error) throw error;
+				ApplicationWindow.webContents.send('init_complete', {library: games, most_played: most_played, suggested: suggested});
+			});
 		});
+	});
+}
+
+function getMostPlayed(values) {
+	var sorted = [];
+	values.sort(function (a, b) {
+		return a.plays - b.plays;
+	});
+	return values.reverse().slice(0, 4);
+}
+
+function getSuggested(most_played, cb) {
+	var genres = [];
+	for (var i=most_played.length-1;i>=0;i--) {
+		genres.push(most_played[i].genres[Math.floor(Math.random() * most_played[i].genres.length)]);
+	}
+	request('http://104.236.44.105/api/GetSuggested/?genres=' + genres.join('|'), (error, response, body) => {
+		body = JSON.parse(body);
+		if (error || response.statusCode !== 200 || !body || body.error) return callback(true);
+		return cb(null, body);
 	});
 }
 
