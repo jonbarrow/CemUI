@@ -1,7 +1,7 @@
 var electron = require('electron'),
 	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
 	exec = require('child_process').exec,
-	_ = require('lodash'),
+	smm = require('smm-api'),
 	ssl = require('ssl-root-cas').inject(),
     fs = require('fs-extra'),
 	fs_o = require('original-fs'),
@@ -19,10 +19,11 @@ var electron = require('electron'),
 	request = require('request'),
 	shortcut = require('win-shortcut'),
     ws = require('windows-shortcuts'),
-    dialog = electron.dialog,
+	dialog = electron.dialog,
+	shell = electron.shell,
     BrowserWindow = electron.BrowserWindow,
     ipcMain = electron.ipcMain,
-    app = electron.app;
+	app = electron.app;
 
 let ApplicationWindow;
 
@@ -106,6 +107,15 @@ ipcMain.on('play_rom', (event, id) => {
 	  });
 });
 
+ipcMain.on('show_rom', (event, id) => {
+	var game = game_storage.get('games').find({title_id: id}).value();
+	if (game.is_wud) {
+		shell.showItemInFolder(game.rom);
+	} else {
+		shell.openItem(game.path);
+	}
+})
+
 ipcMain.on('make_shortcut', (event, id) => {
 	createShortcut(id);
 });
@@ -116,6 +126,15 @@ ipcMain.on('set_favorite', (event, id) => {
 
 ipcMain.on('remove_favorite', (event, id) => {
 	game_storage.get('games').find({title_id: id}).set('is_favorite', false).write();
+});
+
+ipcMain.on('smm_search_courses', (event, data) => {
+	data.order = 'uploaded';
+	data.limit = 50;
+	smm.searchCourses(data, (error, courses) => {
+		if (error) throw error;
+		console.log(courses);
+	});
 });
 
 function init() {

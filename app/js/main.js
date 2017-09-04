@@ -105,6 +105,11 @@ ipcRenderer.on('init_complete', function(event, data) {
     }
     
     document.getElementById('main').style.display = 'grid';
+    /*
+    ipcRenderer.send('smm_search_courses', {
+        title: 'sand'
+    });
+    */
 });
 
 addEvent(window, 'load', function() {
