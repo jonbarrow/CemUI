@@ -146,9 +146,33 @@ function init() {
 		return;
 	}
 
-	loadGames(settings_storage.get('games_path').value(), () => {
-		ApplicationWindow.webContents.send('init_complete', game_storage.get('games').value());
+	verifyGames(() => {
+		loadGames(settings_storage.get('games_path').value(), () => {
+			ApplicationWindow.webContents.send('init_complete', game_storage.get('games').value());
+		});
 	});
+}
+
+function verifyGames(cb) {
+	var games = game_storage.get('games').value();
+	for (var i=games.length-1;i>=0;i--) {
+		var game = games[i],
+			pathToCheck;
+		if (game.is_wud) {
+			pathToCheck = game.rom;
+		} else {
+			pathToCheck = game.path + '/code/' + game.rom;
+		}
+
+		console.log(pathToCheck);
+
+		if (!fs.existsSync(pathToCheck)) {
+			console.log(game);
+			game_storage.get('games').remove(game).write();
+		}
+	}
+
+	return cb();
 }
 
 function loadGames(dir, master_callback) {
