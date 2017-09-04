@@ -164,10 +164,7 @@ function verifyGames(cb) {
 			pathToCheck = game.path + '/code/' + game.rom;
 		}
 
-		console.log(pathToCheck);
-
 		if (!fs.existsSync(pathToCheck)) {
-			console.log(game);
 			game_storage.get('games').remove(game).write();
 		}
 	}
