@@ -118,7 +118,7 @@ h2, p {
     display: grid;
     grid-template-columns: repeat(auto-fill, calc(50vw / 6));
     grid-template-rows: repeat(auto-fill, calc(50vw / 6 * 1.43) /* WARNING SAME VALUE AS GRIDITEM HEIGHT*/); 
-    grid-gap: 15px;
+    grid-gap: 7px;
     
     padding: 10px;
     margin-right: 10px;
