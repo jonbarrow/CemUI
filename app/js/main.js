@@ -163,14 +163,13 @@ function createModal(game,isSuggest) {
 
 
     if (isSuggest) {
-        var visit_button = document.createElement('p');
+        var visit_button = document.createElement('a');
         title.innerHTML = '<h2 class="txt-s-32 txt-c-black">' + game.game_title_clean + '</h2>';
         box.src = game.game_boxart_url;
         visit_button.classList = 'txt-s-16 txt-bold button button-small';
         visit_button.innerHTML = 'Visit game website';
-        visit_button.onclick = function() {
-            alert('coming soon');
-        }
+        visit_button.href = 'http://www.nintendo.com/games/detail/' + game.game_slug;
+        visit_button.target = '_blank';
         desc.innerHTML = '<p class="txt-s-16 txt-c-gray">' + game.game_overview + '</p>';
         desc.innerHTML += '<br><h2 class="txt-s-16 txt-c-black">Playability</h2>';
         desc.innerHTML += '<p class="txt-s-16 txt-c-gray">' + game.game_playability + '</p>';

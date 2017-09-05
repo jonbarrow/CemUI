@@ -233,6 +233,7 @@ h2, p {
 }
 .button {
     display: inline-block;
+    text-decoration: none;
     background-color: #fff;
     padding: 10px 40px;
     color: #000;
