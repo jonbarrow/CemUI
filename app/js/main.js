@@ -7,6 +7,12 @@ function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
 }
 
+addEvent(window, 'keypress', function(event) {
+    if (event.charCode == 112) {
+        ipcRenderer.send('open_dev');
+    }
+});
+
 addEvent(document.getElementById('select_cemu').getElementsByClassName('button')[0], 'click', function() {
     ipcRenderer.send('load_cemu_folder');
 });

@@ -40,7 +40,6 @@ function createWindow(file) {
 	ApplicationWindow.webContents.on('did-finish-load', () => {
         ApplicationWindow.show();
 		ApplicationWindow.focus();
-		//ApplicationWindow.webContents.openDevTools(); // debug stuff
     });
 
   	ApplicationWindow.loadURL(url.format({
@@ -66,7 +65,12 @@ app.on('window-all-closed', () => {
   	if (process.platform !== 'darwin') {
     	app.quit(); // OSX shit
   	}
-})
+});
+
+ipcMain.on('open_dev', () => {
+	console.log('d')
+	ApplicationWindow.webContents.openDevTools(); // debug stuff
+});
 
 ipcMain.on('init', () => {
 	init();
