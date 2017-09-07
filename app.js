@@ -266,6 +266,7 @@ function loadGames(dir, master_callback) {
 						});
 					},
 					function(data, name, is_wud, cb) {
+						data.screenshots_list = [];
 						if (data.game_screenshot_urls && data.game_screenshot_urls !== '') {
 							fs.ensureDirSync('cache/images/' + data.game_title_id + '/screenshots');
 							var urls = data.game_screenshot_urls.split('|');
@@ -280,6 +281,7 @@ function loadGames(dir, master_callback) {
 										return cb(true);
 									})
 									.on('close', () => {
+										data.screenshots_list.push('cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
 										iteration++;
 										if (iteration == urls.length) {
 											cb(null, data, name, is_wud);
@@ -393,6 +395,7 @@ function loadGames(dir, master_callback) {
 						rom: rom,
 						name: data.game_title,
 						name_clean: data.game_title_clean,
+						screenshots: data.screenshots_list,
 						genres: data.game_genres.split('|'),
 						release_date: data.game_release_date,
 						publisher: data.game_publisher,
