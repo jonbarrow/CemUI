@@ -1,7 +1,6 @@
 "use strict"
 
-var packager = require('electron-packager'),
-    builder = require("electron-builder"),
+var builder = require("electron-builder"),
     targets = builder.Platform;
 
 builder.build({
@@ -19,8 +18,11 @@ builder.build({
     console.log('Done');
 }).catch((error) => {
     throw error;
-})
+});
+
 /*
+var packager = require('electron-packager');
+
 packager({
 	"dir": ".",
 	"name": "CemUI",

@@ -121,7 +121,6 @@ addEvent(window, 'load', function() {
 });
 
 function addToGrid(arr,id) {
-    console.log(arr);
     var children = document.getElementById(id).children;
     for (var i=0,length = children.length ;i<length;i++) {
         if (typeof arr[i] != 'undefined') {
@@ -226,8 +225,19 @@ function createModal(game,isSuggest) {
     sst.classList = 'ssT';
     sst.innerHTML = '<h2 class="txt-s-24 txt-c-black">Screenshots</h2>';
     screenshots_list.classList = 'ss';
-    
-    
+
+    if (!isSuggest) {
+        for (var i=0;i<game.screenshots.length;i++) {
+            var screenshot_url = game.screenshots[i],
+                screenshot = document.createElement('img');
+            screenshot.src  = screenshot_url;
+            screenshot.classList = 'screenshot';
+            
+            //screenshots_list.appendChild(screenshot);
+            // No styles for screenshots yet, images way too big. Too lazy
+        }
+    }
+        
     if (isSuggest) {
         buttons.appendChild(visit_button);
     } else {

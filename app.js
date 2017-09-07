@@ -281,7 +281,7 @@ function loadGames(dir, master_callback) {
 										return cb(true);
 									})
 									.on('close', () => {
-										data.screenshots_list.push('cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
+										data.screenshots_list.push('../cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
 										iteration++;
 										if (iteration == urls.length) {
 											cb(null, data, name, is_wud);
