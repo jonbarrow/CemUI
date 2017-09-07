@@ -14,6 +14,10 @@ addEvent(window, 'keypress', function(event) {
 });
 
 addEvent(document.getElementById('select_cemu').getElementsByClassName('button')[0], 'click', function() {
+    if (this.classList.contains('disabled')) {
+        return false;
+    }
+    this.classList.add('disabled');
     ipcRenderer.send('load_cemu_folder');
 });
 
@@ -26,30 +30,32 @@ addEvent(document.getElementById('select_games').getElementsByClassName('button'
 
 
 ipcRenderer.on('show_screen', function(event, data) {
+    document.getElementById('screen_start').style.display = "none";
+    document.getElementById('select_games').style.display = "none";
+    document.getElementById('select_cemu').style.display = "none";
     if (data.cemu) {
         openScreen('select_cemu');
     }
     if (data.games) {
         openScreen('select_games');
     }
+    if (data.welcome){
+        openScreen('screen_start');
+    }
 });
 
 ipcRenderer.on('cemu_folder_loaded', function(event, data) {
     var button = document.getElementById('select_cemu').getElementsByClassName('button')[0];
     console.log(button);
-    closeScreen(button);
-    setTimeout(function() {
-        ipcRenderer.send('init');
-    }, 1000);
+    setTimeout(function () {
+        closeScreen(document.getElementById('select_cemu').getElementsByClassName('button')[0]);
+    },1000);
 });
 
 ipcRenderer.on('games_folder_loaded', function(event, data) {
     var button = document.getElementById('select_games').getElementsByClassName('button')[0];
     console.log(button);
     closeScreen(button);
-    setTimeout(function() {
-        ipcRenderer.send('init');
-    }, 1000);
 });
 
 ipcRenderer.on('game_folder_loading', function(event, data) {
@@ -233,7 +239,7 @@ function createModal(game,isSuggest) {
     screenshots_list.classList = 'ss';
 
     if (!isSuggest) {
-        for (var i=0;i<game.screenshots.length;i++) {
+        /*for (var i=0;i<game.screenshots.length;i++) {
             var screenshot_url = game.screenshots[i],
                 screenshot = document.createElement('img');
             screenshot.src  = screenshot_url;
@@ -241,7 +247,7 @@ function createModal(game,isSuggest) {
             
             //screenshots_list.appendChild(screenshot);
             // No styles for screenshots yet, images way too big. Too lazy
-        }
+        }*/
     }
         
     if (isSuggest) {
@@ -289,6 +295,12 @@ function openModal(id) {
 }
 function closeScreen(el) {
     el.parentElement.style.opacity = "0";
+    el.parentElement.parentElement.classList.add('closed');
+    if (document.getElementById('screen_start').classList.contains('closed') &&
+        document.getElementById('select_games').classList.contains('closed') &&
+        document.getElementById('select_cemu').classList.contains('closed')) {
+        ipcRenderer.send('init');
+    }
     setTimeout(function () {
         el.parentElement.parentElement.style.opacity = "0";
         setTimeout(function () {
@@ -300,6 +312,7 @@ function closeScreen(el) {
 function openScreen(id) {
     var el = document.getElementById(id);
     el.style.display = "inline-block";
+    el.classList.remove('closed');
     setTimeout(function () {
         el.style.opacity = "1";
     },100);

@@ -141,6 +141,10 @@ ipcMain.on('smm_search_courses', (event, data) => {
 });
 
 function init() {
+    var screenGames = false,
+        screenCemu = false,
+        screenWelcome = false;
+    
 	fs.ensureDirSync('cache/images');
 	fs.ensureDirSync('cache/json');
 	if (!fs.existsSync('cache/json/games.json')) {
@@ -148,6 +152,7 @@ function init() {
 	}
 	if (!fs.existsSync('cache/json/settings.json')) {
 		fs.createFileSync('cache/json/settings.json');
+        screenWelcome = true;
 	}
 	game_storage = low(new FileSync('cache/json/games.json'));
 	game_storage.defaults({games: []}).write();
@@ -155,19 +160,21 @@ function init() {
 	settings_storage.defaults({}).write();
 
 	if (!settings_storage.get('cemu_path').value()) {
-		ApplicationWindow.webContents.send('show_screen', {cemu: true});
-		return;
+		screenCemu = true;
 	}
 
 	if (!settings_storage.get('games_path').value()) {
-		ApplicationWindow.webContents.send('show_screen', {games: true});
-		return;
+		screenGames = true;
 	}
 
 	if (!game_storage.get('games').value() || game_storage.get('games').value().length <= 0) {
-		ApplicationWindow.webContents.send('show_screen', {games: true});
-		return;
+		screenGames = true;
 	}
+    
+    if (screenCemu || screenGames || screenWelcome) {
+        ApplicationWindow.webContents.send('show_screen', {games: screenGames, cemu: screenCemu, welcome: screenWelcome});
+        return;
+    }
 
 	verifyGames(() => {
 		loadGames(settings_storage.get('games_path').value(), () => {
