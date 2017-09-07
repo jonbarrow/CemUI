@@ -239,15 +239,15 @@ function createModal(game,isSuggest) {
     screenshots_list.classList = 'ss';
 
     if (!isSuggest) {
-        /*for (var i=0;i<game.screenshots.length;i++) {
+        for (var i=0;i<game.screenshots.length;i++) {
             var screenshot_url = game.screenshots[i],
                 screenshot = document.createElement('img');
             screenshot.src  = screenshot_url;
             screenshot.classList = 'screenshot';
             
-            //screenshots_list.appendChild(screenshot);
+            screenshots_list.appendChild(screenshot);
             // No styles for screenshots yet, images way too big. Too lazy
-        }*/
+        }
     }
         
     if (isSuggest) {

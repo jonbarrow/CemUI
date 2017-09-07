@@ -287,7 +287,9 @@ h2, p {
 }
 .close {
     color: #aaa;
-    float: right;
+    position: absolute;
+    right:15px;
+    top:15px;
     font-size: 28px;
     font-weight: bold;
 }
@@ -343,6 +345,13 @@ h2, p {
 }
 .modal-grid-game > .ss {
     grid-area: ss;
+    overflow-y: scroll;
+}
+.ss img {
+    height: 90%;
+    width: auto;
+    margin: 0 20px;
+    border-radius: 20px;
 }
 
 /* typography styles */
