@@ -68,7 +68,6 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('open_dev', () => {
-	console.log('d')
 	ApplicationWindow.webContents.openDevTools(); // debug stuff
 });
 
@@ -285,7 +284,7 @@ function loadGames(dir, master_callback) {
 										return cb(true);
 									})
 									.on('close', () => {
-										data.screenshots_list.push('../cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
+										data.screenshots_list.push(__dirname + '/cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
 										iteration++;
 										if (iteration == urls.length) {
 											cb(null, data, name, is_wud);
@@ -399,6 +398,7 @@ function loadGames(dir, master_callback) {
 						rom: rom,
 						name: data.game_title,
 						name_clean: data.game_title_clean,
+						boxart: __dirname.replace(/\\/g, '/') + '/cache/images/' + data.game_title_id + '/box.jpg',
 						screenshots: data.screenshots_list,
 						genres: data.game_genres.split('|'),
 						release_date: data.game_release_date,

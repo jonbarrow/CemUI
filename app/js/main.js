@@ -87,7 +87,7 @@ ipcRenderer.on('init_complete', function(event, data) {
             updateFavorite(this);
         }
         
-        box.style.backgroundImage = 'url("../cache/images/' + game.title_id + '/box.jpg")';
+        box.style.backgroundImage = 'url("' + game.boxart + '")';
         box.classList = 'boxart';
         box.onclick = function() {
             openModal(this.parentElement.getAttribute('data-modal-id'));
@@ -136,7 +136,7 @@ function addToGrid(arr,id) {
                 game = arr[i];
 
             if (typeof game.game_boxart_url == 'undefined') {
-                box.style.backgroundImage = 'url("../cache/images/' + game.title_id + '/box.jpg")';
+                box.style.backgroundImage = 'url("' + game.boxart + '")';
                 wrapper.setAttribute('data-modal-id', game.title_id);
             } else {
                 box.style.backgroundImage = 'url("' + game.game_boxart_url + '")';
@@ -206,7 +206,7 @@ function createModal(game,isSuggest) {
         game_settings_button.onclick = function() {
             alert('Coming soon');
         }
-        box.src = '../cache/images/' + game.title_id + '/box.jpg';
+        box.src = game.boxart;
         desc.innerHTML = '<p class="txt-s-16 txt-c-gray">' + game.description + '</p>';
         modal.id = game.title_id;
     }
