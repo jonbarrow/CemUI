@@ -1,7 +1,7 @@
 
 ## In-dev rewrite of CemUI
  
-**IMPORTANT:** This branch is the in-development version of CemUI 2.0! Nothing here is stable.
+**IMPORTANT:** This is the in-development version of CemUI 2.0! Nothing here is stable.
 
 ## How can I help? / I have a suggestion!
 We always welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone with experience in JavaScript, Node, html, css, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules, and will be packaged by Electron just fine!
