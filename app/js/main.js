@@ -215,13 +215,13 @@ function createModal(game,isSuggest) {
         sect2.classList = "sect2";
         
         sect1back.innerHTML = "<p>back</p>";
-        sect1back.classList = "txt-s-16";
+        sect1back.classList = "txt-s-16 txt-bold button button-small";
         sect1back.onclick = function() {
             closeExpandModal(this.parentElement.parentElement.parentElement.children[1]);
         }
         
         sect1.appendChild(sect1back);
-        sect1.innerHTML += '<h2 class="txt-s-32 txt-c-black">Settings</h2>';
+        //sect1.innerHTML += '<h2 class="txt-s-32 txt-c-black">Settings</h2>';
         
         
         title.innerHTML = '<h2 class="txt-s-32 txt-c-black">' + game.name + '</h2>';

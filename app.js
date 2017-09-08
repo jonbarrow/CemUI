@@ -106,8 +106,6 @@ ipcMain.on('play_rom', (event, id) => {
 		game_path = game.path + '/code/' + game.rom;
 	}
 
-	console.log(game_path);
-
 	exec('"' + settings_storage.get('cemu_path').value() + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
 		if (error) {
 			console.error(error);
@@ -257,7 +255,7 @@ function loadGames(dir, master_callback) {
 							return cb(true);
 						}
 			
-						if (path.extname(dir + '/' + file) == '.wud') {
+						if (path.extname(dir + '/' + file) == '.wud' || path.extname(dir + '/' + file) == '.wux') {
 							is_wud = true;
 						}
 						cb(null, is_wud);
@@ -487,7 +485,7 @@ function pickEmuFolder() {
 }
 
 function isGame(game_path) {
-	if (path.extname(game_path) == '.wud') return true;
+	if (path.extname(game_path) == '.wud' || path.extname(game_path) == '.wux') return true;
 
 	var stats = fs.lstatSync(game_path);
 	if (!stats) return false;
@@ -525,9 +523,15 @@ function getGameData(game_path, is_wud, callback) {
 }
 
 function getProductCode(file, cb) {
+
 	var fd = fs.openSync(file, 'r'),
-		buffer = new Buffer(10),
+		buffer = new Buffer(10);
+
+	if (path.extname(file) == '.wux') {
+		productCode = fs.readSync(fd, buffer, 0, 10, 0x2F0000);
+	} else {
 		productCode = fs.readSync(fd, buffer, 0, 10, 0);
+	}
 	return buffer.toString('utf8', 0, productCode);
 }
 
