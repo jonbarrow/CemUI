@@ -234,7 +234,7 @@ function createModal(game,isSuggest) {
     modal_content.onclick = function(event) {
         event.stopPropagation();
     }
-    close.classList = 'close';
+    close.classList = 'close txt-s-24';
     close.onclick = function() {
         closeModal();
     }
