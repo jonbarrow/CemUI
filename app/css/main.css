@@ -293,6 +293,7 @@ h2, p {
     top:15px;
     font-size: 28px;
     font-weight: bold;
+    z-index: 99;
 }
 
 .close:hover,
@@ -305,6 +306,7 @@ h2, p {
 .modal-grid-game {
     width: 100%;
     height: 100%;
+    transition: left 1s;
     
     display: grid;
     grid-template-columns: 2fr 8fr;
@@ -357,6 +359,38 @@ h2, p {
     width: auto;
     margin: 0 20px;
     border-radius: 20px;
+}
+
+.modal-grid-game-settings {
+    width: 100%;
+    height: 100%;
+    transition: left 1s;
+    
+    display: grid;
+    grid-template-columns: 4fr 7fr 9fr;
+    grid-template-rows: 1fr;
+    grid-gap: 15px;
+    padding: 25px;
+    
+    grid-template-areas:
+        "art sect1 sect2";
+}
+
+.modal-grid-game-settings .art {
+    grid-area: art;
+    width: 100%;
+    height: 100%;
+}
+.modal-grid-game-settings .art img {
+    border-radius: 10px;
+    width: 100%;
+    height: auto;
+}
+.modal-grid-game-settings .sect1 {
+    grid-area: sect1;
+}
+.modal-grid-game-settings .sect2 {
+    grid-area: sect2;
 }
 
 /* typography styles */
