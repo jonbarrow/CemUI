@@ -65,7 +65,6 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
     button.classList.add('disabled');
     button.innerHTML = '(This may take a moment) Downloading game data... ';
     spinner.classList = 'fa fa-spinner fa-spin';
-    //$("h5").html("Downloading Game Data...").append('<br><small class=\"text-muted\">(This may take a moment)</small>');
     button.appendChild(spinner);
     
 });
