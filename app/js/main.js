@@ -65,7 +65,6 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
     button.classList.add('disabled');
     button.innerHTML = '(This may take a moment) Downloading game data... ';
     spinner.classList = 'fa fa-spinner fa-spin';
-    //$("h5").html("Downloading Game Data...").append('<br><small class=\"text-muted\">(This may take a moment)</small>');
     button.appendChild(spinner);
     
 });
@@ -101,6 +100,7 @@ ipcRenderer.on('init_complete', function(event, data) {
             if (clicks === 1) {
                 clicktimer = setTimeout(function() {
                     clicks = 0;
+                    closeExpandModal(document.getElementById(this.parentElement.getAttribute('data-modal-id')).children[0].children[1]);
                     openModal(this.parentElement.getAttribute('data-modal-id'));
                 }.bind(this), 400);
             } else if (clicks === 2) {
@@ -175,6 +175,7 @@ function createModal(game,isSuggest) {
         modal_content = document.createElement('div'),
         close = document.createElement('span'),
         modal_grid_game = document.createElement('div'),
+        modal_grid_game_settings = document.createElement('div'),
         art = document.createElement('div'),
         box = document.createElement('img'),
         title = document.createElement('div'),
@@ -200,7 +201,28 @@ function createModal(game,isSuggest) {
         var play_button = document.createElement('p'),
             folder_button = document.createElement('p'),
             shortcut_button = document.createElement('p'),
-            game_settings_button = document.createElement('p');
+            game_settings_button = document.createElement('p'),
+            settingsartcontainer = document.createElement('div'),
+            settingsart = document.createElement('img'),
+            sect1 = document.createElement('div'),
+            sect1back = document.createElement('div'),
+            sect2 = document.createElement('div');
+        
+        modal_grid_game_settings.classList = "modal-grid-game-settings";
+        settingsart.src = game.boxart;
+        settingsartcontainer.classList = "art";
+        sect1.classList = "sect1";
+        sect2.classList = "sect2";
+        
+        sect1back.innerHTML = "<p>back</p>";
+        sect1back.classList = "txt-s-16";
+        sect1back.onclick = function() {
+            closeExpandModal(this.parentElement.parentElement.parentElement.children[1]);
+        }
+        
+        sect1.appendChild(sect1back);
+        sect1.innerHTML += '<h2 class="txt-s-32 txt-c-black">Settings</h2>';
+        
         
         title.innerHTML = '<h2 class="txt-s-32 txt-c-black">' + game.name + '</h2>';
         play_button.classList = 'txt-s-16 txt-bold button button-small play-button';
@@ -221,7 +243,7 @@ function createModal(game,isSuggest) {
         game_settings_button.classList = 'txt-s-16 txt-bold button button-small game-settings-button';
         game_settings_button.innerHTML = 'Settings';
         game_settings_button.onclick = function() {
-            alert('Coming soon');
+            expandModal(this);
         }
         box.src = game.boxart;
         desc.innerHTML = '<p class="txt-s-16 txt-c-gray">' + game.description + '</p>';
@@ -235,12 +257,14 @@ function createModal(game,isSuggest) {
     modal_content.onclick = function(event) {
         event.stopPropagation();
     }
-    close.classList = 'close';
+    close.classList = 'close txt-s-24';
     close.onclick = function() {
         closeModal();
     }
     close.innerHTML = '&times;';
     modal_grid_game.classList = 'modal-grid-game';
+    modal_grid_game.style.position = "relative";
+    modal_grid_game.style.left = "0";
     art.classList = 'art';
     title.classList = 'title';
     buttons.classList = 'buttons';
@@ -267,6 +291,13 @@ function createModal(game,isSuggest) {
         buttons.appendChild(folder_button);
         buttons.appendChild(shortcut_button);
         buttons.appendChild(game_settings_button);
+        modal_grid_game_settings.style.position = "absolute";
+        modal_grid_game_settings.style.left = "100%";
+        modal_grid_game_settings.style.top = "0";
+        settingsartcontainer.appendChild(settingsart);
+        modal_grid_game_settings.appendChild(settingsartcontainer);
+        modal_grid_game_settings.appendChild(sect1);
+        modal_grid_game_settings.appendChild(sect2);
     }
     art.appendChild(box);
     modal_grid_game.appendChild(art);
@@ -277,6 +308,9 @@ function createModal(game,isSuggest) {
     modal_grid_game.appendChild(screenshots_list);
     modal_content.appendChild(close);
     modal_content.appendChild(modal_grid_game);
+    if (!isSuggest) {
+        modal_content.appendChild(modal_grid_game_settings);
+    }
     modal.appendChild(modal_content);
 
     modal_list.appendChild(modal);
@@ -302,6 +336,19 @@ function openModal(id) {
     },250);
     document.getElementById('main').style.filter = 'blur(3px)';
     modal_open = true;
+}
+function expandModal(el) {
+    var grid = el.parentElement.parentElement;
+    var expandgrid = grid.parentElement.children[2];
+    grid.style.left = "-100%";
+    expandgrid.style.left = "0";
+}
+function closeExpandModal(el) {
+    console.log("closing");
+    var grid = el;
+    var expandgrid = grid.parentElement.children[2];
+    grid.style.left = "0";
+    expandgrid.style.left = "100%";
 }
 function closeScreen(el) {
     el.parentElement.style.opacity = "0";

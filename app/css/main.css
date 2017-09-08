@@ -284,6 +284,7 @@ h2, p {
     height: 80%;
     border-radius: 30px;
     z-index: 4;
+    overflow: hidden;
 }
 .close {
     color: #aaa;
@@ -292,6 +293,7 @@ h2, p {
     top:15px;
     font-size: 28px;
     font-weight: bold;
+    z-index: 99;
 }
 
 .close:hover,
@@ -304,11 +306,14 @@ h2, p {
 .modal-grid-game {
     width: 100%;
     height: 100%;
+    transition: left 1s;
     
     display: grid;
-    grid-template-columns: 1fr 9fr;
+    grid-template-columns: 2fr 8fr;
     grid-template-rows: 5fr 5fr 40fr 10fr 40fr;
     grid-gap: 15px;
+    
+    margin-bottom: 15px;
     
     grid-template-areas:
         "art title"
@@ -319,13 +324,15 @@ h2, p {
 }
 .modal-grid-game > .art {
     grid-area: art;
-    height: calc(50vw / 3);
-    width: calc(50vw / 4.5);
+    display: inline-block;
+    width: 100%;
+    height: 100%;
 }
 .art > img {
     border-radius: 10px;
-    height: 100%;
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    overflow-y
 }
 .modal-grid-game > .title {
     grid-area: title;
@@ -354,6 +361,38 @@ h2, p {
     border-radius: 20px;
 }
 
+.modal-grid-game-settings {
+    width: 100%;
+    height: 100%;
+    transition: left 1s;
+    
+    display: grid;
+    grid-template-columns: 4fr 7fr 9fr;
+    grid-template-rows: 1fr;
+    grid-gap: 15px;
+    padding: 25px;
+    
+    grid-template-areas:
+        "art sect1 sect2";
+}
+
+.modal-grid-game-settings .art {
+    grid-area: art;
+    width: 100%;
+    height: 100%;
+}
+.modal-grid-game-settings .art img {
+    border-radius: 10px;
+    width: 100%;
+    height: auto;
+}
+.modal-grid-game-settings .sect1 {
+    grid-area: sect1;
+}
+.modal-grid-game-settings .sect2 {
+    grid-area: sect2;
+}
+
 /* typography styles */
 .txt-c-blue {
     color: #0099FF;
@@ -380,6 +419,7 @@ h2, p {
 .txt-bold {
     font-weight: bold;
 }
+
 .txt-s-64 {
     font-size: 64px;
 }
@@ -400,4 +440,86 @@ h2, p {
 }
 .txt-s-12 {
     font-size: 12px;
+}
+@media only screen and (min-width: 1440px) {
+    .txt-s-64 {
+        font-size: 69px;
+    }
+    .txt-s-48 {
+        font-size: 53px;
+    }
+    .txt-s-38  {
+        font-size: 43px;
+    }
+    .txt-s-32 {
+        font-size: 37px;
+    }
+    .txt-s-24 {
+        font-size: 29px;
+    }
+    .txt-s-16 {
+        font-size: 21px;
+    }
+    .txt-s-12 {
+        font-size: 17px;
+    }
+        
+    .modal-content {
+        padding: 30px;
+        border-radius: 40px;
+    }
+
+    .modal-grid-game {
+        grid-gap: 20px;
+    }
+    .button {
+        margin: 5px;
+        padding: 20px 80px;
+    }
+    .button-small {
+        padding: 15px;
+    }
+    
+    .art > img {
+        border-radius: 40px;
+    }
+    
+    .games {
+        grid-gap: 10px;
+    }
+    
+    .grid-item {
+        border-radius: 20px;
+    }
+}
+@media only screen and (min-width: 2360px) {
+    .txt-s-64 {
+        font-size: 79px;
+    }
+    .txt-s-48 {
+        font-size: 63px;
+    }
+    .txt-s-38  {
+        font-size: 53px;
+    }
+    .txt-s-32 {
+        font-size: 47px;
+    }
+    .txt-s-24 {
+        font-size: 39px;
+    }
+    .txt-s-16 {
+        font-size: 31px;
+    }
+    .txt-s-12 {
+        font-size: 27px;
+    }
+        
+    .modal-content {
+        padding: 50px;
+    }
+
+    .modal-grid-game {
+        grid-gap: 30px;
+    }
 }
