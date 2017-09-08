@@ -246,7 +246,6 @@ function createModal(game,isSuggest) {
             screenshot.classList = 'screenshot';
             
             screenshots_list.appendChild(screenshot);
-            // No styles for screenshots yet, images way too big. Too lazy
         }
     }
         

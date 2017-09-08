@@ -8,9 +8,11 @@ var electron = require('electron'),
 	fsmonitor = require('fsmonitor'),
 	async = require('async'),
 	XMLParser = require('pixl-xml'),
+	ini = require('ini'),
 	low = require('lowdb'),
 	FileSync = require('lowdb/adapters/FileSync'),
 	game_storage,
+	settings_storage,
     path = require('path'),
 	url = require('url'),
 	tga2png = require('tga2png'),
@@ -32,8 +34,8 @@ const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
 function createWindow(file) {
   	ApplicationWindow = new BrowserWindow({
 		icon: './ico.png',
-		minHeight: 600,
-  		minWidth: 400
+		minHeight: 561,
+  		minWidth: 837
 	});
 
 	ApplicationWindow.setMenu(null);
@@ -78,7 +80,12 @@ ipcMain.on('init', () => {
 });
 
 ipcMain.on('load_cemu_folder', () => {
-	settings_storage.set('cemu_path', pickEmuFolder()).write();
+	var cemu_path = pickEmuFolder();
+	cemu_path = cemu_path.replace(/\\/g, '/');
+	settings_storage.set('cemu_path', cemu_path).write();
+	cemu_path = cemu_path.split('/');
+	cemu_path.pop();
+	settings_storage.set('cemu_folder_path', cemu_path.join('/')).write();
 	ApplicationWindow.webContents.send('cemu_folder_loaded');
 });
 
@@ -141,6 +148,13 @@ ipcMain.on('smm_search_courses', (event, data) => {
 		console.log(courses);
 	});
 });
+
+ipcMain.on('update_game_settings', (event, data) => {
+	var id = data.id.toLowerCase().replace('-', ''),
+		settings = data.settings;
+
+	fs.writeFileSync(settings_storage.get('cemu_folder_path').value() + '/gameProfiles/' + id + '.ini', ini.encode(settings));
+})
 
 function init() {
     var screenGames = false,
