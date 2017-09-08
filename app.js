@@ -19,7 +19,6 @@ var electron = require('electron'),
 	png2ico = require('png-to-ico'),
 	jimp = require('jimp'),
 	request = require('request'),
-	shortcut = require('win-shortcut'),
     ws = require('windows-shortcuts'),
 	dialog = electron.dialog,
 	shell = electron.shell,
@@ -537,29 +536,27 @@ function createShortcut(id) {
 	God I fucking hate Node support for lnk files, and lnk files in general. 00050000-10143500
 	*/
 	var game = game_storage.get('games').find({ title_id: id }).value(),
-		cemu = settings_storage.get('cemu_path').value();
+		cemu = settings_storage.get('cemu_path').value(),
+		rom;
 	if (!game) return;
-	shortcut.create({
-		target_file: cemu,
-		target_folder: require('os').homedir() + '/Desktop',
-		title: game.name_clean,
-		icon: DATA_ROOT + 'cache/images/' + id + '/icon.ico'
+
+	if (game.is_wud) {
+		rom = game.path;
+	} else {
+		rom = game.path + '/code/' + game.rom;
+	}
+
+	ws.create(require('os').homedir() + '/Desktop/' + game.name_clean + '.lnk', {
+		target : cemu,
+		args: '-g "' + rom + '"',
+		icon: DATA_ROOT + 'cache/images/' + id + '/icon.ico',
+		iconIndex: '0',
+		runStyle : ws.MIN
 	}, (error) => {
 		if (error) {
-			throw error;
+			throw Error(error);
 		}
-		var rom;
-		if (game.is_wud) {
-			rom = game.path;
-		} else {
-			rom = game.path + '/code/' + game.rom;
-		}
-		ws.edit(require('os').homedir() + '/Desktop/' + game.name_clean + '.lnk', {
-			args: '-g "' + rom + '"'
-		}, () => {
-			console.log('d')
-		});
-	})
+	});
 }
 
 Array.prototype.contains = function(el) {
