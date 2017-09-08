@@ -328,9 +328,9 @@ h2, p {
 }
 .art > img {
     border-radius: 10px;
-    width: 100%;
-    min-width: auto;
+    max-width: 100%;
     max-height: 100%;
+    overflow-y
 }
 .modal-grid-game > .title {
     grid-area: title;
