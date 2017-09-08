@@ -1,7 +1,7 @@
 
 ## In-dev rewrite of CemUI
  
-**IMPORTANT:** This branch is for the in-development version of CemUI 2.0! Nothing here is stable.
+**IMPORTANT:** This branch is the in-development version of CemUI 2.0! Nothing here is stable.
 
 ## How can I help? / I have a suggestion!
 We always welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone with experience in JavaScript, Node, html, css, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules, and will be packaged by Electron just fine!
@@ -12,8 +12,8 @@ If you have a suggestion, and do not know any of the required languages, you can
 To get CemUI 2.0 right now, you must build from source. To do this, follow these steps:
 
 1. Install NodeJS https://nodejs.org/
-2. Download the source code of _THIS BRANCH (2.0)_
-3. Enter the source code directory via a command prompt (`cd C:/Path/To/CemUI-2.0`)
+2. Download the source code
+3. Enter the source code directory via a command prompt (`cd C:/Path/To/CemUI`)
 4. Run `npm i` to install all depends
 5. Run `npm i electron -g` to globally install Electron
 6. Run `electron .` in the source code directory. This will start the developer version of CemUI
