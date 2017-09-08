@@ -23,7 +23,6 @@ window.addEventListener('gc.controller.found', function(event) {
 }, false);
 
 window.addEventListener('gc.button.press', function(event) {
-    console.log(event.detail.name)
 	switch (event.detail.name) {
         case 'FACE_1':
             var current_selected = document.getElementsByClassName('controller-active grid-item')[0];
@@ -90,15 +89,12 @@ window.addEventListener('gc.button.press', function(event) {
             tst.style.top = pos.top + 20 + 'px';
             tst.style.left = pos.left + carry.clientWidth + 20 + 'px';
             document.body.appendChild(tst);*/
-            
-
 
 
             if (!next) {
                 sound_switch_error.play();
                 return;
             }
-            console.log(next.classList)
             if (next.classList == 'boxart') {
                 next = next.parentElement;
             }
@@ -219,6 +215,8 @@ window.addEventListener('gc.button.press', function(event) {
             
             next.classList.add('controller-active');
             sound_switch.play();
+            next.scrollIntoView(true);
+            games_lib.scrollTop -= games_lib.clientHeight/8;
             break;
         case 'DPAD_UP':
             if (modal_open) return;
@@ -243,7 +241,7 @@ window.addEventListener('gc.button.press', function(event) {
             tst.style.top = pos.top - carry.clientHeight + 20 + 'px';
             tst.style.left = pos.left + 20 + 'px';
             document.body.appendChild(tst);
-            console.log(next)*/
+            */
             
 
             if (!next) {
@@ -264,8 +262,15 @@ window.addEventListener('gc.button.press', function(event) {
             
             next.classList.add('controller-active');
             sound_switch.play();
+            next.scrollIntoView(false);
+            games_lib.scrollTop += games_lib.clientHeight/8;
             break;
         default:
             break;
     }
 }, false);
+
+
+Element.prototype.documentOffsetTop = function () {
+    return this.offsetTop + ( this.offsetParent ? this.offsetParent.documentOffsetTop() : 0 );
+};
