@@ -23,7 +23,13 @@ window.addEventListener('gc.controller.found', function(event) {
 }, false);
 
 window.addEventListener('gc.button.press', function(event) {
+    console.log(event.detail.name)
 	switch (event.detail.name) {
+        case 'FACE_4':
+            var current_selected = document.getElementsByClassName('controller-active grid-item')[0];
+            if (!current_selected) return;
+            current_selected.getElementsByClassName('favicon')[0].click();
+            break;
         case 'FACE_1':
             var current_selected = document.getElementsByClassName('controller-active grid-item')[0];
             if (!current_selected) return;
@@ -38,7 +44,9 @@ window.addEventListener('gc.button.press', function(event) {
                 
                 return;
             }
-            openModal(current_selected.getAttribute('data-modal-id'));
+            if (current_selected) {
+                current_selected.getElementsByClassName('boxart')[0].click();
+            }
             break;
         case 'FACE_2':
             var selected_buttons = document.getElementsByClassName('button controller-active');

@@ -1,7 +1,8 @@
 const {ipcRenderer} = require('electron'); // Gets ipcRenderer
 var games_lib = document.getElementById('games-grid'),
     modal_list  = document.getElementById('modal-content-list'),
-    modal_open = false;
+    modal_open = false,
+    clicks = 0;
 
 function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
@@ -84,9 +85,9 @@ ipcRenderer.on('init_complete', function(event, data) {
         
         if (game.is_favorite) {
             wrapper.classList.add('highlight');
-            fav.classList = 'txt-s-24 fa fa-times grid-icon';
+            fav.classList = 'txt-s-24 fa fa-times grid-icon favicon';
         } else {
-            fav.classList = 'txt-s-16 fa fa-star grid-icon';
+            fav.classList = 'txt-s-16 fa fa-star grid-icon favicon';
         }
         fav.setAttribute('aria-hidden','true');
         fav.onclick = function () {
@@ -96,7 +97,17 @@ ipcRenderer.on('init_complete', function(event, data) {
         box.style.backgroundImage = 'url("' + game.boxart + '")';
         box.classList = 'boxart';
         box.onclick = function() {
-            openModal(this.parentElement.getAttribute('data-modal-id'));
+            clicks++;
+            if (clicks === 1) {
+                clicktimer = setTimeout(function() {
+                    clicks = 0;
+                    openModal(this.parentElement.getAttribute('data-modal-id'));
+                }.bind(this), 400);
+            } else if (clicks === 2) {
+                clearTimeout(clicktimer);
+                clicks = 0;
+                ipcRenderer.send('play_rom', this.parentElement.getAttribute('data-modal-id'));
+            }
         }
         
         wrapper.appendChild(fav);
