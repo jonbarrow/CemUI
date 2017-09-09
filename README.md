@@ -27,7 +27,7 @@ To get CemUI v2.0 right now, you must build from source. To do this, follow thes
 5. Run `npm i electron -g` to globally install Electron
 6. Run `electron .` in the source code directory. This will start the developer version of CemUI.
 
-**This is the only official place that you can download CemUI, any other places hosting CemUI is doing it without our permission.**
+**This is the only official place that you can download CemUI, any other places hosting CemUI are doing it without our permission.**
 
 ## I found a bug!
 Given that this project is still very early in development, bugs will probably be common, and vary from person to person. If you find a bug, we ask that you follow this format for reporting the bug on the [Issue Tracker](https://github.com/RedDuckss/CemUI/issues) on the repo:
