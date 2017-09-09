@@ -4,7 +4,7 @@
 **IMPORTANT:** This is the in-development version of CemUI 2.0! Nothing here is stable.
 
 # **DOWNLOAD LINK NOTICE:**
-## It has come to my attention that the site http://emucr.com is redistributing CemUI via it's own servers! DO NOT DOWNLOAD CEMUI FROM THAT SITE! I _CANNOT_ promise it will be safe! I have already commented on the post asking for it to be removed or editted to direct back to this repo! I did NOT approve of their redistribution!
+## It has come to my attention that the site http://emucr.com is redistributing CemUI via it's own servers! DO NOT DOWNLOAD CEMUI FROM THAT SITE! I _CANNOT_ promise it will be safe! I have already commented on the post asking for it to be removed or editted to direct back to this repo! I did NOT approve of their redistribution! - RedDucks
 
 ## How can I help? / I have a suggestion!
 We always welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone with experience in JavaScript, Node, html, css, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules, and will be packaged by Electron just fine!
