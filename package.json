@@ -33,6 +33,11 @@
     "electron-reload": "^1.2.1"
   },
   "build": {
+    "publish": [{
+      "provider": "github",
+      "owner": "RedDuckss",
+      "repo": "CemUI"
+    }],
     "appId": "com.cemui.app",
     "productName": "CemUI",
     "asar": true,

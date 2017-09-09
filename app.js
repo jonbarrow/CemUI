@@ -1,4 +1,5 @@
 var electron = require('electron'),
+	updater = require("electron-updater").autoUpdater,
 	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
 	exec = require('child_process').exec,
 	smm = require('smm-api'),
@@ -25,6 +26,25 @@ var electron = require('electron'),
     BrowserWindow = electron.BrowserWindow,
     ipcMain = electron.ipcMain,
 	app = electron.app;
+
+updater.on('checking-for-update', () => {
+  console.log('Checking for update...');
+})
+updater.on('update-available', (info) => {
+  console.log('Update available.');
+})
+updater.on('update-not-available', (info) => {
+  console.log('Update not available.');
+})
+updater.on('error', (err) => {
+  console.log('Error in auto-updater.');
+})
+updater.on('download-progress', (progressObj) => {
+  console.log(log_message);
+})
+updater.on('update-downloaded', (info) => {
+  console.log('Update downloaded; will install in 5 seconds');
+});
 
 let ApplicationWindow;
 
@@ -61,6 +81,7 @@ function createWindow(file) {
 }
 
 app.on('ready', function() {
+	updater.checkForUpdates()
     createWindow('index');
 	ApplicationWindow.webContents.on('new-window', function(event, url) {
   		event.preventDefault();
