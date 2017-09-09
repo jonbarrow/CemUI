@@ -28,7 +28,11 @@ var electron = require('electron'),
 
 let ApplicationWindow;
 
+const API_ROOT_CHECK = '104.236.44.105';
+const API_ROOT = 'http://' + API_ROOT_CHECK;
 const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
+
+let dns_errors = 0;
 
 function createWindow(file) {
   	ApplicationWindow = new BrowserWindow({
@@ -113,7 +117,7 @@ ipcMain.on('play_rom', (event, id) => {
 		}
 
 		game_storage.get('games').find(game).set('plays', game.plays+=1).write();
-	  });
+	});
 });
 
 ipcMain.on('show_rom', (event, id) => {
@@ -215,7 +219,8 @@ function getSuggested(most_played, cb) {
 	for (var i=most_played.length-1;i>=0;i--) {
 		genres.push(most_played[i].genres[Math.floor(Math.random() * most_played[i].genres.length)]);
 	}
-	request('http://104.236.44.105/api/GetSuggested/?genres=' + genres.join('|'), (error, response, body) => {
+	request(API_ROOT + '/api/GetSuggested/?genres=' + genres.join('|'), (error, response, body) => {
+		if (error) return cb(null, {});
 		body = JSON.parse(body);
 		if (error || response.statusCode !== 200 || !body || body.error) return callback(true);
 		return cb(null, body);
@@ -261,6 +266,15 @@ function loadGames(dir, master_callback) {
 						cb(null, is_wud);
 					},
 					function(is_wud, cb) {
+						request(API_ROOT, (error, response, body) => {
+							if (error) {
+								return cb('dns');
+							} else {
+								return cb(null, is_wud);
+							}
+						})
+					},
+					function(is_wud, cb) {
 						try {
 							if (!is_wud) {
 								var xml = XMLParser.parse(dir + '/' + file + '/meta/meta.xml');
@@ -295,21 +309,23 @@ function loadGames(dir, master_callback) {
 							var urls = data.game_screenshot_urls.split('|');
 							for (var j=0;j<urls.length;j++) {
 								var iteration = 0;
-								request(urls[j])
-									.on('error', () => {
-										return cb(true);
-									})
-									.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + j + '.jpg'))
-									.on('error', () => {
-										return cb(true);
-									})
-									.on('close', () => {
-										data.screenshots_list.push(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
-										iteration++;
-										if (iteration == urls.length) {
-											cb(null, data, name, is_wud);
-										}
-									});								
+								var req = request(urls[j]);
+
+								req.on('error', () => {
+									return cb(true);
+								});
+								
+								req.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + j + '.jpg'))
+								.on('error', () => {
+									return cb(true);
+								})
+								.on('close', () => {
+									data.screenshots_list.push(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
+									iteration++;
+									if (iteration == urls.length) {
+										cb(null, data, name, is_wud);
+									}
+								});								
 							}
 						} else {
 							cb(null, data, name, is_wud);
@@ -398,6 +414,9 @@ function loadGames(dir, master_callback) {
 					}
 				], function(error, data, name, is_wud) {
 					if (error) {
+						if (error == 'dns') {
+							dns_errors++;
+						}
 						return callback(null);
 					}
 
@@ -441,6 +460,12 @@ function loadGames(dir, master_callback) {
 				callback(null);
 			}
 		}, (error) => {
+			if (dns_errors >=1) {
+				dialog.showMessageBox({
+					type: 'question',
+					message: 'Could not download data for ' + dns_errors + ' game(s). API failure.'
+			  	});
+			}
 			if (error) return master_callback(true);
 			return master_callback(null);
 
@@ -490,7 +515,16 @@ function isGame(game_path) {
 	var stats = fs.lstatSync(game_path);
 	if (!stats) return false;
 
-	if (stats.isDirectory()) {
+	if (stats.isSymbolicLink()) {
+		var link = fs.readlinkSync(game_path),
+			subfolders = fs.readdirSync(link);
+		if (subfolders.contains('code') && subfolders.contains('content') && subfolders.contains('meta')) {
+			if (fs.pathExistsSync(game_path + '/meta/meta.xml')) {
+				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
+				if (!rom || rom.length < 0) return false;
+			} else return false;
+		} else return false;
+	} else if (stats.isDirectory()) {
 		var subfolders = fs.readdirSync(game_path);
 		if (subfolders.contains('code') && subfolders.contains('content') && subfolders.contains('meta')) {
 			if (fs.pathExistsSync(game_path + '/meta/meta.xml')) {
@@ -515,7 +549,7 @@ function getGameData(game_path, is_wud, callback) {
 		post_code = [xml.title_id._Data.slice(0, 8), '-', xml.title_id._Data.slice(8)].join('');
 	}
 
-	request('http://104.236.44.105/api/GetGame/?' + post_type + '=' + post_code, (error, response, body) => {
+	request(API_ROOT + '/api/GetGame/?' + post_type + '=' + post_code, (error, response, body) => {
 		body = JSON.parse(body);
 		if (!body || body.error) return callback(true);
 		return callback(null, body)

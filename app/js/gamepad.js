@@ -72,7 +72,9 @@ window.addEventListener('gc.controller.found', function(event) {
 
     if (!games[0]) return;
 
-    if (highlighted) {
+    console.log(highlighted)
+
+    if (highlighted && highlighted[0]) {
         highlighted[0].classList.add('controller-active');
     } else {
         games[0].classList.add('controller-active');
@@ -81,7 +83,7 @@ window.addEventListener('gc.controller.found', function(event) {
 }, false);
 
 window.addEventListener('gc.analog.start', function(event) {
-    console.log(event.detail)
+    //console.log(event.detail)
 })
 
 window.addEventListener('gc.button.press', function(event) {

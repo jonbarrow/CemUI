@@ -376,7 +376,6 @@ function openScreen(id) {
 }
 
 function updateFavorite(el) {
-    console.log(el);
     if(el.parentElement.classList.contains('highlight')) {
         removeFavorite(el);
     } else {
@@ -411,12 +410,16 @@ function setFavorite(el) {
     el.classList.add('txt-s-24');
     el.parentElement.classList.add('highlight');
     var items = document.getElementsByClassName('filler-grid-item');
-    try {
-        games_lib.removeChild(items[0]);
-        games_lib.removeChild(items[1]);
-        games_lib.removeChild(items[2]);
-        ipcRenderer.send('set_favorite', el.parentElement.getAttribute('data-modal-id'));
-    } catch(ex) {}
+    if (items.length > 0) {
+        try {
+            games_lib.removeChild(items[0]);
+            games_lib.removeChild(items[1]);
+            games_lib.removeChild(items[2]);
+        } catch(ex) {
+            console.log(ex)
+        }
+    }
+    ipcRenderer.send('set_favorite', el.parentElement.getAttribute('data-modal-id'));
 }
 
 var modalList = document.getElementsByClassName('modal');
