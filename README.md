@@ -1,7 +1,6 @@
 ![CemUI Logo](https://i.imgur.com/FyFr81X.png)
 
 ![Latest](https://img.shields.io/github/release/RedDuckss/CemUI/all.svg)
-![Latest Stable](https://img.shields.io/github/release/RedDuckss/CemUI.svg)
 ![Total Downloads](https://img.shields.io/github/downloads/RedDuckss/CemUI/total.svg)
 ![Star](https://img.shields.io/github/stars/RedDuckss/CemUI.svg?style=social&label=Star)
 
@@ -9,7 +8,7 @@
 **CemUI** is an easy-to-use, open source, game manager for the popular Wii-U Emulator, [Cemu](http://cemu.info/).
 
 **Note:**
-> CemUI v2.0 is currently a WIP and is not guaranteed to be stable. For the latest stable release, please go [here](https://github.com/RedDuckss/CemUI/releases/latest).
+> CemUI v2.0 is currently a WIP and is not guaranteed to be stable.
 
 # How can I help? / I have a suggestion!
 We **always** welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone with experience in JavaScript, Node, HTML, CSS, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules!
