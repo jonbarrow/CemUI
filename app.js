@@ -343,12 +343,12 @@ function loadGames(dir, master_callback) {
 									data.screenshots_list.push(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
 									iteration++;
 									if (iteration == urls.length) {
-										cb(null, data, name, is_wud);
+										return cb(null, data, name, is_wud);
 									}
 								});								
 							}
 						} else {
-							cb(null, data, name, is_wud);
+							return cb(null, data, name, is_wud);
 						}
 						
 					},
@@ -363,13 +363,13 @@ function loadGames(dir, master_callback) {
 									return cb(true);
 								})
 								.on('close', () => {
-									cb(null, data, name, is_wud)
+									return cb(null, data, name, is_wud)
 								});
 						} else {
 							fs.createReadStream('./defaults/box.jpg')
 								.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/box.jpg'));
 							
-							cb(null, data, name, is_wud);
+							return cb(null, data, name, is_wud);
 						}
 						
 					},
