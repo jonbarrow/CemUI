@@ -1,21 +1,21 @@
 /* global styles */
 @font-face {
-    font-family: 'continuum';
-    src: url('../fonts/Raleway-Bold.woff') format('woff');
+    font-family: 'Raleway';
+    src: url('../fonts/Raleway-Bold.ttf') format('ttf');
     font-weight: bold;
     font-style: normal;
 
 }
 @font-face {
-    font-family: 'continuum';
-    src: url('../fonts/Raleway-Regular.woff') format('woff');
+    font-family: 'Raleway';
+    src: url('../fonts/Raleway-Regular.ttf') format('ttf');
     font-weight: normal;
     font-style: normal;
 
 }
 @font-face {
-    font-family: 'continuum';
-    src: src: url('../fonts/Raleway-ExtraBold.woff') format('woff');
+    font-family: 'Raleway';
+    src: src: url('../fonts/Raleway-ExtraBold.ttf') format('ttf');
     font-weight: 900;
     font-style: normal;
 
@@ -59,7 +59,7 @@ body, html {
     padding: 0;
     margin: 0;
     overflow: hidden;
-    font-family: 'continuum';
+    font-family: 'Raleway';
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
