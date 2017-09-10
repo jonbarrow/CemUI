@@ -361,10 +361,6 @@ function loadGames(dir, master_callback) {
 								});
 								
 								req.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + j + '.jpg'))
-								.on('error', (error) => {
-									console.log(urls[j], error)
-									return cb(true);
-								})
 								.on('close', () => {
 									data.screenshots_list.push(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
 									iteration++;
