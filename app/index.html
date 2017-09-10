@@ -120,7 +120,24 @@
 
                 <div class="modal-content">
                     <span class="close">&times;</span>
-                    <p>Game 2</p>
+                    <div class="dropdown">
+                        <div class="head txt-s-16 txt-c-black" onclick="dropdown(this);">
+                            <p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>Selected item</span></p>
+                        </div>
+                        <div class="items txt-s-16 txt-c-black">
+                            <div class="item"><p>Item 1</p></div>
+                            <div class="item"><p>Item 2</p></div>
+                        </div>
+                    </div>
+                    <br><br>
+                    <input class="tgl tgl-light" id="toggle1" type="checkbox" />
+                    <label class="tgl-btn" for="toggle1"></label>
+                    <br><br>
+                    <div id="slidecontainer">
+                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                    </div>
+                    
+                    
                 </div>
 
             </div>

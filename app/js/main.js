@@ -206,23 +206,81 @@ function createModal(game,isSuggest) {
             settingsart = document.createElement('img'),
             sect1 = document.createElement('div'),
             sect1back = document.createElement('div'),
+            sect1sett = document.createElement('div'),
             sect2 = document.createElement('div');
+        
         
         modal_grid_game_settings.classList = "modal-grid-game-settings";
         settingsart.src = game.boxart;
         settingsartcontainer.classList = "art";
+        settingsartcontainer.style.width = "80%";
+        settingsartcontainer.style.paddingLeft = "20%";
         sect1.classList = "sect1";
         sect2.classList = "sect2";
         
-        sect1back.innerHTML = "<p>back</p>";
-        sect1back.classList = "txt-s-16 txt-bold button button-small";
-        sect1back.onclick = function() {
-            closeExpandModal(this.parentElement.parentElement.parentElement.children[1]);
-        }
+        sect1.innerHTML += "<p class='txt-s-16 txt-c-gray txt-hover' style='display: inline-block' onclick='closeExpandModal(this.parentElement.parentElement.parentElement.children[1]);'>back</p>";
+        sect1.innerHTML += '<h2 class="txt-s-48 txt-c-black">Settings</h2>';
+        sect1.innerHTML += '<p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">Graphics options</p>';   
         
-        sect1.appendChild(sect1back);
-        //sect1.innerHTML += '<h2 class="txt-s-32 txt-c-black">Settings</h2>';
+        var dropdown = document.createElement('div'),
+            dropdownhead = document.createElement('div'),
+            dropdownitems = document.createElement('div');
+         
+        dropdown.classList = "dropdown";
+        dropdownhead.classList = "head txt-s-16 txt-c-black";
+        dropdownhead.setAttribute("onclick","dropdown(this);");
+        dropdownhead.innerHTML = '<p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>Selected item</span></p>';
+        dropdownitems.classList = "items txt-s-16 txt-c-black";
+        dropdownitems.innerHTML += '<div class="item"><p>Item 1</p></div>';
+        dropdownitems.innerHTML += '<div class="item"><p>Item 2</p></div>';
+        dropdownitems.innerHTML += '<div class="item"><p>Item 3</p></div>';
+        dropdown.appendChild(dropdownhead);
+        dropdown.appendChild(dropdownitems);
+        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">dropdown 1</p>';
+        sect1.appendChild(dropdown);
         
+        var dropdown = document.createElement('div'),
+            dropdownhead = document.createElement('div'),
+            dropdownitems = document.createElement('div');
+         
+        dropdown.classList = "dropdown";
+        dropdownhead.classList = "head txt-s-16 txt-c-black";
+        dropdownhead.setAttribute("onclick","dropdown(this);");
+        dropdownhead.innerHTML = '<p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>Selected item</span></p>';
+        dropdownitems.classList = "items txt-s-16 txt-c-black";
+        dropdownitems.innerHTML += '<div class="item"><p>Item 1</p></div>';
+        dropdownitems.innerHTML += '<div class="item"><p>Item 2</p></div>';
+        dropdownitems.innerHTML += '<div class="item"><p>Item 3</p></div>';
+        dropdown.appendChild(dropdownhead);
+        dropdown.appendChild(dropdownitems);
+        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">dropdown 2</p>';
+        sect1.appendChild(dropdown);
+        
+        var toggle = document.createElement('input'),
+            togglebtn = document.createElement('label'),
+            toggleid = "toggleone";
+        
+        toggle.classList = "tgl tgl-light";
+        toggle.id = toggleid;
+        toggle.setAttribute('type','checkbox');
+        togglebtn.classList = "tgl-btn";
+        togglebtn.setAttribute('for',toggleid);
+        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">toggle 1</p>';
+        sect1.appendChild(toggle);
+        sect1.appendChild(togglebtn);
+        
+        var toggle = document.createElement('input'),
+            togglebtn = document.createElement('label'),
+            toggleid = "toggle2";
+        
+        toggle.classList = "tgl tgl-light";
+        toggle.id = toggleid;
+        toggle.setAttribute('type','checkbox');
+        togglebtn.classList = "tgl-btn";
+        togglebtn.setAttribute('for',toggleid);
+        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">toggle 1</p>';
+        sect1.appendChild(toggle);
+        sect1.appendChild(togglebtn);
         
         title.innerHTML = '<h2 class="txt-s-32 txt-c-black">' + game.name + '</h2>';
         play_button.classList = 'txt-s-16 txt-bold button button-small play-button';
@@ -340,7 +398,7 @@ function openModal(id) {
 function expandModal(el) {
     var grid = el.parentElement.parentElement;
     var expandgrid = grid.parentElement.children[2];
-    grid.style.left = "-100%";
+    grid.style.left = "-110%";
     expandgrid.style.left = "0";
 }
 function closeExpandModal(el) {
@@ -374,6 +432,30 @@ function openScreen(id) {
         el.style.opacity = "1";
     },100);
 }
+
+function dropdown(el) {
+    var items = el.parentElement.children[1];
+    var icon = el.getElementsByClassName('fa').item(0).classList;
+    if (items.classList.contains('visible')) {
+        closeDropdown();
+    } else {
+        closeDropdown();
+        items.classList.add('visible');
+        icon.remove('fa-caret-down');
+        icon.add('fa-caret-up');
+    }
+}
+
+function closeDropdown() {
+    var dropdowns = document.getElementsByClassName('visible');
+    for (var i = 0; i < dropdowns.length; i++) {
+        var icon = dropdowns.item(i).parentElement.getElementsByClassName('fa').item(0).classList;
+        dropdowns.item(i).classList.remove('visible');
+        icon.remove('fa-caret-up');
+        icon.add('fa-caret-down');
+    }
+}
+
 
 function updateFavorite(el) {
     if(el.parentElement.classList.contains('highlight')) {
