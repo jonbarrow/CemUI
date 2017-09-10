@@ -409,16 +409,16 @@ h2, p {
     background-color: #d2d9ef;
 }
 .dropdown .items {
-    display: none;
     position: absolute;
     width: 100%;
-    height: auto;
+    height: 0;
     overflow: hidden;
     z-index: 99;
     background-color: #fff;
+    transition: height 1s;
 }
 .dropdown .visible {
-    display: inline-block;
+    height: auto;
 }
 .dropdown .items .item {
     width: 100%;

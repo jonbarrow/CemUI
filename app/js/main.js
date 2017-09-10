@@ -218,9 +218,36 @@ function createModal(game,isSuggest) {
         sect1.classList = "sect1";
         sect2.classList = "sect2";
         
+        sect2.innerHTML += "<p class='txt-s-16 txt-c-gray' style='opacity: 0;display: inline-block'>back</p><h2 style='opacity: 0;' class=\"txt-s-48 txt-c-black\">Settings</h2>";
         sect1.innerHTML += "<p class='txt-s-16 txt-c-gray txt-hover' style='display: inline-block' onclick='closeExpandModal(this.parentElement.parentElement.parentElement.children[1]);'>back</p>";
         sect1.innerHTML += '<h2 class="txt-s-48 txt-c-black">Settings</h2>';
-        sect1.innerHTML += '<p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">Graphics options</p>';   
+        sect1.innerHTML += '<p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">Graphics</p>';   
+        
+        var toggle = document.createElement('input'),
+            togglebtn = document.createElement('label'),
+            toggleid = "shadermul";
+        
+        toggle.classList = "tgl tgl-light";
+        toggle.id = toggleid;
+        toggle.setAttribute('type','checkbox');
+        togglebtn.classList = "tgl-btn";
+        togglebtn.setAttribute('for',toggleid);
+        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Accurate shader MUL emulation</p>';
+        sect1.appendChild(toggle);
+        sect1.appendChild(togglebtn);
+        
+        var toggle = document.createElement('input'),
+            togglebtn = document.createElement('label'),
+            toggleid = "gpufence";
+        
+        toggle.classList = "tgl tgl-light";
+        toggle.id = toggleid;
+        toggle.setAttribute('type','checkbox');
+        togglebtn.classList = "tgl-btn";
+        togglebtn.setAttribute('for',toggleid);
+        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">disable GPU fence</p>';
+        sect1.appendChild(toggle);
+        sect1.appendChild(togglebtn);
         
         var dropdown = document.createElement('div'),
             dropdownhead = document.createElement('div'),
@@ -229,15 +256,17 @@ function createModal(game,isSuggest) {
         dropdown.classList = "dropdown";
         dropdownhead.classList = "head txt-s-16 txt-c-black";
         dropdownhead.setAttribute("onclick","dropdown(this);");
-        dropdownhead.innerHTML = '<p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>Selected item</span></p>';
+        dropdownhead.innerHTML = '<p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>high</span></p>';
         dropdownitems.classList = "items txt-s-16 txt-c-black";
-        dropdownitems.innerHTML += '<div class="item"><p>Item 1</p></div>';
-        dropdownitems.innerHTML += '<div class="item"><p>Item 2</p></div>';
-        dropdownitems.innerHTML += '<div class="item"><p>Item 3</p></div>';
+        dropdownitems.innerHTML += '<div class="item">high</div>';
+        dropdownitems.innerHTML += '<div class="item">medium</div>';
+        dropdownitems.innerHTML += '<div class="item">low</div>';
         dropdown.appendChild(dropdownhead);
         dropdown.appendChild(dropdownitems);
-        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">dropdown 1</p>';
+        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">GPU buffer cache accuracy</p>';
         sect1.appendChild(dropdown);
+        
+        sect2.innerHTML += '<p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">CPU</p>';
         
         var dropdown = document.createElement('div'),
             dropdownhead = document.createElement('div'),
@@ -246,41 +275,42 @@ function createModal(game,isSuggest) {
         dropdown.classList = "dropdown";
         dropdownhead.classList = "head txt-s-16 txt-c-black";
         dropdownhead.setAttribute("onclick","dropdown(this);");
-        dropdownhead.innerHTML = '<p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>Selected item</span></p>';
+        dropdownhead.innerHTML = '<p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>cycle counter</span></p>';
         dropdownitems.classList = "items txt-s-16 txt-c-black";
-        dropdownitems.innerHTML += '<div class="item"><p>Item 1</p></div>';
-        dropdownitems.innerHTML += '<div class="item"><p>Item 2</p></div>';
-        dropdownitems.innerHTML += '<div class="item"><p>Item 3</p></div>';
+        dropdownitems.innerHTML += '<div class="item">host based</div>';
+        dropdownitems.innerHTML += '<div class="item">cycle counter</div>';
         dropdown.appendChild(dropdownhead);
         dropdown.appendChild(dropdownitems);
-        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">dropdown 2</p>';
-        sect1.appendChild(dropdown);
+        sect2.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">CPU timer</p>';
+        sect2.appendChild(dropdown);
         
         var toggle = document.createElement('input'),
             togglebtn = document.createElement('label'),
-            toggleid = "toggleone";
+            toggleid = "singleprecision";
         
         toggle.classList = "tgl tgl-light";
         toggle.id = toggleid;
         toggle.setAttribute('type','checkbox');
         togglebtn.classList = "tgl-btn";
         togglebtn.setAttribute('for',toggleid);
-        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">toggle 1</p>';
-        sect1.appendChild(toggle);
-        sect1.appendChild(togglebtn);
+        sect2.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Emulate single precision</p>';
+        sect2.appendChild(toggle);
+        sect2.appendChild(togglebtn);
+        
+        sect2.innerHTML += '<p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">Audio</p>';
         
         var toggle = document.createElement('input'),
             togglebtn = document.createElement('label'),
-            toggleid = "toggle2";
+            toggleid = "disableaudio";
         
         toggle.classList = "tgl tgl-light";
         toggle.id = toggleid;
         toggle.setAttribute('type','checkbox');
         togglebtn.classList = "tgl-btn";
         togglebtn.setAttribute('for',toggleid);
-        sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">toggle 1</p>';
-        sect1.appendChild(toggle);
-        sect1.appendChild(togglebtn);
+        sect2.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Disable audio</p>';
+        sect2.appendChild(toggle);
+        sect2.appendChild(togglebtn);
         
         title.innerHTML = '<h2 class="txt-s-32 txt-c-black">' + game.name + '</h2>';
         play_button.classList = 'txt-s-16 txt-bold button button-small play-button';
