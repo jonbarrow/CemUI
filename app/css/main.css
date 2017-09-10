@@ -9,14 +9,14 @@
 @font-face {
     font-family: 'continuum';
     src: url('../fonts/Raleway-Regular.woff') format('woff');
-    font-weight: 100;
+    font-weight: normal;
     font-style: normal;
 
 }
 @font-face {
     font-family: 'continuum';
     src: src: url('../fonts/Raleway-ExtraBold.woff') format('woff');
-    font-weight: normal;
+    font-weight: 900;
     font-style: normal;
 
 }
