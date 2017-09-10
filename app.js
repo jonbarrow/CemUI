@@ -330,7 +330,7 @@ function loadGames(dir, master_callback) {
 							fs.ensureDirSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots');
 							var urls = data.game_screenshot_urls.split('|');
 							async.each(urls, (url, sc_callback) => {
-								var req = request(urls[j]);
+								var req = request(url);
 
 								req.on('error', (error) => {
 									return sc_callback(true);
