@@ -185,6 +185,7 @@ function init() {
     
 	fs.ensureDirSync(DATA_ROOT + 'cache/images');
 	fs.ensureDirSync(DATA_ROOT + 'cache/json');
+	fs.ensureDirSync(DATA_ROOT + 'cache/themes');
 	if (!fs.existsSync(DATA_ROOT + 'cache/json/games.json')) {
 		fs.createFileSync(DATA_ROOT + 'cache/json/games.json');
 	}
@@ -333,13 +334,11 @@ function loadGames(dir, master_callback) {
 								var req = request(urls[j]);
 
 								req.on('error', () => {
+									console.log(urls[j])
 									return cb(true);
 								});
 								
 								req.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + j + '.jpg'))
-								.on('error', () => {
-									return cb(true);
-								})
 								.on('close', () => {
 									data.screenshots_list.push(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
 									iteration++;
