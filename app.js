@@ -336,7 +336,7 @@ function loadGames(dir, master_callback) {
 									return sc_callback(true);
 								});
 								
-								req.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + j + '.jpg'))
+								req.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + urls.indexOf(url) + '.jpg'))
 								.on('error', (error) => {
 									return sc_callback(true);
 								})
