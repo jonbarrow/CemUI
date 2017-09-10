@@ -70,73 +70,83 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
 });
 
 ipcRenderer.on('init_complete', function(event, data) {
-    var games = data.library;
-    for (var i=0,length = games.length ;i<length;i++) {
-        var game = games[i],
-            wrapper = document.createElement('div'),
-            fav = document.createElement('i'),
-            box = document.createElement('div');
+    setTimeout(function () {
+        var games = data.library;
+        for (var i=0,length = games.length ;i<length;i++) {
+            var game = games[i],
+                wrapper = document.createElement('div'),
+                fav = document.createElement('i'),
+                box = document.createElement('div');
 
-        createModal(game);
+            createModal(game);
 
-        wrapper.setAttribute('data-modal-id', game.title_id);
-        wrapper.className = 'grid-item';
-        
-        if (game.is_favorite) {
-            wrapper.classList.add('highlight');
-            fav.classList = 'txt-s-24 fa fa-times grid-icon favicon';
-        } else {
-            fav.classList = 'txt-s-16 fa fa-star grid-icon favicon';
-        }
-        fav.setAttribute('aria-hidden','true');
-        fav.onclick = function () {
-            updateFavorite(this);
-        }
-        
-        box.style.backgroundImage = 'url("' + game.boxart + '")';
-        box.classList = 'boxart';
-        box.onclick = function() {
-            clicks++;
-            if (clicks === 1) {
-                clicktimer = setTimeout(function() {
-                    clicks = 0;
-                    closeExpandModal(document.getElementById(this.parentElement.getAttribute('data-modal-id')).children[0].children[1]);
-                    openModal(this.parentElement.getAttribute('data-modal-id'));
-                }.bind(this), 400);
-            } else if (clicks === 2) {
-                clearTimeout(clicktimer);
-                clicks = 0;
-                ipcRenderer.send('play_rom', this.parentElement.getAttribute('data-modal-id'));
+            wrapper.setAttribute('data-modal-id', game.title_id);
+            wrapper.className = 'grid-item';
+
+            if (game.is_favorite) {
+                wrapper.classList.add('highlight');
+                fav.classList = 'txt-s-24 fa fa-times grid-icon favicon';
+            } else {
+                fav.classList = 'txt-s-16 fa fa-star grid-icon favicon';
             }
+            fav.setAttribute('aria-hidden','true');
+            fav.onclick = function () {
+                updateFavorite(this);
+            }
+            preload(game.boxart);
+            box.style.backgroundImage = 'url("' + game.boxart + '")';
+            box.classList = 'boxart';
+            box.onclick = function() {
+                clicks++;
+                if (clicks === 1) {
+                    clicktimer = setTimeout(function() {
+                        clicks = 0;
+                        closeExpandModal(document.getElementById(this.parentElement.getAttribute('data-modal-id')).children[0].children[1]);
+                        openModal(this.parentElement.getAttribute('data-modal-id'));
+                    }.bind(this), 400);
+                } else if (clicks === 2) {
+                    clearTimeout(clicktimer);
+                    clicks = 0;
+                    ipcRenderer.send('play_rom', this.parentElement.getAttribute('data-modal-id'));
+                }
+            }
+
+            wrapper.appendChild(fav);
+            wrapper.appendChild(box);
+
+            games_lib.appendChild(wrapper);
         }
-        
-        wrapper.appendChild(fav);
-        wrapper.appendChild(box);
-        
-        games_lib.appendChild(wrapper);
-    }
-    
-    addToGrid(data.suggested,'suggest_grid');
-    addToGrid(data.most_played,'most_grid');
-    
-    var count = games.length;
-    var high = document.getElementsByClassName('highlight')[0];
-        if (typeof high != 'undefined') {
-            count = count + 3;
+
+        addToGrid(data.suggested,'suggest_grid');
+        addToGrid(data.most_played,'most_grid');
+
+        var count = games.length;
+        var high = document.getElementsByClassName('highlight')[0];
+            if (typeof high != 'undefined') {
+                count = count + 3;
+            }
+        count = 15 - count;
+        for (var i=0;i<count;i++) {
+            var item = document.createElement('div');
+            item.classList = "grid-item filler-grid-item";
+            games_lib.appendChild(item);
         }
-    count = 15 - count;
-    for (var i=0;i<count;i++) {
-        var item = document.createElement('div');
-        item.classList = "grid-item filler-grid-item";
-        games_lib.appendChild(item);
-    }
-    
-    document.getElementById('main').style.display = 'grid';
-    /*
-    ipcRenderer.send('smm_search_courses', {
-        title: 'sand'
-    });
-    */
+
+        document.getElementById('main').style.display = 'grid';
+        openModal('modal1');
+        setTimeout(function () {
+            closeModal();
+        },1000);
+        setTimeout(function () {
+            closeScreen(document.getElementById('loading'),true);
+        },2000);
+
+        /*
+        ipcRenderer.send('smm_search_courses', {
+            title: 'sand'
+        });
+        */
+    },0); //This is to let the rendering catch up before proceeding.
 });
 
 addEvent(window, 'load', function() {
@@ -151,11 +161,13 @@ function addToGrid(arr,id) {
             var wrapper = children[i],
                 box = document.createElement('div'),
                 game = arr[i];
-
+            
             if (typeof game.game_boxart_url == 'undefined') {
+                preload(game.boxart);
                 box.style.backgroundImage = 'url("' + game.boxart + '")';
                 wrapper.setAttribute('data-modal-id', game.title_id);
             } else {
+                preload(game.game_boxart_url);
                 box.style.backgroundImage = 'url("' + game.game_boxart_url + '")';
                 wrapper.setAttribute('data-modal-id', game.game_title_id);
                 createModal(game,true);
@@ -168,6 +180,11 @@ function addToGrid(arr,id) {
             wrapper.appendChild(box);
         }
     }
+}
+
+function preload(url) {
+heavyImage = new Image();
+heavyImage.src = url;
 }
 
 function createModal(game,isSuggest) {
@@ -410,7 +427,7 @@ function closeModal() {
         document.getElementsByClassName('selected-modal')[0].style.display = "none";
         document.getElementsByClassName('selected-modal')[0].classList.remove('selected-modal');
     },500);
-    document.getElementById('main').style.filter = 'blur(0px)';
+    document.getElementById('main').classList.remove('blur');
     modal_open = false;
 }
 function openModal(id) {
@@ -422,7 +439,7 @@ function openModal(id) {
     setTimeout(function () {
         modal.style.opacity = "1";
     },250);
-    document.getElementById('main').style.filter = 'blur(3px)';
+    document.getElementById('main').classList.add('blur');
     modal_open = true;
 }
 function expandModal(el) {
@@ -438,12 +455,13 @@ function closeExpandModal(el) {
     grid.style.left = "0";
     expandgrid.style.left = "100%";
 }
-function closeScreen(el) {
+function closeScreen(el,bool) {
     el.parentElement.style.opacity = "0";
     el.parentElement.parentElement.classList.add('closed');
     if (document.getElementById('screen_start').classList.contains('closed') &&
         document.getElementById('select_games').classList.contains('closed') &&
-        document.getElementById('select_cemu').classList.contains('closed')) {
+        document.getElementById('select_cemu').classList.contains('closed') &&
+       !bool) {
         ipcRenderer.send('init');
     }
     setTimeout(function () {

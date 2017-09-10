@@ -63,7 +63,23 @@ h2, p {
 
 /* main layout styles */
 #main {
-
+    
+    /* anti-blur lag */
+    filter: blur(0px);
+    will-change: filter;
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    -webkit-transform: translate3d(0,0,0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+    transform: translate3d(0,0,0);
+    transform: translateZ(0);
+    
+    
+    
+    
+    
     display: none;
 
     height: 100vh;
@@ -80,6 +96,9 @@ h2, p {
         "whitespace whitespace";
     
     transition: filter 1s;
+}
+.blur {
+    filter: blur(3px);
 }
 .title {
     grid-area: title;
@@ -269,6 +288,7 @@ h2, p {
     height: 100%; 
     overflow: auto; 
     opacity: 0;
+    transform: translateY(0);
     transition: opacity .5s;
     background-color: rgb(0,0,0); 
     background-color: rgba(0,0,0,0.4); 
@@ -333,7 +353,8 @@ h2, p {
     border-radius: 10px;
     max-width: 100%;
     max-height: 100%;
-    overflow-y
+    overflow-y: hidden;
+    box-shadow: 0 0 0 #000;
 }
 .modal-grid-game > .title {
     grid-area: title;
@@ -386,6 +407,7 @@ h2, p {
     border-radius: 10px;
     width: 100%;
     height: auto;
+    box-shadow: 0 0 0 #000;
 }
 .modal-grid-game-settings .sect1 {
     grid-area: sect1;
