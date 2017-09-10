@@ -329,29 +329,31 @@ function loadGames(dir, master_callback) {
 						if (data.game_screenshot_urls && data.game_screenshot_urls !== '') {
 							fs.ensureDirSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots');
 							var urls = data.game_screenshot_urls.split('|');
-							/*async.each(urls, (url, sc_callback) => {
+							async.each(urls, (url, sc_callback) => {
 								var req = request(url);
 
 								req.on('error', (error) => {
-									return sc_callback(true);
+									return sc_callback(url);
 								});
 								
 								req.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + urls.indexOf(url) + '.jpg'))
 								.on('error', (error) => {
-									return sc_callback(true);
+									return sc_callback(url);
 								})
 								.on('close', () => {
-									data.screenshots_list.push(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + iteration + '.jpg');
+									console.log('finished', url);
+									data.screenshots_list.push(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + urls.indexOf(url) + '.jpg');
 									sc_callback(null);
 								});
 							}, (error) => {
-								if(error) {
+								if (error) {
+									console.log('error on', error);
 								  	return cb(true);
 								} else {
 									return cb(null, data, name, is_wud);
 								}
-							});*/
-							for (var j=0;j<urls.length;j++) {
+							});
+							/*for (var j=0;j<urls.length;j++) {
 								var iteration = 0;
 								var req = request(urls[j]);
 
@@ -368,7 +370,7 @@ function loadGames(dir, master_callback) {
 										return cb(null, data, name, is_wud);
 									}
 								});								
-							}
+							}*/
 						} else {
 							return cb(null, data, name, is_wud);
 						}
