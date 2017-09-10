@@ -185,7 +185,7 @@ function init() {
     
 	fs.ensureDirSync(DATA_ROOT + 'cache/images');
 	fs.ensureDirSync(DATA_ROOT + 'cache/json');
-	fs.ensureDirSync(DATA_ROOT + 'cache/themes');
+	fs.ensureDirSync(DATA_ROOT + 'themes');
 	if (!fs.existsSync(DATA_ROOT + 'cache/json/games.json')) {
 		fs.createFileSync(DATA_ROOT + 'cache/json/games.json');
 	}
@@ -281,6 +281,8 @@ function loadGames(dir, master_callback) {
 						if (test) {
 							return cb(true);
 						}
+
+						console.log('new game found', file)
 			
 						if (path.extname(dir + '/' + file) == '.wud' || path.extname(dir + '/' + file) == '.wux') {
 							is_wud = true;
@@ -290,6 +292,7 @@ function loadGames(dir, master_callback) {
 					function(is_wud, cb) {
 						request(API_ROOT, (error, response, body) => {
 							if (error) {
+								console.log('dns')
 								return cb('dns');
 							} else {
 								return cb(null, is_wud);
@@ -302,12 +305,14 @@ function loadGames(dir, master_callback) {
 								var xml = XMLParser.parse(dir + '/' + file + '/meta/meta.xml');
 							}
 						} catch (error) {
+							console.log(error)
 							return cb(true);
 						}
 						
 						
 						if (!is_wud) {
 							if (!xml || !xml.title_id) {
+								console.log('no title id')
 								return cb(true);
 							}
 						}
@@ -318,6 +323,7 @@ function loadGames(dir, master_callback) {
 						var name = file;
 						getGameData(dir + '/' + file, is_wud, (error, data) => {
 							if (error) {
+								console.log(error)
 								return cb(true);
 							}
 
@@ -333,11 +339,13 @@ function loadGames(dir, master_callback) {
 								var req = request(url);
 
 								req.on('error', (error) => {
+									console.log(error)
 									return sc_callback(url);
 								});
 								
 								req.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + urls.indexOf(url) + '.jpg'))
 								.on('error', (error) => {
+									console.log(error)
 									return sc_callback(url);
 								})
 								.on('close', () => {
