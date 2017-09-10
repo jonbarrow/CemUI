@@ -333,8 +333,8 @@ function loadGames(dir, master_callback) {
 								var iteration = 0;
 								var req = request(urls[j]);
 
-								req.on('error', () => {
-									console.log(urls[j])
+								req.on('error', (error) => {
+									console.log(urls[j], error)
 									return cb(true);
 								});
 								
