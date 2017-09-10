@@ -1,8 +1,24 @@
 /* global styles */
-
 @font-face {
-    font-family: wlm;
-    src: url('../fonts/wlm black.ttf');
+    font-family: 'continuum';
+    src: url('../fonts/Raleway-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'continuum';
+    src: url('../fonts/Raleway-Regular.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'continuum';
+    src: src: url('../fonts/Raleway-ExtraBold.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
 }
 ::-webkit-scrollbar {
   width: 6px;
@@ -43,7 +59,7 @@ body, html {
     padding: 0;
     margin: 0;
     overflow: hidden;
-    font-family: Segoe UI,'wlm',Frutiger,Frutiger Linotype,Dejavu Sans,Helvetica Neue,Arial,sans-serif; 
+    font-family: 'continuum';
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
