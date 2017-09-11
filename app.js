@@ -302,7 +302,11 @@ function loadGames(dir, master_callback) {
 					function(is_wud, cb) {
 						try {
 							if (!is_wud) {
-								var xml = XMLParser.parse(dir + '/' + file + '/meta/meta.xml');
+								if (fs.pathExistsSync(dir + '/' + file + '/meta/meta.xml')) {
+									var xml = XMLParser.parse(dir + '/' + file + '/meta/meta.xml');
+								} else {
+									var xml = XMLParser.parse(dir + '/' + file + '/code/app.xml');
+								}
 							}
 						} catch (error) {
 							console.log(error)
@@ -571,8 +575,11 @@ function isGame(game_path) {
 	if (stats.isSymbolicLink()) {
 		var link = fs.readlinkSync(game_path),
 			subfolders = fs.readdirSync(link);
-		if (subfolders.contains('code') && subfolders.contains('content') && subfolders.contains('meta')) {
-			if (fs.pathExistsSync(game_path + '/meta/meta.xml')) {
+		if (subfolders.contains('code') && subfolders.contains('content')) {
+			if (subfolders.contains('meta') && fs.pathExistsSync(game_path + '/meta/meta.xml')) {
+				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
+				if (!rom || rom.length < 0) return false;
+			} else if (fs.pathExistsSync(game_path + '/code/app.xml')) {
 				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
 				if (!rom || rom.length < 0) return false;
 			} else return false;
@@ -597,7 +604,12 @@ function getGameData(game_path, is_wud, callback) {
 		post_type = 'product_code';
 		post_code = getProductCode(game_path);
 	} else {
-		xml = XMLParser.parse(game_path + '/meta/meta.xml');
+		if (fs.pathExistsSync(game_path + '/meta/meta.xml')) {
+			xml = XMLParser.parse(game_path + '/meta/meta.xml');
+		} else {
+			xml = XMLParser.parse(game_path + '/code/app.xml');
+		}
+		
 		post_type = 'title_id';
 		post_code = [xml.title_id._Data.slice(0, 8), '-', xml.title_id._Data.slice(8)].join('');
 	}
