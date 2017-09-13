@@ -206,6 +206,19 @@ function addToGrid(arr,id) {
     }
 }
 
+function dropdown(el) {
+    var items = el.parentElement.children[1];
+    var icon = el.getElementsByClassName('fa').item(0).classList;
+    if (items.classList.contains('visible')) {
+        closeDropdown();
+    } else {
+        closeDropdown();
+        items.classList.add('visible');
+        icon.remove('fa-caret-down');
+        icon.add('fa-caret-up');
+    }
+}
+
 function preload(url) {
 heavyImage = new Image();
 heavyImage.src = url;
@@ -239,7 +252,7 @@ function createModal(game,isSuggest) {
         desc.innerHTML += '<p class="txt-s-16 txt-c-gray">' + game.game_playability + '</p>';
         modal.id = game.game_title_id;
     } else {
-        var play_button = document.createElement('p'),
+        var play_button = document.createElement('div'),
             folder_button = document.createElement('p'),
             shortcut_button = document.createElement('p'),
             game_settings_button = document.createElement('p'),
@@ -353,22 +366,65 @@ function createModal(game,isSuggest) {
         sect2.appendChild(toggle);
         sect2.appendChild(togglebtn);
         
-        title.innerHTML = '<h2 class="txt-s-32 txt-c-black">' + game.name + '</h2>';
-        play_button.classList = 'txt-s-16 txt-bold button button-small play-button';
-        play_button.innerHTML = 'Play';
-        play_button.onclick = function() {
-            ipcRenderer.send('play_rom', this.parentElement.parentElement.parentElement.parentElement.id);
+        
+        
+        var dropdownhead = document.createElement('div'),
+            dropdownitems = document.createElement('div'),
+            dropdownbutton =  document.createElement('p'),
+            dropdownicon = document.createElement('i');
+         
+        play_button.classList = "dropdownbutton";
+        dropdownhead.classList = "head txt-s-16 txt-c-black";
+        dropdownbutton.classList = 'txt-s-16 txt-bold button button-small button-left play-button';
+        dropdownbutton.innerHTML = 'Play';
+        dropdownbutton.onclick = function() {
+            ipcRenderer.send('play_rom', this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id);
         }
+        dropdownicon.classList = "button button-small button-right fa fa-caret-down";
+        dropdownicon.setAttribute('aria-hidden','true');
+        dropdownicon.onclick = function () {
+            dropdown(this.parentElement);
+        };
+        
+        dropdownhead.appendChild(dropdownbutton);
+        dropdownhead.appendChild(dropdownicon);
+        dropdownitems.classList = "items txt-s-16 txt-c-black";
+        dropdownitems.innerHTML += '<div class="item">item 1</div>';
+        dropdownitems.innerHTML += '<div class="item">item 2</div>';
+        play_button.appendChild(dropdownhead);
+        play_button.appendChild(dropdownitems);
+        
+        title.innerHTML = '<h2 class="txt-s-32 txt-c-black">' + game.name + '</h2>';
         folder_button.classList = 'txt-s-16 txt-bold button button-small folder-button';
         folder_button.innerHTML = 'Show in folder';
         folder_button.onclick = function() {
             ipcRenderer.send('show_rom', this.parentElement.parentElement.parentElement.parentElement.id);
         }
-        shortcut_button.classList = 'txt-s-16 txt-bold button button-small shortcut-button';
-        shortcut_button.innerHTML = 'Create desktop shortcut';
-        shortcut_button.onclick = function() {
-            ipcRenderer.send('make_shortcut', this.parentElement.parentElement.parentElement.parentElement.id);
+         var dropdownhead = document.createElement('div'),
+            dropdownitems = document.createElement('div'),
+            dropdownbutton =  document.createElement('p'),
+            dropdownicon = document.createElement('i');
+         
+        shortcut_button.classList = "dropdownbutton";
+        dropdownhead.classList = "head txt-s-16 txt-c-black";
+        dropdownbutton.classList = 'txt-s-16 txt-bold button button-small button-left shortcut-button';
+        dropdownbutton.innerHTML = 'Create desktop shortcut';
+        dropdownbutton.onclick = function() {
+            ipcRenderer.send('make_shortcut', this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id);
         }
+        dropdownicon.classList = "button button-small button-right fa fa-caret-down";
+        dropdownicon.setAttribute('aria-hidden','true');
+        dropdownicon.onclick = function () {
+            dropdown(this.parentElement);
+        };
+        
+        dropdownhead.appendChild(dropdownbutton);
+        dropdownhead.appendChild(dropdownicon);
+        dropdownitems.classList = "items txt-s-16 txt-c-black";
+        dropdownitems.innerHTML += '<div class="item">item 1</div>';
+        dropdownitems.innerHTML += '<div class="item">item 2</div>';
+        shortcut_button.appendChild(dropdownhead);
+        shortcut_button.appendChild(dropdownitems);
         game_settings_button.classList = 'txt-s-16 txt-bold button button-small game-settings-button';
         game_settings_button.innerHTML = 'Settings';
         game_settings_button.onclick = function() {
@@ -516,19 +572,6 @@ function openScreen(id) {
     setTimeout(function () {
         el.style.opacity = "1";
     },100);
-}
-
-function dropdown(el) {
-    var items = el.parentElement.children[1];
-    var icon = el.getElementsByClassName('fa').item(0).classList;
-    if (items.classList.contains('visible')) {
-        closeDropdown();
-    } else {
-        closeDropdown();
-        items.classList.add('visible');
-        icon.remove('fa-caret-down');
-        icon.add('fa-caret-up');
-    }
 }
 
 function closeDropdown() {
