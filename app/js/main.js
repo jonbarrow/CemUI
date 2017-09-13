@@ -408,6 +408,19 @@ function createModal(game,isSuggest) {
                 screenshot = document.createElement('img');
             screenshot.src  = screenshot_url;
             screenshot.classList = 'screenshot';
+
+            screenshot.onclick = function() {
+                if (this.className.match(/\bactive\b/)) {
+                    this.classList.remove('active');
+                } else {
+                    var actives = document.getElementsByClassName('screenshot active');
+                    for (var j=0;j<actives.length;j++) {
+                        var active = actives[j];
+                        active.classList.remove('active');
+                    }
+                    this.classList.add('active');
+                }
+            }
             
             screenshots_list.appendChild(screenshot);
         }
