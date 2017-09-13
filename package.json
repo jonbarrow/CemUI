@@ -1,7 +1,7 @@
 {
   "name": "cemui",
   "productName": "CemUI",
-  "version": "2.1.1",
+  "version": "1.1.1",
   "description": "Front end launcher for the WiiU emulator, Cemu",
   "author": "RedDucks",
   "main": "app.js",
