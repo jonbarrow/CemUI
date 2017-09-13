@@ -1,0 +1,29 @@
+2017-09-13T19:08:53.174Z - error:  Error: Cannot download "https://github.com/RedDuckss/CemUI/releases/download/v2.0.0/cemui-setup-2.0.0.exe", status 404: Not Found
+    at ClientRequest.request.doRequest.response (C:\Users\jelle\Documents\projecten\cemui\CemUI\node_modules\electron-builder-http\src\httpExecutor.ts:135:18)
+    at Object.onceWrapper (events.js:293:19)
+    at emitOne (events.js:96:13)
+    at ClientRequest.emit (events.js:191:7)
+    at URLRequest.ClientRequest.urlRequest.on (C:\Users\jelle\AppData\Roaming\npm\node_modules\electron\dist\resources\electron.asar\browser\api\net.js:207:12)
+    at emitOne (events.js:96:13)
+    at URLRequest.emit (events.js:191:7)
+From previous event:
+    at CancellationToken.createPromise (C:\Users\jelle\Documents\projecten\cemui\CemUI\node_modules\electron-builder-http\src\CancellationToken.ts:51:5)
+    at C:\Users\jelle\Documents\projecten\cemui\CemUI\node_modules\electron-updater\src\electronHttpExecutor.ts:23:44
+    at Generator.next (<anonymous>)
+From previous event:
+    at ElectronHttpExecutor.download (C:\Users\jelle\Documents\projecten\cemui\CemUI\node_modules\electron-updater\out\electronHttpExecutor.js:65:11)
+    at C:\Users\jelle\Documents\projecten\cemui\CemUI\node_modules\electron-updater\src\NsisUpdater.ts:56:31
+    at Generator.next (<anonymous>)
+    at FSReqWrap.oncomplete (fs.js:114:15)
+From previous event:
+    at NsisUpdater.doDownloadUpdate (C:\Users\jelle\Documents\projecten\cemui\CemUI\node_modules\electron-updater\out\NsisUpdater.js:126:11)
+    at C:\Users\jelle\Documents\projecten\cemui\CemUI\node_modules\electron-updater\src\AppUpdater.ts:283:25
+    at Generator.next (<anonymous>)
+From previous event:
+    at NsisUpdater.downloadUpdate (C:\Users\jelle\Documents\projecten\cemui\CemUI\node_modules\electron-updater\out\AppUpdater.js:338:11)
+    at EventEmitter.downloadUpdate (C:\Users\jelle\Documents\projecten\cemui\CemUI\app.js:104:10)
+    at emitOne (events.js:96:13)
+    at EventEmitter.emit (events.js:191:7)
+    at WebContents.<anonymous> (C:\Users\jelle\AppData\Roaming\npm\node_modules\electron\dist\resources\electron.asar\browser\api\web-contents.js:247:13)
+    at emitTwo (events.js:106:13)
+    at WebContents.emit (events.js:194:7)
