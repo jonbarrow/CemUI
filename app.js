@@ -1,3 +1,5 @@
+const APP_VERSION = '2.1.0';
+
 var electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
 	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
@@ -20,39 +22,82 @@ var electron = require('electron'),
 	png2ico = require('png-to-ico'),
 	jimp = require('jimp'),
 	request = require('request'),
-    ws = require('windows-shortcuts'),
+	ws = require('windows-shortcuts'),
+	winston = require('winston'),
 	dialog = electron.dialog,
 	shell = electron.shell,
     BrowserWindow = electron.BrowserWindow,
     ipcMain = electron.ipcMain,
 	app = electron.app;
 
+
+winston.emitErrs = true;
+
+var logger = new (winston.Logger)({
+	level: 'verbose',
+    transports: [
+      	new winston.transports.Console({ colorize: true }),
+      	new (winston.transports.File)({
+      		colorize: false,
+      		json: false,
+      		filename: 'cemui.error.log'
+      	})
+    ]
+});
+
 updater.on('checking-for-update', () => {
-  console.log('Checking for update...');
+	ApplicationWindow.webContents.send('update_status', {
+		type: 'checking',
+		message: 'Checking for update...'
+	})
+  	console.log('Checking for update...');
 })
 updater.on('update-available', (info) => {
-  console.log('Update available.');
+	ApplicationWindow.webContents.send('update_status', {
+		type: 'available',
+		message: 'Update available'
+	})
+  	console.log('Update available.');
 })
 updater.on('update-not-available', (info) => {
-  console.log('Update not available.');
+	ApplicationWindow.webContents.send('update_status', {
+		type: 'unavailable',
+		message: 'Update not available'
+	})
+  	console.log('Update not available.');
 })
-updater.on('error', (err) => {
-  console.log('Error in auto-updater.');
+updater.on('error', (error) => {
+	ApplicationWindow.webContents.send('update_status', {
+		type: 'error',
+		message: error
+	})
+	logger.log('error', error);
+  	console.log('Error in auto-updater.');
 })
-updater.on('download-progress', (progressObj) => {
-  console.log(log_message);
+updater.on('download-progress', (progress) => {
+	ApplicationWindow.webContents.send('update_status', {
+		type: 'progress',
+		progress: progress
+	})
 })
 updater.on('update-downloaded', (info) => {
-  console.log('Update downloaded; will install in 5 seconds');
+	ApplicationWindow.webContents.send('update_status', {
+		type: 'completed',
+		message: 'Update downloaded'
+	})
+  	console.log('Update downloaded');
 });
 
 let ApplicationWindow;
 
-const API_ROOT_CHECK = '104.236.44.105';
-const API_ROOT = 'http://' + API_ROOT_CHECK;
+const API_ROOT = 'http://cemui.com';
 const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
 
 let dns_errors = 0;
+
+function applyUpdate() {
+	updater.quitAndInstall();
+}
 
 function createWindow(file) {
   	ApplicationWindow = new BrowserWindow({
@@ -104,20 +149,27 @@ ipcMain.on('init', () => {
 });
 
 ipcMain.on('load_cemu_folder', () => {
-	var cemu_path = pickEmuFolder();
+	var cemu_path = pickEmuFolder(),
+		cemu_object = {};
+
 	cemu_path = cemu_path.replace(/\\/g, '/');
-	settings_storage.set('cemu_path', cemu_path).write();
+	cemu_object.cemu_path = cemu_path;
+
 	cemu_path = cemu_path.split('/');
 	cemu_path.pop();
-	settings_storage.set('cemu_folder_path', cemu_path.join('/')).write();
+	cemu_object.cemu_folder_path = cemu_path.join('/');
+
+	settings_storage.get('cemu_paths').push(cemu_object).write();
 	ApplicationWindow.webContents.send('cemu_folder_loaded');
 });
 
 ipcMain.on('load_games_folder', () => {
-	var g_path = pickGameFolder();
+	var game_path = pickGameFolder();
+
 	ApplicationWindow.webContents.send('game_folder_loading');
-	loadGames(g_path, () => {
-		settings_storage.set('games_path', g_path).write();
+
+	loadGames(game_path, () => {
+		settings_storage.get('game_paths').push(game_path).write();
 		ApplicationWindow.webContents.send('games_folder_loaded');
 	});
 });
@@ -131,7 +183,7 @@ ipcMain.on('play_rom', (event, id) => {
 		game_path = game.path + '/code/' + game.rom;
 	}
 
-	exec('"' + settings_storage.get('cemu_path').value() + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
+	exec('"' + settings_storage.get('cemu_paths').value()[0].cemu_path + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
 		if (error) {
 			console.error(error);
 			return;
@@ -196,13 +248,20 @@ function init() {
 	game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
 	game_storage.defaults({games: []}).write();
 	settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
-	settings_storage.defaults({}).write();
+	settings_storage.defaults({cemu_paths: [], game_paths: [], theme: 'Default'}).write();
 
-	if (!settings_storage.get('cemu_path').value()) {
+	if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
+		fs.createFileSync(DATA_ROOT + 'cache/json/settings.json');
+        screenWelcome = true;
+	}
+
+	if (!settings_storage.get('cemu_paths').value() || settings_storage.get('cemu_paths').value().length < 1) {
+		settings_storage.set('cemu_paths', []).write();
 		screenCemu = true;
 	}
 
-	if (!settings_storage.get('games_path').value()) {
+	if (!settings_storage.get('game_paths').value() || settings_storage.get('game_paths').value().length < 1) {
+		settings_storage.set('game_paths', []).write();
 		screenGames = true;
 	}
 
@@ -216,7 +275,11 @@ function init() {
     }
 
 	verifyGames(() => {
-		loadGames(settings_storage.get('games_path').value(), () => {
+		async.each(settings_storage.get('game_paths').value(), (game_path, callback) => {
+			loadGames(game_path, () => {
+				callback();
+			});
+		}, (error) => {
 			var games = game_storage.get('games').value(),
 				most_played = getMostPlayed(games);
 			
@@ -224,7 +287,7 @@ function init() {
 				if (error) throw error;
 				ApplicationWindow.webContents.send('init_complete', {library: games, most_played: most_played, suggested: suggested});
 			});
-		});
+		})
 	});
 }
 
@@ -292,7 +355,7 @@ function loadGames(dir, master_callback) {
 					function(is_wud, cb) {
 						request(API_ROOT, (error, response, body) => {
 							if (error) {
-								console.log('dns')
+								console.log(error)
 								return cb('dns');
 							} else {
 								return cb(null, is_wud);
@@ -412,16 +475,64 @@ function loadGames(dir, master_callback) {
 					},
 					function(data, name, is_wud, cb) {
 						if (!is_wud) {
-							tga2png(dir + '/' + name + '/meta/iconTex.tga').then(buffer=> {
-								png2ico(buffer).then((buffer) => {
-									fs.writeFileSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico', buffer);
-									cb(null, data, name, is_wud);
-								}).catch(() => {
+							if (fs.pathExistsSync(dir + '/' + name + '/meta/iconTex.tga')) {
+								tga2png(dir + '/' + name + '/meta/iconTex.tga').then(buffer=> {
+									png2ico(buffer).then((buffer) => {
+										fs.writeFileSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico', buffer);
+										cb(null, data, name, is_wud);
+									}).catch(() => {
+										return cb(true);
+									});
+								}, (error) => {
 									return cb(true);
 								});
-							}, (error) => {
-								return cb(true);
-							});
+							} else if (data.game_icon_url) {
+								request({
+									rejectUnauthorized: false,
+									url: data.game_icon_url,
+									method: "GET"
+								})
+								.on('error', (error) => {
+									console.log(error)
+									return cb(true);
+								})
+								.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.jpg'))
+								.on('error', (error) => {
+									console.log(error)
+									return cb(true);
+								})
+								.on('close', () => {
+									jimp.read(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.jpg', (error, icon) => {
+										if (error) {
+											console.log(error);
+											return cb(true);
+										}
+										icon.write(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.png', (error) => {
+											if (error) {
+												console.log(error);
+												return cb(true);
+											}
+											fs.removeSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.jpg');
+	
+											png2ico(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.png').then((buffer) => {
+												fs.removeSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.png');
+												fs.writeFileSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico', buffer);
+												cb(null, data, name, is_wud);
+											}).catch((error) => {
+												console.log(error)
+												return cb(true);
+											});
+										});
+									})
+								});
+							} else {
+								console.log('No icon found for ' + data.game_title + '. Defaulting to default icon')
+								fs.createReadStream('./defaults/icon.ico')
+									.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico'));
+								
+								cb(null, data, name, is_wud);
+							}
+							
 						} else if (data.game_icon_url) {
 							request({
 								rejectUnauthorized: false,
@@ -586,8 +697,11 @@ function isGame(game_path) {
 		} else return false;
 	} else if (stats.isDirectory()) {
 		var subfolders = fs.readdirSync(game_path);
-		if (subfolders.contains('code') && subfolders.contains('content') && subfolders.contains('meta')) {
-			if (fs.pathExistsSync(game_path + '/meta/meta.xml')) {
+		if (subfolders.contains('code') && subfolders.contains('content')) {
+			if (subfolders.contains('meta') && fs.pathExistsSync(game_path + '/meta/meta.xml')) {
+				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
+				if (!rom || rom.length < 0) return false;
+			} else if (fs.pathExistsSync(game_path + '/code/app.xml')) {
 				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
 				if (!rom || rom.length < 0) return false;
 			} else return false;
@@ -639,7 +753,7 @@ function createShortcut(id) {
 	God I fucking hate Node support for lnk files, and lnk files in general. 00050000-10143500
 	*/
 	var game = game_storage.get('games').find({ title_id: id }).value(),
-		cemu = settings_storage.get('cemu_path').value(),
+		cemu = settings_storage.get('cemu_paths').value()[0].cemu_path,
 		rom;
 	if (!game) return;
 

@@ -1,7 +1,7 @@
 {
   "name": "cemui",
   "productName": "CemUI",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Front end launcher for the WiiU emulator, Cemu",
   "author": "RedDucks",
   "main": "app.js",
@@ -25,7 +25,8 @@
     "ssl-root-cas": "^1.2.3",
     "tga2png": "^0.1.3",
     "watch": "^1.0.2",
-    "windows-shortcuts": "^0.1.5"
+    "windows-shortcuts": "^0.1.5",
+    "winston": "^2.3.1"
   },
   "devDependencies": {
     "electron": "^1.7.5",
@@ -33,11 +34,13 @@
     "electron-reload": "^1.2.1"
   },
   "build": {
-    "publish": [{
-      "provider": "github",
-      "owner": "RedDuckss",
-      "repo": "CemUI"
-    }],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "RedDuckss",
+        "repo": "CemUI"
+      }
+    ],
     "appId": "com.cemui.app",
     "productName": "CemUI",
     "asar": true,
