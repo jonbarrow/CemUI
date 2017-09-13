@@ -293,18 +293,23 @@ h2, p {
 }
 
 .progress {
-    height: 3px;
+    height: 6px;
+    border-radius: 2px;
     width: 30vw;
     background-color: #000;
+    display: block;
+    margin: 1em auto;
+    overflow: hidden;
 }
 .progress .indicator {
     margin: 0;
     padding: 0;
-    background-color: #607bd4;
+    background-color: #86a2ff;
     position: relative;
     left: 0;
     width: 0%;
     height: 100%;
+    transition: width .25s;
 }
 
 
