@@ -412,11 +412,19 @@ h2, p {
     grid-area: ss;
     overflow-y: scroll;
 }
-.ss img {
+.ss .screenshot {
     height: 90%;
     width: auto;
     margin: 0 20px;
     border-radius: 20px;
+}
+.ss .screenshot.active {
+    /*
+    stuff
+    */
+}
+.ss .screenshot:hover {
+    cursor: pointer;
 }
 
 .modal-grid-game-settings {
