@@ -32,6 +32,7 @@ var electron = require('electron'),
 
 
 winston.emitErrs = true;
+updater.autoDownload = false;
 
 var logger = new (winston.Logger)({
 	level: 'verbose',
@@ -99,6 +100,14 @@ function applyUpdate() {
 	updater.quitAndInstall();
 }
 
+function downloadUpdate() {
+	updater.downloadUpdate();
+}
+
+function checkForUpdate() {
+	updater.checkForUpdates();
+}
+
 function createWindow(file) {
   	ApplicationWindow = new BrowserWindow({
 		icon: './ico.png',
@@ -144,7 +153,8 @@ ipcMain.on('open_dev', () => {
 	ApplicationWindow.webContents.openDevTools(); // debug stuff
 });
 
-ipcMain.on('check_for_update', updater.checkForUpdates);
+ipcMain.on('check_for_update', checkForUpdate);
+ipcMain.on('download_update', downloadUpdate);
 ipcMain.on('apply_update', applyUpdate);
 
 ipcMain.on('init', () => {
