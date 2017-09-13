@@ -31,6 +31,10 @@ var electron = require('electron'),
 	app = electron.app;
 
 
+const API_ROOT = 'http://cemui.com';
+const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
+
+
 winston.emitErrs = true;
 updater.autoDownload = false;
 
@@ -45,6 +49,26 @@ var logger = new (winston.Logger)({
       	})
     ]
 });
+
+var screenGames = false,
+	screenCemu = false,
+	screenWelcome = false;
+
+fs.ensureDirSync(DATA_ROOT + 'cache/images');
+fs.ensureDirSync(DATA_ROOT + 'cache/json');
+fs.ensureDirSync(DATA_ROOT + 'themes');
+if (!fs.existsSync(DATA_ROOT + 'cache/json/games.json')) {
+	fs.createFileSync(DATA_ROOT + 'cache/json/games.json');
+}
+if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
+	fs.createFileSync(DATA_ROOT + 'cache/json/settings.json');
+	screenWelcome = true;
+}
+
+game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
+game_storage.defaults({games: []}).write();
+settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
+settings_storage.defaults({cemu_paths: [], game_paths: [], theme: 'Default'}).write();
 
 updater.on('checking-for-update', () => {
 	ApplicationWindow.webContents.send('update_status', {
@@ -91,9 +115,6 @@ updater.on('update-downloaded', (info) => {
 
 let ApplicationWindow;
 
-const API_ROOT = 'http://cemui.com';
-const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
-
 let dns_errors = 0;
 
 function applyUpdate() {
@@ -124,7 +145,7 @@ function createWindow(file) {
     });
 
   	ApplicationWindow.loadURL(url.format({
-  		pathname: path.join(__dirname, '/app/'+file+'.html'),
+  		pathname: path.join(__dirname, '/app/' + settings_storage.get('theme').value() + '/' + file + '.html'),
     	protocol: 'file:',
     	slashes: true
   	}));
@@ -244,24 +265,6 @@ ipcMain.on('update_game_settings', (event, data) => {
 })
 
 function init() {
-    var screenGames = false,
-        screenCemu = false,
-        screenWelcome = false;
-    
-	fs.ensureDirSync(DATA_ROOT + 'cache/images');
-	fs.ensureDirSync(DATA_ROOT + 'cache/json');
-	fs.ensureDirSync(DATA_ROOT + 'themes');
-	if (!fs.existsSync(DATA_ROOT + 'cache/json/games.json')) {
-		fs.createFileSync(DATA_ROOT + 'cache/json/games.json');
-	}
-	if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
-		fs.createFileSync(DATA_ROOT + 'cache/json/settings.json');
-        screenWelcome = true;
-	}
-	game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
-	game_storage.defaults({games: []}).write();
-	settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
-	settings_storage.defaults({cemu_paths: [], game_paths: [], theme: 'Default'}).write();
 
 	if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
 		fs.createFileSync(DATA_ROOT + 'cache/json/settings.json');
