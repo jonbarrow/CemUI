@@ -58,7 +58,11 @@ ipcRenderer.on('update_status',function(e,data) {
         };
     } else if (data.type == "progress")  {
         document.getElementById('update_txt').innerHTML = "Loading";
+<<<<<<< HEAD
         document.getElementById('progress_update').style.width = data.type.progress.percent + '%';
+=======
+        document.getElementById('progress_update').style.width = data.progress.percent + '%';
+>>>>>>> ce44af8547b209133abcabb24b56c066b1810f71
         console.log(data.progress);
     } else if (data.type == "completed") {
         document.getElementById('update_txt').innerHTML = "Applying update";
