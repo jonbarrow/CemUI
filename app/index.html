@@ -54,7 +54,7 @@
             
         </div>
         <!-- extra screens -->
-        <div id="loading_screen" class="screen" style="display: block; z-index: 999; opacity: 0.9999;">
+        <div id="loading_screen" class="screen" style="display: block; opacity: 0.9999;">
             <div class="screen-content">
                 <h2 class="txt-s-48 txt-bold txt-c-black" id="loading">LOADING</h2>
                 <p class="txt-s-24 txt-margin">This won't take long</p>
@@ -72,6 +72,14 @@
                 <h2 class="txt-up txt-s-24 txt-c-black" style="position:relative;">CEM<span class="txt-c-blue txt-s-16" style="position: absolute; top:3px;">UI</span></h2>
                 <p class="txt-s-24 txt-margin">Please select the CEMU folder</p>
                 <p class="txt-s-16 txt-bold button">Select CEMU</p>
+            </div>
+        </div>
+        <div id="screen_start" class="screen closed" style="display: block;">
+            <div class="screen-content">
+                <h2 class="txt-up txt-s-24 txt-c-black" style="position:relative;">CEM<span class="txt-c-blue txt-s-16" style="position: absolute; top:3px;">UI</span></h2>
+                <p class="txt-s-16 txt-margin">There is an update available</p>
+                <div class="progress"><div class="indicator" style="width: 50%"></div></div>
+                <p class="txt-s-16 txt-bold button" onclick="closeScreen(this);">Start</p>
             </div>
         </div>
         <div id="screen_start" class="screen closed">
