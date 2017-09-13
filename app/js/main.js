@@ -45,6 +45,30 @@ ipcRenderer.on('show_screen', function(event, data) {
     }
 });
 
+ipcRenderer.on('update_status',function(e,data) {
+    
+    if (data.type == "available") {
+        openScreen('screen_update');
+        document.getElementById('update_txt').innerHTML = "Update available";
+        document.getElementById('update_button').innerHTML = "Start updating";
+        document.getElementById('update_button').onclick = function () {
+            ipcRenderer.send('download_update');
+            this.onclick = "";
+            this.innerHTML = "downloading";
+        };
+    } else if (data.type == "progress")  {
+        document.getElementById('update_txt').innerHTML = "Loading";
+        document.getElementById('progress_update').style.width = '50%';
+        console.log(data.progress);
+    } else if (data.type == "completed") {
+        document.getElementById('update_txt').innerHTML = "Applying update";
+        document.getElementById('update_button').innerHTML = "applying";
+        document.getElementById('update_button').onclick = '';
+        ipcRenderer.send('apply_update');
+    }
+    
+});
+
 ipcRenderer.on('cemu_folder_loaded', function(event, data) {
     var button = document.getElementById('select_cemu').getElementsByClassName('button')[0];
     console.log(button);

@@ -77,9 +77,9 @@
         <div id="screen_update" class="screen closed">
             <div class="screen-content">
                 <h2 class="txt-up txt-s-32 txt-c-black" style="position:relative;">CEM<span class="txt-c-blue txt-s-16" style="position: absolute; top:3px;">UI</span></h2>
-                <p class="txt-s-16 txt-margin">There is an update available</p>
-                <div class="progress"><div class="indicator" style="width: 50%"></div></div>
-                <p class="txt-s-16 txt-bold button" onclick="closeScreen(this);">Start</p>
+                <p class="txt-s-16 txt-margin" id="update_txt"></p>
+                <div class="progress"><div id="progress_update" class="indicator" style="width: 50%"></div></div>
+                <p class="txt-s-16 txt-bold button" onclick="closeScreen(this);" id="update_button">Start</p>
             </div>
         </div>
         <div id="screen_start" class="screen closed">
