@@ -144,6 +144,7 @@ ipcMain.on('open_dev', () => {
 	ApplicationWindow.webContents.openDevTools(); // debug stuff
 });
 
+ipcMain.on('check_for_update', updater.checkForUpdates());
 ipcMain.on('apply_update', applyUpdate);
 
 ipcMain.on('init', () => {
