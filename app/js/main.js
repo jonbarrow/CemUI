@@ -58,7 +58,7 @@ ipcRenderer.on('update_status',function(e,data) {
         };
     } else if (data.type == "progress")  {
         document.getElementById('update_txt').innerHTML = "Loading";
-        document.getElementById('progress_update').style.width = '50%';
+        document.getElementById('progress_update').style.width = data.type.progress.percent + '%';
         console.log(data.progress);
     } else if (data.type == "completed") {
         document.getElementById('update_txt').innerHTML = "Applying update";
