@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <style>
+            img {
+                z-index: 0;
+            }
+
+            .controlls {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+            }
+
+            .r-stick {
+                position: absolute;
+                top: 0;
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                background: blue;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="controlls">
+            <img src="gamepad.svg">
+            <div class="r-stick"></div>
+            <div class="l-stick"></div>
+        </div>
+
+        <script>
+            const {ipcRenderer} = require('electron');
+            var gamepad = document.getElementsByTagName('img')[0];
+            gamepad.onload = function() {
+                
+            }
+        </script>
+    </body>
+</html>
