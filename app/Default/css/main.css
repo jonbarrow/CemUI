@@ -514,6 +514,7 @@ h2, p {
 }
 .dropdown .items .item:hover, .dropdownbutton .items .item:hover {
     background-color: #d2deff;
+    cursor: pointer;
 }
 .dropdown span,.dropdownbutton span {
     padding-left: 5px;

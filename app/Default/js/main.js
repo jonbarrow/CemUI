@@ -2,7 +2,8 @@ const {ipcRenderer} = require('electron'); // Gets ipcRenderer
 var games_lib = document.getElementById('games-grid'),
     modal_list  = document.getElementById('modal-content-list'),
     modal_open = false,
-    clicks = 0;
+    clicks = 0,
+    emulators_list;
 
 function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
@@ -29,6 +30,9 @@ addEvent(document.getElementById('select_games').getElementsByClassName('button'
     ipcRenderer.send('load_games_folder');
 });
 
+ipcRenderer.on('emulator_list', function(event, data) {
+    emulators_list = data;
+})
 
 ipcRenderer.on('show_screen', function(event, data) {
     document.getElementById('screen_start').style.display = "none";
@@ -165,6 +169,8 @@ ipcRenderer.on('init_complete', function(event, data) {
             closeScreen(document.getElementById('loading'),true);
         },2000);
 
+        createCemuDropdowns();
+
         /*
         ipcRenderer.send('smm_search_courses', {
             title: 'sand'
@@ -220,11 +226,51 @@ function dropdown(el) {
 }
 
 function preload(url) {
-heavyImage = new Image();
-heavyImage.src = url;
+    heavyImage = new Image();
+    heavyImage.src = url;
 }
 
-function createModal(game,isSuggest) {
+function createCemuDropdowns() {
+    var dropdown_list = document.getElementsByClassName('dropdownbutton cemudropdown launchgame');
+    for (var i=0;i<dropdown_list.length;i++) {
+        var items = dropdown_list[i].getElementsByClassName('items')[0];
+        items.innerHTML = '';
+        for (var j=0;j<emulators_list.length;j++) {
+            var emulator = emulators_list[j],
+                item = document.createElement('div');
+            
+            item.className = 'item';
+            item.innerHTML = emulator.name;
+            item.onclick = function() {
+                ipcRenderer.send('play_rom', {emu: emulator.name, rom: this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id});        
+                closeDropdown();
+            }
+
+            items.appendChild(item)
+        }
+    }
+
+    var dropdown_list = document.getElementsByClassName('dropdownbutton cemudropdown shortcut');
+    for (var i=0;i<dropdown_list.length;i++) {
+        var items = dropdown_list[i].getElementsByClassName('items')[0];
+        items.innerHTML = '';
+        for (var j=0;j<emulators_list.length;j++) {
+            var emulator = emulators_list[j],
+                item = document.createElement('div');
+            
+            item.className = 'item';
+            item.innerHTML = emulator.name;
+            item.onclick = function() {
+                ipcRenderer.send('make_shortcut', {emu: emulator.name, rom: this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id});        
+                closeDropdown();
+            }
+
+            items.appendChild(item)
+        }
+    }
+}
+
+function createModal(game, isSuggest) {
     var modal = document.createElement('div'),
         modal_content = document.createElement('div'),
         close = document.createElement('span'),
@@ -303,11 +349,11 @@ function createModal(game,isSuggest) {
         sect1.appendChild(toggle);
         sect1.appendChild(togglebtn);
         
-        var dropdown = document.createElement('div'),
+        var _dropdown = document.createElement('div'),
             dropdownhead = document.createElement('div'),
             dropdownitems = document.createElement('div');
          
-        dropdown.classList = "dropdown";
+        _dropdown.classList = "dropdown";
         dropdownhead.classList = "head txt-s-16 txt-c-black";
         dropdownhead.setAttribute("onclick","dropdown(this);");
         dropdownhead.innerHTML = '<p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>high</span></p>';
@@ -315,28 +361,28 @@ function createModal(game,isSuggest) {
         dropdownitems.innerHTML += '<div class="item">high</div>';
         dropdownitems.innerHTML += '<div class="item">medium</div>';
         dropdownitems.innerHTML += '<div class="item">low</div>';
-        dropdown.appendChild(dropdownhead);
-        dropdown.appendChild(dropdownitems);
+        _dropdown.appendChild(dropdownhead);
+        _dropdown.appendChild(dropdownitems);
         sect1.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">GPU buffer cache accuracy</p>';
-        sect1.appendChild(dropdown);
+        sect1.appendChild(_dropdown);
         
         sect2.innerHTML += '<p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">CPU</p>';
         
-        var dropdown = document.createElement('div'),
+        var _dropdown = document.createElement('div'),
             dropdownhead = document.createElement('div'),
             dropdownitems = document.createElement('div');
          
-        dropdown.classList = "dropdown";
+        _dropdown.classList = "dropdown";
         dropdownhead.classList = "head txt-s-16 txt-c-black";
         dropdownhead.setAttribute("onclick","dropdown(this);");
         dropdownhead.innerHTML = '<p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>cycle counter</span></p>';
         dropdownitems.classList = "items txt-s-16 txt-c-black";
         dropdownitems.innerHTML += '<div class="item">host based</div>';
         dropdownitems.innerHTML += '<div class="item">cycle counter</div>';
-        dropdown.appendChild(dropdownhead);
-        dropdown.appendChild(dropdownitems);
+        _dropdown.appendChild(dropdownhead);
+        _dropdown.appendChild(dropdownitems);
         sect2.innerHTML += '<p class="txt-s-16 txt-c-black" style="padding-top: 10px;">CPU timer</p>';
-        sect2.appendChild(dropdown);
+        sect2.appendChild(_dropdown);
         
         var toggle = document.createElement('input'),
             togglebtn = document.createElement('label'),
@@ -373,12 +419,12 @@ function createModal(game,isSuggest) {
             dropdownbutton =  document.createElement('p'),
             dropdownicon = document.createElement('i');
          
-        play_button.classList = "dropdownbutton";
+        play_button.classList = "dropdownbutton cemudropdown launchgame";
         dropdownhead.classList = "head txt-s-16 txt-c-black";
         dropdownbutton.classList = 'txt-s-16 txt-bold button button-small button-left play-button';
         dropdownbutton.innerHTML = 'Play';
         dropdownbutton.onclick = function() {
-            ipcRenderer.send('play_rom', this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id);
+            ipcRenderer.send('play_rom', {emu: 'Default', rom: this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id});
         }
         dropdownicon.classList = "button button-small button-right fa fa-caret-down";
         dropdownicon.setAttribute('aria-hidden','true');
@@ -405,12 +451,12 @@ function createModal(game,isSuggest) {
             dropdownbutton =  document.createElement('p'),
             dropdownicon = document.createElement('i');
          
-        shortcut_button.classList = "dropdownbutton";
+        shortcut_button.classList = "dropdownbutton cemudropdown shortcut";
         dropdownhead.classList = "head txt-s-16 txt-c-black";
         dropdownbutton.classList = 'txt-s-16 txt-bold button button-small button-left shortcut-button';
         dropdownbutton.innerHTML = 'Create desktop shortcut';
         dropdownbutton.onclick = function() {
-            ipcRenderer.send('make_shortcut', this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id);
+            ipcRenderer.send('make_shortcut', {emu: 'Default', rom: this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id});
         }
         dropdownicon.classList = "button button-small button-right fa fa-caret-down";
         dropdownicon.setAttribute('aria-hidden','true');

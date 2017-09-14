@@ -182,9 +182,29 @@ ipcMain.on('init', () => {
 	init();
 });
 
+ipcMain.on('create_emulator_instance', (name, cemu_path) => {
+	var cemu_object = {};
+	if (!name) return ApplicationWindow.webContents.send('add_cemu_error', {type: 'missing', value: 'name'});
+	if (!path) return ApplicationWindow.webContents.send('add_cemu_error', {type: 'missing', value: 'path'});
+	if (settings_storage.get('cemu_paths').find({ name: name }).value()) return ApplicationWindow.webContents.send('add_cemu_error', {type: 'taken', value: 'name'});
+	if (settings_storage.get('cemu_paths').find({ cemu_path: cemu_path }).value()) return ApplicationWindow.webContents.send('add_cemu_error', {type: 'taken', value: 'path'});
+
+	cemu_object.name = name;
+
+	cemu_path = cemu_path.replace(/\\/g, '/');
+	cemu_object.cemu_path = cemu_path;
+
+	cemu_path = cemu_path.split('/');
+	cemu_path.pop();
+	cemu_object.cemu_folder_path = cemu_path.join('/');
+
+	settings_storage.get('cemu_paths').push(cemu_object).write();
+	ApplicationWindow.webContents.send('cemu_folder_added');
+})
+
 ipcMain.on('load_cemu_folder', () => {
 	var cemu_path = pickEmuFolder(),
-		cemu_object = {};
+		cemu_object = {name: 'Default'};
 
 	cemu_path = cemu_path.replace(/\\/g, '/');
 	cemu_object.cemu_path = cemu_path;
@@ -208,8 +228,8 @@ ipcMain.on('load_games_folder', () => {
 	});
 });
 
-ipcMain.on('play_rom', (event, id) => {
-	var game = game_storage.get('games').find({title_id: id}).value(),
+ipcMain.on('play_rom', (event, data) => {
+	var game = game_storage.get('games').find({title_id: data.rom}).value(),
 		game_path;
 	if (game.is_wud) {
 		game_path = game.path;
@@ -217,7 +237,7 @@ ipcMain.on('play_rom', (event, id) => {
 		game_path = game.path + '/code/' + game.rom;
 	}
 
-	exec('"' + settings_storage.get('cemu_paths').value()[0].cemu_path + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
+	exec('"' + settings_storage.get('cemu_paths').find({name: data.emu}).value().cemu_path + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
 		if (error) {
 			console.error(error);
 			return;
@@ -236,8 +256,8 @@ ipcMain.on('show_rom', (event, id) => {
 	}
 })
 
-ipcMain.on('make_shortcut', (event, id) => {
-	createShortcut(id);
+ipcMain.on('make_shortcut', (event, data) => {
+	createShortcut(data.emu, data.rom);
 });
 
 ipcMain.on('set_favorite', (event, id) => {
@@ -301,6 +321,7 @@ function init() {
 			
 			getSuggested(most_played, (error, suggested) => {
 				if (error) throw error;
+				ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
 				ApplicationWindow.webContents.send('init_complete', {library: games, most_played: most_played, suggested: suggested});
 			});
 		})
@@ -764,12 +785,12 @@ function getProductCode(file, cb) {
 	return buffer.toString('utf8', 0, productCode);
 }
 
-function createShortcut(id) {
+function createShortcut(emulator, id) {
 	/*
 	God I fucking hate Node support for lnk files, and lnk files in general. 00050000-10143500
 	*/
 	var game = game_storage.get('games').find({ title_id: id }).value(),
-		cemu = settings_storage.get('cemu_paths').value()[0].cemu_path,
+		cemu = settings_storage.get('cemu_paths').find({name: emulator}).value().cemu_path,
 		rom;
 	if (!game) return;
 
@@ -779,7 +800,7 @@ function createShortcut(id) {
 		rom = game.path + '/code/' + game.rom;
 	}
 
-	ws.create(require('os').homedir() + '/Desktop/' + game.name_clean + '.lnk', {
+	ws.create(require('os').homedir() + '/Desktop/' + game.name_clean + ' (' + emulator + ').lnk', {
 		target : cemu,
 		args: '-g "' + rom + '"',
 		icon: DATA_ROOT + 'cache/images/' + id + '/icon.ico',
