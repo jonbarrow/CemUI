@@ -437,10 +437,9 @@ function loadGames(dir, master_callback) {
 					function(data, name, is_wud, cb) {
 						fs.ensureDirSync(DATA_ROOT + 'cache/images/' + data.game_title_id);
 						data.screenshots_list = [];
-						if (data.game_screenshot_urls && data.game_screenshot_urls !== '') {
+						if (data.game_screenshot_urls && data.game_screenshot_urls !== '' && data.game_screenshot_urls !== 'null') {
 							fs.ensureDirSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots');
 							var urls = data.game_screenshot_urls.split('|');
-							console.log(urls);
 							async.each(urls, (url, sc_callback) => {
 								var req = request(url);
 
