@@ -1,28 +1,34 @@
 /* global styles */
 @font-face {
-    font-family: 'Raleway';
-    src: url('../fonts/Raleway-Bold.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
-
-}
-@font-face {
-    font-family: 'Raleway';
-    src: url('../fonts/Raleway-Regular.ttf') format('truetype');
+    font-family: 'OpenSansBold';
+    src: url('../fonts/OpenSans-Bold.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 
 }
 @font-face {
-    font-family: 'Raleway';
-    src: src: url('../fonts/Raleway-ExtraBold.ttf') format('truetype');
-    font-weight: 900;
+    font-family: 'OpenSans';
+    src: url('../fonts/OpenSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'OpenSansSemiBold';
+    src: src: url('../fonts/OpenSans-Semibold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'OpenSansLight';
+    src: src: url('../fonts/OpenSans-Light.ttf') format('truetype');
+    font-weight: normal;
     font-style: normal;
 
 }
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
 }
 ::-webkit-scrollbar-button {
   width: 0;
@@ -59,7 +65,7 @@ body, html {
     padding: 0;
     margin: 0;
     overflow: hidden;
-    font-family: 'Raleway';
+    font-family: 'OpenSans';
     font-size: 1em;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -67,15 +73,17 @@ body, html {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    
 }
 body {
     background-color: #fff;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 #header {
     padding: 1em;
     background-color: #F3F3F3;
-    overflow: hidden;
     box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.25);
 }
 #header .left {
@@ -128,20 +136,49 @@ body {
 }
 
 #sectionContainer {
+    position: relative;
     width: 70vw;
-    height: 50vh;
+    flex-grow: 1;
     margin: 0 auto;
     overflow-y: scroll;
+    left: 0vw;
+    transition: left 1s;
 }
-#games { 
+#sectionContainerHome {
+    width: 70vw;
+    flex-grow: 1;
+    margin: 0 auto;
+    overflow-y: scroll;
+    position: relative;
+    left: 0vw;
+    transition: left 1s;
+}
+#sectionContainerHome > div {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "recentPlayed mostPlayed";
+}
+.games { 
     display: grid;
     grid-template-columns: repeat(auto-fill, calc(70vw / 4 - 14px) );
-    grid-auto-rows: calc(70vw / 4 / 1.43); 
-    
-    height: auto;
-    
-    padding: 10px;
+    grid-auto-rows: calc(70vw / 4 / 2); 
+    width: 100%;
     margin-right: 10px;
+}
+.gamesRows { 
+    display: grid;
+    grid-template-columns: repeat(auto-fill, calc(70vw / 4 - 14px) );
+    grid-template-rows: repeat(auto-fill, calc(70vw / 4 / 2) );
+    width: 100%;
+    grid-area: recentPlayed;
+    margin-right: 10px;
+}
+#mostPlayed {
+    grid-area: mostPlayed;
 }
 .grid-item {
     padding: 7px;
@@ -179,10 +216,13 @@ body {
     margin: 25px;
 }
 .txt-bold {
-    font-weight: bold;
+    font-weight: 'OpenSansSemiBold';
 }
 .txt-extrabold {
-    font-weight: 900;
+    font-family: 'OpenSansBold';
+}
+.txt-light {
+    font-family: 'OpenSansLight';
 }
 .txt-hover:hover {
     color: #000;
