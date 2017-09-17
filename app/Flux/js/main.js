@@ -1,5 +1,5 @@
 const {ipcRenderer} = require('electron'); // Gets ipcRenderer
-var games_lib = document.getElementById('games-grid'),
+var games_lib = document.getElementById('games'),
     modal_list  = document.getElementById('modal-content-list'),
     modal_open = false,
     clicks = 0,
@@ -15,6 +15,7 @@ addEvent(window, 'keypress', function(event) {
     }
 });
 
+/*
 addEvent(document.getElementById('select_cemu').getElementsByClassName('button')[0], 'click', function() {
     if (this.classList.contains('disabled')) {
         return false;
@@ -22,18 +23,22 @@ addEvent(document.getElementById('select_cemu').getElementsByClassName('button')
     this.classList.add('disabled');
     ipcRenderer.send('load_cemu_folder');
 });
+*/
 
+/*
 addEvent(document.getElementById('select_games').getElementsByClassName('button')[0], 'click', function() {
     if (this.classList.contains('disabled')) {
         return false;
     }
     ipcRenderer.send('load_games_folder');
 });
+*/
 
 ipcRenderer.on('emulator_list', function(event, data) {
     emulators_list = data;
 })
 
+/*
 ipcRenderer.on('show_screen', function(event, data) {
     document.getElementById('screen_start').style.display = "none";
     document.getElementById('select_games').style.display = "none";
@@ -48,7 +53,9 @@ ipcRenderer.on('show_screen', function(event, data) {
         openScreen('screen_start');
     }
 });
+*/
 
+/*
 ipcRenderer.on('update_status',function(e,data) {
     
     if (data.type == "available") {
@@ -72,7 +79,9 @@ ipcRenderer.on('update_status',function(e,data) {
     }
     
 });
+*/
 
+/*
 ipcRenderer.on('cemu_folder_loaded', function(event, data) {
     var button = document.getElementById('select_cemu').getElementsByClassName('button')[0];
     console.log(button);
@@ -80,13 +89,17 @@ ipcRenderer.on('cemu_folder_loaded', function(event, data) {
         closeScreen(document.getElementById('select_cemu').getElementsByClassName('button')[0]);
     },1000);
 });
+*/
 
+/*
 ipcRenderer.on('games_folder_loaded', function(event, data) {
     var button = document.getElementById('select_games').getElementsByClassName('button')[0];
     console.log(button);
     closeScreen(button);
 });
+*/
 
+/*
 ipcRenderer.on('game_folder_loading', function(event, data) {
     var button = document.getElementById('select_games').getElementsByClassName('button')[0];
         spinner = document.createElement('span');
@@ -96,6 +109,7 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
     button.appendChild(spinner);
     
 });
+*/
 
 ipcRenderer.on('init_complete', function(event, data) {
     setTimeout(function () {
@@ -103,27 +117,14 @@ ipcRenderer.on('init_complete', function(event, data) {
         for (var i=0,length = games.length ;i<length;i++) {
             var game = games[i],
                 wrapper = document.createElement('div'),
-                fav = document.createElement('i'),
                 box = document.createElement('div');
-
-            createModal(game);
 
             wrapper.setAttribute('data-modal-id', game.title_id);
             wrapper.className = 'grid-item';
 
-            if (game.is_favorite) {
-                wrapper.classList.add('highlight');
-                fav.classList = 'txt-s-24 fa fa-times grid-icon favicon';
-            } else {
-                fav.classList = 'txt-s-16 fa fa-star grid-icon favicon';
-            }
-            fav.setAttribute('aria-hidden','true');
-            fav.onclick = function () {
-                updateFavorite(this);
-            }
             preload(game.boxart);
             box.style.backgroundImage = 'url("' + game.boxart + '")';
-            box.classList = 'boxart';
+            box.classList = 'game';
             box.onclick = function() {
                 clicks++;
                 if (clicks === 1) {
@@ -139,27 +140,23 @@ ipcRenderer.on('init_complete', function(event, data) {
                 }
             }
 
-            wrapper.appendChild(fav);
             wrapper.appendChild(box);
 
             games_lib.appendChild(wrapper);
         }
 
-        addToGrid(data.suggested,'suggest_grid');
-        addToGrid(data.most_played,'most_grid');
+        //addToGrid(data.suggested,'suggest_grid');
+        //addToGrid(data.most_played,'most_grid');
 
         var count = games.length;
-        var high = document.getElementsByClassName('highlight')[0];
-            if (typeof high != 'undefined') {
-                count = count + 3;
-            }
-        count = 15 - count;
+        count = 16 - count;
         for (var i=0;i<count;i++) {
             var item = document.createElement('div');
             item.classList = "grid-item filler-grid-item";
+            item.innerHTML = "<div class='game'></div>"
             games_lib.appendChild(item);
         }
-
+        /*
         document.getElementById('main').style.display = 'grid';
         openModal('modal1');
         setTimeout(function () {
@@ -170,19 +167,20 @@ ipcRenderer.on('init_complete', function(event, data) {
         },2000);
 
         createCemuDropdowns();
-
-        /*
+        
         ipcRenderer.send('smm_search_courses', {
             title: 'sand'
         });
         */
-    },0); //This is to let the rendering catch up before proceeding.
+        
+    },0);
 });
 
 addEvent(window, 'load', function() {
     ipcRenderer.send('init');
 });
 
+/*
 function addToGrid(arr,id) {
     var children = document.getElementById(id).children;
     for (var i=0,length = children.length ;i<length;i++) {
@@ -211,7 +209,9 @@ function addToGrid(arr,id) {
         }
     }
 }
+*/
 
+/*
 function dropdown(el) {
     var items = el.parentElement.children[1];
     var icon = el.getElementsByClassName('fa').item(0).classList;
@@ -224,12 +224,14 @@ function dropdown(el) {
         icon.add('fa-caret-up');
     }
 }
+*/
 
 function preload(url) {
     heavyImage = new Image();
     heavyImage.src = url;
 }
 
+/*
 function createCemuDropdowns() {
     var dropdown_list = document.getElementsByClassName('dropdownbutton cemudropdown launchgame');
     for (var i=0;i<dropdown_list.length;i++) {
@@ -269,7 +271,9 @@ function createCemuDropdowns() {
         }
     }
 }
+*/
 
+/*
 function createModal(game, isSuggest) {
     var modal = document.createElement('div'),
         modal_content = document.createElement('div'),
@@ -629,8 +633,8 @@ function closeDropdown() {
         icon.add('fa-caret-down');
     }
 }
-
-
+*/
+/*
 function updateFavorite(el) {
     if(el.parentElement.classList.contains('highlight')) {
         removeFavorite(el);
@@ -702,3 +706,81 @@ for(var i = 0, length = closeList.length; i < length; i++)
         closeModal();
     }
 }
+*/
+
+
+
+
+
+
+
+
+//FLUX JS
+
+function openSection(id) {
+    var library = document.getElementById('library'),
+        home = document.getElementById('home'),
+        settings = document.getElementById('settings'),
+        menu = document.getElementById('menuIndicator');
+    menu.classList.remove('one');
+    menu.classList.remove('two');
+    menu.classList.remove('three');
+    if (id == 'home') {
+        
+        menu.classList.add('two');
+        home.style.left = '0vw';
+        settings.style.left = '-100vw';
+        library.style.left = '100vw';
+        
+    } else if (id == 'library') {
+        
+        menu.classList.add('three');
+        home.style.left = '-100vw';
+        settings.style.left = '-200vw';
+        library.style.left = '0vw';
+        
+    } else {
+        
+        menu.classList.add('one');
+        home.style.left = '100vw';
+        settings.style.left = '0vw';
+        library.style.left = '200vw';
+        
+    }
+}
+
+//flux clock
+var col = true;
+function clock() {
+    var time = new Date(),
+        hours = time.getHours() % 24,
+        minutes = time.getMinutes(),
+        mid = 'am',
+        colm = ":";
+    if(hours==0) { //At 00 hours we need to show 12 am
+        hours=12;
+    }
+    else if(hours>12) {
+        hours = hours%12;
+        mid = 'pm';
+    }
+    if (col) {
+        colm = " ";
+        col = false;
+    } else {
+        col = true;
+    }
+    
+    
+    document.getElementById('clock').innerHTML = harold(hours) + colm + harold(minutes) + " " + mid;
+  
+  function harold(standIn) {
+    if (standIn < 10) {
+      standIn = '0' + standIn
+    }
+    return standIn;
+  }
+    
+}
+clock();
+setInterval(clock, 1000);

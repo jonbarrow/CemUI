@@ -10,57 +10,22 @@
         
         <div id="header">
             <div class="left"><h2 class="txt-s-32 txt-c-black txt-up txt-extrabold">CEM<span class="txt-c-blue">UI</span> <span class="txt-c-purple">flux</span></h2></div>
-            <div class="right"><h2 class="txt-s-32 txt-c-purple txt-extrabold">12:00 AM</h2></div>
+            <div class="right"><h2 class="txt-s-32 txt-c-purple txt-extrabold" id="clock">12:00 AM</h2></div>
         </div>
         <div id="menu" class="txt-c-purple txt-s-16 txt-up">
             <ul>
-                <li><h2>Settings</h2></li><!--
-                --><li><h2>Home</h2></li><!--
-                --><li><h2>Library</h2></li><!--
-                --><hr id="menuIndicator" />
+                <li onclick="openSection('settings',this)"><h2>Settings</h2></li><!--
+                --><li onclick="openSection('home',this)"><h2>Home</h2></li><!--
+                --><li onclick="openSection('library',this)"><h2>Library</h2></li><!--
+                --><hr id="menuIndicator" class="two"/>
             </ul>
         </div>
         <div id="sectionContainer">
-            <div id="games" class="games">
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
-                <div class="grid-item"><div class="game"></div></div>
+            <div class="settings" id="settings">
+                <h2>Hello</h2>
             </div>
-        </div>
-        <!--<div id="sectionContainerHome">
-            <div>
+            <div class="home" id="home">
                 <div id="mostPlayed" class="gamesRows"><div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
                     <div class="grid-item"><div class="game"></div></div>
                     <div class="grid-item"><div class="game"></div></div>
                     <div class="grid-item"><div class="game"></div></div>
@@ -77,13 +42,13 @@
                     <div class="grid-item"><div class="game"></div></div>
                     <div class="grid-item"><div class="game"></div></div>
                     <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
                 </div>
             </div>
-        </div>-->
+            <div class="library" id="library">
+                <div id="games" class="games">
+                </div>
+            </div>
+        </div>
         <script src="js/main.js"></script>
         <script src="js/Controller.js"></script>
         <script src="js/Controller.layouts.js"></script>

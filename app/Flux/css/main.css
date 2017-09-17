@@ -99,7 +99,6 @@ body {
 #menu ul {
     margin: 0;
     padding: 0;
-    margin-left: -2em;
 }
 #menu ul li {
     display: inline;
@@ -125,14 +124,14 @@ body {
 #menu ul li:hover {
     color: #ff93de;
 }
-#menu ul li:first-child:hover ~ hr {
-    margin-left: calc( (0%) + (100% / 3 / 16 * 3) );
+#menu ul li:first-child:hover ~ hr,.one {
+    margin-left: calc( (0%) + (100% / 3 / 16 * 3) ) !important;
 }
-#menu ul li:nth-child(2):hover ~ hr {
-    margin-left: calc( (100% / 3) + (100% / 3 / 16 * 3) );
+#menu ul li:nth-child(2):hover ~ hr,.two {
+    margin-left: calc( (100% / 3) + (100% / 3 / 16 * 3) ) !important;
 }
-#menu ul li:nth-child(3):hover ~ hr {
-    margin-left: calc( (100% / 3 * 2) + (100% / 3 / 16 * 3) );
+#menu ul li:nth-child(3):hover ~ hr,.three {
+    margin-left: calc( (100% / 3 * 2) + (100% / 3 / 16 * 3) ) !important;
 }
 
 #sectionContainer {
@@ -140,9 +139,6 @@ body {
     width: 70vw;
     flex-grow: 1;
     margin: 0 auto;
-    overflow-y: scroll;
-    left: 0vw;
-    transition: left 1s;
 }
 #sectionContainerHome {
     width: 70vw;
@@ -153,14 +149,30 @@ body {
     left: 0vw;
     transition: left 1s;
 }
-#sectionContainerHome > div {
+#sectionContainer > .home {
     position: absolute;
     height: 100%;
-    width: 100%;
     display: grid;
+    width: 100%;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
     grid-template-areas: "recentPlayed mostPlayed";
+}
+#sectionContainer > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow-y: scroll;
+    left: 0vw;
+    transition: left 1s;
+    height: 100%;
+}
+#sectionContainer > .settings {
+    left: -100vw;
+}
+#sectionContainer > .library {
+    left: 100vw;
 }
 .games { 
     display: grid;
@@ -168,6 +180,7 @@ body {
     grid-auto-rows: calc(70vw / 4 / 2); 
     width: 100%;
     margin-right: 10px;
+    justify-content: center;
 }
 .gamesRows { 
     display: grid;
@@ -188,6 +201,14 @@ body {
     border-radius: 10px;
     width: 100%;
     height: 100%;
+    background-size: cover;
+    background-position: center center;
+    opacity: 1;
+    transition: opacity .15s, background-color .15s;
+}
+.grid-item > .game:hover {
+    opacity: .7;
+    background-color: #e2e2e2;
 }
 /* typography styles */
 .txt-c-blue {
