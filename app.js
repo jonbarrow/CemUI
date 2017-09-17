@@ -341,7 +341,7 @@ function getSuggested(most_played, cb) {
 	for (var i=most_played.length-1;i>=0;i--) {
 		genres.push(most_played[i].genres[Math.floor(Math.random() * most_played[i].genres.length)]);
 	}
-	request(API_ROOT + '/api/GetSuggested/?genres=' + genres.join('|'), (error, response, body) => {
+	request(API_ROOT + '/api/v2/GetSuggested/' + genres.join('|'), (error, response, body) => {
 		if (error) return cb(null, {});
 		body = JSON.parse(body);
 		if (error || response.statusCode !== 200 || !body || body.error) return callback(true);
@@ -765,7 +765,7 @@ function getGameData(game_path, is_wud, callback) {
 		post_code = [xml.title_id._Data.slice(0, 8), '-', xml.title_id._Data.slice(8)].join('');
 	}
 
-	request(API_ROOT + '/api/GetGame/?' + post_type + '=' + post_code, (error, response, body) => {
+	request(API_ROOT + '/api/v2/GetGame/' + post_type + '/' + post_code, (error, response, body) => {
 		body = JSON.parse(body);
 		if (!body || body.error) return callback(true);
 		return callback(null, body)
