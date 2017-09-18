@@ -1,4 +1,4 @@
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.1.1';
 
 var electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
@@ -24,6 +24,7 @@ var electron = require('electron'),
 	request = require('request'),
 	ws = require('windows-shortcuts'),
 	winston = require('winston'),
+	notifications = electron.Notification,
 	dialog = electron.dialog,
 	shell = electron.shell,
     BrowserWindow = electron.BrowserWindow,
@@ -81,8 +82,22 @@ updater.on('update-available', (info) => {
 	ApplicationWindow.webContents.send('update_status', {
 		type: 'available',
 		message: 'Update available'
-	})
-  	console.log('Update available.');
+	});
+
+	if (notifications.isSupported()) {
+		var notification = new notifications({
+			title: 'Update Available',
+			body: info.releaseName + '\nClick here to start update.'
+		});
+		notification.show();
+
+		notification.on('click', (event) => {
+			ApplicationWindow.webContents.send('update_status', {
+				type: 'notification_clicked_start',
+				message: info.releaseName
+			});
+		});
+	}
 })
 updater.on('update-not-available', (info) => {
 	ApplicationWindow.webContents.send('update_status', {
