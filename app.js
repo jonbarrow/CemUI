@@ -35,7 +35,6 @@ var electron = require('electron'),
 const API_ROOT = 'http://cemui.com';
 const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
 
-
 winston.emitErrs = true;
 updater.autoDownload = false;
 
@@ -69,7 +68,7 @@ if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
 game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
 game_storage.defaults({games: []}).write();
 settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
-settings_storage.defaults({cemu_paths: [], game_paths: [], theme: 'Default'}).write();
+settings_storage.defaults({cemu_paths: [], game_paths: [], theme: 'Fluent'}).write();
 
 updater.on('checking-for-update', () => {
 	ApplicationWindow.webContents.send('update_status', {
@@ -628,6 +627,26 @@ function loadGames(dir, master_callback) {
 							console.log('No icon found for ' + data.game_title + '. Defaulting to default icon')
 							fs.createReadStream('./defaults/icon.ico')
 								.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico'));
+							
+							cb(null, data, name, is_wud);
+						}
+					},
+					function(data, name, is_wud, cb) {
+						if (data.game_grid_image_url) {
+							request(data.game_grid_image_url)
+							.on('error', () => {
+								return cb(true);
+							})
+							.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/grid.webp'))
+							.on('error', () => {
+								return cb(true);
+							})
+							.on('close', () => {
+								return cb(null, data, name, is_wud)
+							});
+						} else {
+							fs.createReadStream('./defaults/grid.jpg')
+								.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/grid.webp'));
 							
 							cb(null, data, name, is_wud);
 						}
