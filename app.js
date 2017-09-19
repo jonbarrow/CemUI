@@ -50,10 +50,6 @@ var logger = new (winston.Logger)({
     ]
 });
 
-var screenGames = false,
-	screenCemu = false,
-	screenWelcome = false;
-
 fs.ensureDirSync(DATA_ROOT + 'cache/images');
 fs.ensureDirSync(DATA_ROOT + 'cache/json');
 fs.ensureDirSync(DATA_ROOT + 'themes');
@@ -62,7 +58,6 @@ if (!fs.existsSync(DATA_ROOT + 'cache/json/games.json')) {
 }
 if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
 	fs.createFileSync(DATA_ROOT + 'cache/json/settings.json');
-	screenWelcome = true;
 }
 
 game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
@@ -300,26 +295,24 @@ ipcMain.on('update_game_settings', (event, data) => {
 
 function init() {
 
-	if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
-		fs.createFileSync(DATA_ROOT + 'cache/json/settings.json');
-        screenWelcome = true;
-	}
+	var screenGames = false,
+		screenCemu = false,
+		screenWelcome = false;
 
 	if (!settings_storage.get('cemu_paths').value() || settings_storage.get('cemu_paths').value().length < 1) {
 		settings_storage.set('cemu_paths', []).write();
 		screenCemu = true;
+		console.log('cemu')
 	}
 
 	if (!settings_storage.get('game_paths').value() || settings_storage.get('game_paths').value().length < 1) {
 		settings_storage.set('game_paths', []).write();
 		screenGames = true;
-	}
-
-	if (!game_storage.get('games').value() || game_storage.get('games').value().length <= 0) {
-		screenGames = true;
+		console.log('games')
 	}
     
     if (screenCemu || screenGames || screenWelcome) {
+		console.log('NEED TO OPEN MODALS');
         ApplicationWindow.webContents.send('show_screen', {games: screenGames, cemu: screenCemu, welcome: screenWelcome});
         return;
     }
