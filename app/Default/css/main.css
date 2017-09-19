@@ -286,13 +286,13 @@ h2, p {
     
 }
 .button-left {
-    margin: 2px 0 2px 2px;
+    margin: 2px 0 2px 2px !important;
     border-radius: 10px 0 0 10px;
     display: flex;
     flex-direction: column;
 }
 .button-right {
-    margin: 2px 2px 2px 0;
+    margin: 2px 2px 2px 0 !important;
     border-radius: 0 10px 10px 0;
     display: flex;
     flex-direction: column;
