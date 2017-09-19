@@ -5,7 +5,6 @@
         <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="css/main.css" rel="stylesheet" type="text/css" />
-        <!--<link href="lib/bootstrap_min.css" rel="stylesheet" type="text/css" />-->
     </head>
     <body>
         <div id="main">
@@ -118,7 +117,7 @@
                         </div>
                         <div class="desc"><p class="txt-s-16 txt-c-gray">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam placerat sapien nec sapien lacinia porttitor. Nullam nisi erat, molestie id nibh in, pretium tristique elit. Aenean ultrices lorem at tortor cursus, non vehicula sapien finibus. Morbi aliquet tristique tempus. Suspendisse potenti. Pellentesque a mauris dolor. Fusce tristique congue ipsum, eget pellentesque mi mattis et. Nulla aliquet aliquet leo vel tincidunt. Aliquam erat volutpat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p></div>
                         <div class="ssT"><h2 class="txt-s-24 txt-c-black">Screenshots</h2></div>
-                        <div class="ss">foo</div>
+                        <div class="ss"></div>
                     </div>
                 </div>
 
@@ -150,7 +149,99 @@
 
             </div>
         </section>
+        
+        <template id="TEMPLATE_gameModal">
+            <div class="modal selected-modal">
+                <div class="modal-content">
+                    <span class="close txt-s-24">×</span>
+                    <div class="modal-grid-game" style="position: relative; left: 0px;">
+                        <div class="art">
+                            <img>
+                        </div>
+                        <div class="title">
+                            <h2 class="txt-s-32 txt-c-black"></h2>
+                        </div>
+                        <div class="buttons">
+                            <div class="dropdownbutton cemudropdown launchgame">
+                                <div class="head txt-s-16 txt-c-black">
+                                    <p class="txt-s-16 txt-bold button button-small button-left play-button">Play</p>
+                                    <i class="button play-button-dropdown button-small button-right fa fa-caret-down" aria-hidden="true"></i>
+                                </div>
+                                <div class="items play-items txt-s-16 txt-c-black">
+                                    <div class="item">ERROR</div>
+                                </div>
+                            </div>
+                            <p class="txt-s-16 txt-bold button button-small folder-button">Show in folder</p>
+                            <div class="dropdownbutton cemudropdown shortcut">
+                                <div class="head txt-s-16 txt-c-black">
+                                    <p class="txt-s-16 txt-bold button button-small button-left shortcut-button">Create desktop shortcut</p>
+                                    <i class="shortcut-button-dropdown button button-small button-right fa fa-caret-down" aria-hidden="true"></i>
+                                </div>
+                                <div class="items shortcut-items txt-s-16 txt-c-black">
+                                    <div class="item">ERROR</div>
+                                </div>
+                            </div>
 
+                            <p class="txt-s-16 txt-bold button button-small game-settings-button">Settings</p>
+                        </div>
+                        <div class="desc">
+                            <p class="txt-s-16 txt-c-gray"></p>
+                        </div>
+                        <div class="ssT">
+                            <h2 class="txt-s-24 txt-c-black">Screenshots</h2>
+                        </div>
+                        <div class="ss">
+                        </div>
+                    </div>
+                    <div class="modal-grid-game-settings" style="position: absolute; left: 100%; top: 0px;">
+                        <div class="art" style="width: 80%; padding-left: 20%;">
+                            <img src="C:/Users/jelle/AppData/Roaming/CemUI/app_data/cache/images/00050000-10146000/box.jpg">
+                        </div>
+                        <div class="sect1">
+                            <p class="txt-s-16 txt-c-gray txt-hover" style="display: inline-block" onclick="closeExpandModal(this.parentElement.parentElement.parentElement.children[1]);">back</p>
+                            <h2 class="txt-s-48 txt-c-black">Settings</h2>
+                            <p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">Graphics</p>
+                            <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Accurate shader MUL emulation</p>
+                            <input class="tgl tgl-light" id="shadermul" type="checkbox"><label class="tgl-btn" for="shadermul"></label>
+                            <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">disable GPU fence</p>
+                            <input class="tgl tgl-light" id="gpufence" type="checkbox"><label class="tgl-btn" for="gpufence"></label>
+                            <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">GPU buffer cache accuracy</p>
+                            <div class="dropdown">
+                                <div class="head txt-s-16 txt-c-black" onclick="dropdown(this);">
+                                    <p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>high</span></p>
+                                </div>
+                                <div class="items txt-s-16 txt-c-black">
+                                    <div class="item">high</div>
+                                    <div class="item">medium</div>
+                                    <div class="item">low</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sect2">
+                            <p class="txt-s-16 txt-c-gray" style="opacity: 0;display: inline-block">back</p>
+                            <h2 style="opacity: 0;" class="txt-s-48 txt-c-black">Settings</h2>
+                            <p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">CPU</p>
+                            <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">CPU timer</p>
+                            <div class="dropdown">
+                                <div class="head txt-s-16 txt-c-black" onclick="dropdown(this);">
+                                    <p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>cycle counter</span></p>
+                                </div>
+                                <div class="items txt-s-16 txt-c-black">
+                                    <div class="item">host based</div>
+                                    <div class="item">cycle counter</div>
+                                </div>
+                            </div>
+                            <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Emulate single precision</p>
+                            <input class="tgl tgl-light" id="singleprecision" type="checkbox"><label class="tgl-btn" for="singleprecision"></label>
+                            <p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">Audio</p>
+                            <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Disable audio</p>
+                            <input class="tgl tgl-light" id="disableaudio" type="checkbox"><label class="tgl-btn" for="disableaudio"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        
         <script src="js/main.js"></script>
         <script src="js/Controller.js"></script>
         <script src="js/Controller.layouts.js"></script>

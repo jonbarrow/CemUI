@@ -1,6 +1,8 @@
 const {ipcRenderer} = require('electron'); // Gets ipcRenderer
+ipcRenderer.send('open_dev');
 var games_lib = document.getElementById('games-grid'),
     modal_list  = document.getElementById('modal-content-list'),
+    modal_template = document.getElementById('TEMPLATE_gameModal'),
     modal_open = false,
     clicks = 0,
     emulators_list;
@@ -271,6 +273,58 @@ function createCemuDropdowns() {
 }
 
 function createModal(game, isSuggest) {
+    var modal = modal_template.cloneNode(true);
+    console.log(modal);
+    modal.children[0].id = game.title_id;
+    modal.querySelector('.art > img').src = game.boxart;
+    modal.querySelector('.title > h2').innerHTML = game.name;
+    modal.querySelector('.desc > p').innerHTML = game.description;
+    modal.querySelector('.folder-button').onclick = function() {
+            ipcRenderer.send('show_rom', this.parentElement.parentElement.parentElement.parentElement.id);
+    }
+    modal.querySelector('.shortcut-button').onclick = function() {
+            ipcRenderer.send('make_shortcut', {emu: 'Default', rom: this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id});
+    }
+    modal.querySelector('.shortcut-button-dropdown').onclick = function () {
+            dropdown(this.parentElement);
+    };
+    modal.querySelector('.play-button').onclick = function() {
+            ipcRenderer.send('play_rom', {emu: 'Default', rom: this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id});
+    }
+    modal.querySelector('.play-button-dropdown').onclick = function () {
+            dropdown(this.parentElement);
+    };
+    
+    modal_list.appendChild(modal);
+    
+    /*for (var i=0;i<game.screenshots.length;i++) {
+            var screenshot_url = game.screenshots[i],
+                screenshot = document.createElement('img');
+            screenshot.src  = screenshot_url;
+            screenshot.classList = 'screenshot';
+
+            screenshot.onclick = function() {
+                if (this.className.match(/\bactive\b/)) {
+                    this.classList.remove('active');
+                } else {
+                    var actives = document.getElementsByClassName('screenshot active');
+                    for (var j=0;j<actives.length;j++) {
+                        var active = actives[j];
+                        active.classList.remove('active');
+                    }
+                    this.classList.add('active');
+                }
+            }
+            
+            modal.querySelector('.ss').appendChild(screenshot);
+        }*/
+    
+    //make unique id for labels/inputs
+    // .play-items and .shortcut-items to insert dropdown items needs div with class 'item'
+    
+    
+    
+    /*
     var modal = document.createElement('div'),
         modal_content = document.createElement('div'),
         close = document.createElement('span'),
@@ -558,7 +612,7 @@ function createModal(game, isSuggest) {
     modal.appendChild(modal_content);
 
     modal_list.appendChild(modal);
-}
+*/}
 function closeModal() {
     var modal = document.getElementsByClassName('selected-modal')[0];
     modal.style.opacity = "0";
