@@ -1,4 +1,4 @@
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.1.1';
 
 var electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
@@ -24,6 +24,7 @@ var electron = require('electron'),
 	request = require('request'),
 	ws = require('windows-shortcuts'),
 	winston = require('winston'),
+	notifications = electron.Notification,
 	dialog = electron.dialog,
 	shell = electron.shell,
     BrowserWindow = electron.BrowserWindow,
@@ -33,7 +34,6 @@ var electron = require('electron'),
 
 const API_ROOT = 'http://cemui.com';
 const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
-
 
 winston.emitErrs = true;
 updater.autoDownload = false;
@@ -50,10 +50,6 @@ var logger = new (winston.Logger)({
     ]
 });
 
-var screenGames = false,
-	screenCemu = false,
-	screenWelcome = false;
-
 fs.ensureDirSync(DATA_ROOT + 'cache/images');
 fs.ensureDirSync(DATA_ROOT + 'cache/json');
 fs.ensureDirSync(DATA_ROOT + 'themes');
@@ -62,13 +58,12 @@ if (!fs.existsSync(DATA_ROOT + 'cache/json/games.json')) {
 }
 if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
 	fs.createFileSync(DATA_ROOT + 'cache/json/settings.json');
-	screenWelcome = true;
 }
 
 game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
 game_storage.defaults({games: []}).write();
 settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
-settings_storage.defaults({cemu_paths: [], game_paths: [], theme: 'Default'}).write();
+settings_storage.defaults({cemu_paths: [], game_paths: [], theme: 'Fluent'}).write();
 
 updater.on('checking-for-update', () => {
 	ApplicationWindow.webContents.send('update_status', {
@@ -81,8 +76,22 @@ updater.on('update-available', (info) => {
 	ApplicationWindow.webContents.send('update_status', {
 		type: 'available',
 		message: 'Update available'
-	})
-  	console.log('Update available.');
+	});
+
+	if (notifications.isSupported()) {
+		var notification = new notifications({
+			title: 'Update Available',
+			body: info.releaseName + '\nClick here to start update.'
+		});
+		notification.show();
+
+		notification.on('click', (event) => {
+			ApplicationWindow.webContents.send('update_status', {
+				type: 'notification_clicked_start',
+				message: info.releaseName
+			});
+		});
+	}
 })
 updater.on('update-not-available', (info) => {
 	ApplicationWindow.webContents.send('update_status', {
@@ -287,26 +296,24 @@ ipcMain.on('update_game_settings', (event, data) => {
 
 function init() {
 
-	if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
-		fs.createFileSync(DATA_ROOT + 'cache/json/settings.json');
-        screenWelcome = true;
-	}
+	var screenGames = false,
+		screenCemu = false,
+		screenWelcome = false;
 
 	if (!settings_storage.get('cemu_paths').value() || settings_storage.get('cemu_paths').value().length < 1) {
 		settings_storage.set('cemu_paths', []).write();
 		screenCemu = true;
+		console.log('cemu')
 	}
 
 	if (!settings_storage.get('game_paths').value() || settings_storage.get('game_paths').value().length < 1) {
 		settings_storage.set('game_paths', []).write();
 		screenGames = true;
-	}
-
-	if (!game_storage.get('games').value() || game_storage.get('games').value().length <= 0) {
-		screenGames = true;
+		console.log('games')
 	}
     
     if (screenCemu || screenGames || screenWelcome) {
+		console.log('NEED TO OPEN MODALS');
         ApplicationWindow.webContents.send('show_screen', {games: screenGames, cemu: screenCemu, welcome: screenWelcome});
         return;
     }
@@ -342,7 +349,7 @@ function getSuggested(most_played, cb) {
 	for (var i=most_played.length-1;i>=0;i--) {
 		genres.push(most_played[i].genres[Math.floor(Math.random() * most_played[i].genres.length)]);
 	}
-	request(API_ROOT + '/api/GetSuggested/?genres=' + genres.join('|'), (error, response, body) => {
+	request(API_ROOT + '/api/v2/GetSuggested/' + genres.join('|'), (error, response, body) => {
 		if (error) return cb(null, {});
 		body = JSON.parse(body);
 		if (error || response.statusCode !== 200 || !body || body.error) return callback(true);
@@ -617,6 +624,26 @@ function loadGames(dir, master_callback) {
 							
 							cb(null, data, name, is_wud);
 						}
+					},
+					function(data, name, is_wud, cb) {
+						if (data.game_grid_image_url) {
+							request(data.game_grid_image_url)
+							.on('error', () => {
+								return cb(true);
+							})
+							.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/grid.webp'))
+							.on('error', () => {
+								return cb(true);
+							})
+							.on('close', () => {
+								return cb(null, data, name, is_wud)
+							});
+						} else {
+							fs.createReadStream('./defaults/grid.jpg')
+								.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/grid.webp'));
+							
+							cb(null, data, name, is_wud);
+						}
 					}
 				], function(error, data, name, is_wud) {
 					if (error) {
@@ -766,7 +793,7 @@ function getGameData(game_path, is_wud, callback) {
 		post_code = [xml.title_id._Data.slice(0, 8), '-', xml.title_id._Data.slice(8)].join('');
 	}
 
-	request(API_ROOT + '/api/GetGame/?' + post_type + '=' + post_code, (error, response, body) => {
+	request(API_ROOT + '/api/v2/GetGame/' + post_type + '/' + post_code, (error, response, body) => {
 		body = JSON.parse(body);
 		if (!body || body.error) return callback(true);
 		return callback(null, body)

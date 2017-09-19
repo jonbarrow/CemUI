@@ -16,6 +16,12 @@ We **always** welcome suggestions and Pull Requests! This program is written in 
 
 **If you have a suggestion, and do not know any of the required languages, you can reach us on our [Discord server][1]**
 
+# Changelog & FAQ
+### [Changelog](https://github.com/RedDuckss/CemUI/blob/master/CHANGELOG.md)
+
+### [FAQ](https://github.com/RedDuckss/CemUI/blob/master/FAQ.md)
+
+
 # How to get the latest version of CemUI
 To get CemUI v2.0 right now, you must build from source. To do this, follow these steps:
 
