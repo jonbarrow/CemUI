@@ -162,6 +162,7 @@ app.on('ready', function() {
   		event.preventDefault();
 	  	electron.shell.openExternal(url);
 	});
+    
 })
 
 app.on('window-all-closed', () => {
