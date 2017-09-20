@@ -150,6 +150,9 @@ ipcRenderer.on('init_complete', function(event, data) {
             box.style.backgroundImage = 'url("' + game.boxart + '")';
             box.classList = 'boxart';
             box.onclick = function() {
+                closeExpandModal(document.getElementById(this.parentElement.getAttribute('data-modal-id')).children[0].children[1]);
+                openModal(this.parentElement.getAttribute('data-modal-id'));
+                /*
                 clicks++;
                 if (clicks === 1) {
                     clicktimer = setTimeout(function() {
@@ -162,6 +165,7 @@ ipcRenderer.on('init_complete', function(event, data) {
                     clicks = 0;
                     ipcRenderer.send('play_rom', this.parentElement.getAttribute('data-modal-id'));
                 }
+                */
             }
 
             wrapper.appendChild(fav);
@@ -250,6 +254,14 @@ function dropdown(el) {
     }
 }
 
+function editDropdown(el) {
+    var parent = el.parentElement.parentElement;
+    parent.setAttribute('data-value', el.getAttribute('data-value'));
+    parent.firstElementChild.innerHTML = '<p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>' + el.innerHTML + '</span></p>';
+
+    closeDropdown();
+}
+
 function preload(url) {
     heavyImage = new Image();
     heavyImage.src = url;
@@ -293,6 +305,47 @@ function createCemuDropdowns() {
             items.appendChild(item)
         }
     }
+
+    var dropdown_list = document.getElementsByClassName('savesettings');
+    for (var i=0;i<dropdown_list.length;i++) {
+        var items = dropdown_list[i].getElementsByClassName('items')[0];
+        items.innerHTML = '';
+        for (var j=0;j<emulators_list.length;j++) {
+            var emulator = emulators_list[j],
+                item = document.createElement('div');
+            
+            item.className = 'item';
+            item.innerHTML = emulator.name;
+            item.onclick = function() {
+                saveSettings(emulator.name, this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id);
+                closeDropdown();
+            }
+
+            items.appendChild(item)
+        }
+    }
+}
+
+function saveSettings(emu, title_id) {
+    var modal = document.getElementsByClassName('selected-modal')[0],
+        settings_section = modal.getElementsByClassName('modal-grid-game-settings')[0];
+
+    let settings = {
+        Graphics: {
+            accurateShaderMul: settings_section.querySelectorAll('[data-for="accurateShaderMul"]')[0].checked,
+            disableGPUFence: settings_section.querySelectorAll('[data-for="disableGPUFence"]')[0].checked,
+            GPUBufferCacheAccuracy: settings_section.querySelectorAll('[data-for="GPUBufferCacheAccuracy"]')[0].getAttribute('data-value')
+        },
+        CPU: {
+            cpuTimer: settings_section.querySelectorAll('[data-for="cpuTimer"]')[0].getAttribute('data-value'),
+            emulateSinglePrecision: settings_section.querySelectorAll('[data-for="emulateSinglePrecision"]')[0].checked
+        },
+        Audio: {
+            disableAudio: settings_section.querySelectorAll('[data-for="disableAudio"]')[0].checked
+        }
+    }
+
+    ipcRenderer.send('update_game_settings', {emu: emu, rom: title_id, settings: settings});
 }
 
 function createModal(game, isSuggest) {
@@ -345,8 +398,11 @@ function createModal(game, isSuggest) {
         modal.querySelector('.game-settings-button').onclick = function() {
             expandModal(this);
         }
+        modal.querySelector('.save-button').onclick = function() {
+            saveSettings('Default', this.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.id)
+        }
         modal.querySelector('.savesettings .fa').onclick = function () {
-                dropdown(this.parentElement);
+            dropdown(this.parentElement);
         }
         for (var i=0;i<modal.querySelectorAll('input').length;i++) {
             modal.querySelectorAll('input')[i].id = 'input_id_' + input_id_counter;

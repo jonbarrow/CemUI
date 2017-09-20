@@ -288,10 +288,10 @@ ipcMain.on('smm_search_courses', (event, data) => {
 });
 
 ipcMain.on('update_game_settings', (event, data) => {
-	var id = data.id.toLowerCase().replace('-', ''),
+	var id = data.rom.toLowerCase().replace('-', ''),
 		settings = data.settings;
 
-	fs.writeFileSync(settings_storage.get('cemu_folder_path').value() + '/gameProfiles/' + id + '.ini', ini.encode(settings));
+	fs.writeFileSync(settings_storage.get('cemu_paths').find({name: data.emu}).value().cemu_folder_path + '/gameProfiles/' + id + '.ini', ini.encode(settings));
 })
 
 function init() {
@@ -683,7 +683,21 @@ function loadGames(dir, master_callback) {
 						rating: data.game_esrb,
 						max_players: data.game_max_player,
 						co_op: data.game_coop,
-						description: data.game_overview
+						description: data.game_overview,
+						settings: {
+							Graphics: {
+								accurateShaderMul: true,
+								disableGPUFence: false,
+								GPUBufferCacheAccuracy: 0
+							},
+							CPU: {
+								cpuTimer: 'cycleCounter',
+								emulateSinglePrecision: false
+							},
+							Audio: {
+								disableAudio: false
+							}
+						}
 					}
 					
 					game_storage.get('games').push(game_data).write();

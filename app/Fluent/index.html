@@ -202,18 +202,18 @@
                             <h2 class="txt-s-48 txt-c-black">Settings</h2>
                             <p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">Graphics</p>
                             <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Accurate shader MUL emulation</p>
-                            <input class="tgl tgl-light" id="shadermul" type="checkbox"><label class="tgl-btn" for="shadermul"></label>
+                            <input data-for="accurateShaderMul" class="tgl tgl-light settings-accurateShaderMul" id="shadermul" type="checkbox"><label class="tgl-btn" for="shadermul"></label>
                             <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">disable GPU fence</p>
-                            <input class="tgl tgl-light" id="gpufence" type="checkbox"><label class="tgl-btn" for="gpufence"></label>
+                            <input data-for="disableGPUFence" class="tgl tgl-light settings-disableGPUFence" id="gpufence" type="checkbox"><label class="tgl-btn" for="gpufence"></label>
                             <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">GPU buffer cache accuracy</p>
-                            <div class="dropdown">
+                            <div class="dropdown settings-GPUBufferCacheAccuracy" data-value=0 data-for="GPUBufferCacheAccuracy">
                                 <div class="head txt-s-16 txt-c-black" onclick="dropdown(this);">
                                     <p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>high</span></p>
                                 </div>
                                 <div class="items txt-s-16 txt-c-black">
-                                    <div class="item">high</div>
-                                    <div class="item">medium</div>
-                                    <div class="item">low</div>
+                                    <div class="item" data-value=0 onclick="editDropdown(this);">high</div>
+                                    <div class="item" data-value=1 onclick="editDropdown(this);">medium</div>
+                                    <div class="item" data-value=2 onclick="editDropdown(this);">low</div>
                                 </div>
                             </div>
                         </div>
@@ -222,20 +222,20 @@
                             <h2 style="opacity: 0;" class="txt-s-48 txt-c-black">Settings</h2>
                             <p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">CPU</p>
                             <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">CPU timer</p>
-                            <div class="dropdown">
+                            <div class="dropdown settings-cpuTimer" data-value="cycleCounter" data-for="cpuTimer">
                                 <div class="head txt-s-16 txt-c-black" onclick="dropdown(this);">
                                     <p><i class="fa fa-caret-down" aria-hidden="true"></i> <span>cycle counter</span></p>
                                 </div>
                                 <div class="items txt-s-16 txt-c-black">
-                                    <div class="item">host based</div>
-                                    <div class="item">cycle counter</div>
+                                    <div class="item" data-value="hostBased" onclick="editDropdown(this);">host based</div>
+                                    <div class="item" data-value="cycleCounter" onclick="editDropdown(this);">cycle counter</div>
                                 </div>
                             </div>
                             <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Emulate single precision</p>
-                            <input class="tgl tgl-light" id="singleprecision" type="checkbox"><label class="tgl-btn" for="singleprecision"></label>
+                            <input data-for="emulateSinglePrecision" class="tgl tgl-light settings-emulateSinglePrecision" id="singleprecision" type="checkbox"><label class="tgl-btn" for="singleprecision"></label>
                             <p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">Audio</p>
                             <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Disable audio</p>
-                            <input class="tgl tgl-light" id="disableaudio" type="checkbox"><label class="tgl-btn" for="disableaudio"></label>
+                            <input data-for="disableAudio" class="tgl tgl-light settings-disableAudio" id="disableaudio" type="checkbox"><label class="tgl-btn" for="disableaudio"></label>
                             
                             <div class="dropdownbutton savesettings">
                                 <div class="head txt-s-16 txt-c-black">
