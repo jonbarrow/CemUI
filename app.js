@@ -289,8 +289,14 @@ ipcMain.on('smm_search_courses', (event, data) => {
 
 ipcMain.on('update_game_settings', (event, data) => {
 	var id = data.rom.toLowerCase().replace('-', ''),
-		settings = data.settings;
-
+		settings = data.settings,
+		valid_games = game_storage.get('games').filter({title_id: data.rom}).value();
+	
+	for (var i=0;i<valid_games.length;i++) {
+		var game = valid_games[i];
+		game_storage.get('games').find({path: game.path}).set('settings', settings).write();
+	}
+	
 	fs.writeFileSync(settings_storage.get('cemu_paths').find({name: data.emu}).value().cemu_folder_path + '/gameProfiles/' + id + '.ini', ini.encode(settings));
 })
 
