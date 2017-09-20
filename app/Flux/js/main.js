@@ -123,7 +123,7 @@ ipcRenderer.on('init_complete', function(event, data) {
             wrapper.className = 'grid-item';
 
             preload(game.boxart);
-            box.style.backgroundImage = 'url("' + game.boxart + '")';
+            box.style.backgroundImage = 'url("' + game.grid + '")';
             box.classList = 'game';
             box.onclick = function() {
                 clicks++;

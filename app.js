@@ -672,6 +672,7 @@ function loadGames(dir, master_callback) {
 						name_clean: data.game_title_clean,
 						boxart: DATA_ROOT + 'cache/images/' + data.game_title_id + '/box.jpg',
 						icon: DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico',
+						grid: DATA_ROOT + 'cache/images/' + data.game_title_id + '/grid.webp',
 						screenshots: data.screenshots_list,
 						genres: data.game_genres.split('|'),
 						release_date: data.game_release_date,
