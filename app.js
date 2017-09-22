@@ -356,13 +356,13 @@ function getSuggested(most_played, cb) {
 		genres.push(most_played[i].genres[Math.floor(Math.random() * most_played[i].genres.length)]);
 	}
 	request(API_ROOT + '/api/v2/GetSuggested/' + genres.join('|'), (error, response, body) => {
-		if (error || response.statusCode !== 200 || !body || body.error) return callback(true);
 		console.log(body)
+		if (error || response.statusCode !== 200 || !body || body.error) return cb(true);
 		try {
 			body = JSON.parse(body);
 			return cb(null, body);
 		} catch (error) {
-			return callback(true);
+			return cb(true);
 		}
 	});
 }
