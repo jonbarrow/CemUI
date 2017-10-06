@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CemUI</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body,html {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #webview {
+                display: block;
+                height: 100%;
+                width: 100%;
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
+        
+        </style>
+    </head>
+    <body>
+        <iframe id="webview"></iframe>
+        <script>
+            const {ipcRenderer} = require('electron');
+            ipcRenderer.send('open_dev');
+            function addEvent(object, event, func) {
+                object.addEventListener(event, func, true);
+            }
+            
+            addEvent(window, 'keypress', function(event) {
+                if (event.charCode == 112) {
+                    ipcRenderer.send('open_dev');
+                }
+            });
+            function setTheme(event,data) {
+                document.body.removeChild(document.getElementById('webview'));
+                var webview = document.createElement('iframe');
+                webview.setAttribute('id','webview');
+                webview.setAttribute('src',data);
+                document.body.appendChild(webview);
+                webview.contentWindow.ipcRenderer = ipcRenderer;
+            }
+            ipcRenderer.on('setTheme',setTheme);
+            ipcRenderer.send('getLoadedTheme');
+            
+            setTheme(null,"../Fluent/index.html");
+        </script>
+    </body>
+
+</html>
