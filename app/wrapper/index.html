@@ -39,14 +39,14 @@
                 document.body.removeChild(document.getElementById('webview'));
                 var webview = document.createElement('iframe');
                 webview.setAttribute('id','webview');
-                webview.setAttribute('src',data);
+                webview.setAttribute('src',data.path);
                 document.body.appendChild(webview);
                 webview.contentWindow.ipcRenderer = ipcRenderer;
             }
-            ipcRenderer.on('setTheme',setTheme);
-            ipcRenderer.send('getLoadedTheme');
+            ipcRenderer.on('theme_change',setTheme);
+            ipcRenderer.send('ask_for_theme');
             
-            setTheme(null,"../Fluent/index.html");
+            //setTheme(null,"../Flux/index.html");
         </script>
     </body>
 

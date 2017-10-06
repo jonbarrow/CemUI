@@ -34,6 +34,9 @@ var electron = require('electron'),
 
 const API_ROOT = 'http://cemui.com';
 const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
+const GLOBAL_THEMES = [
+	'Flux', 'Fluent', 'Metro', 'Switch'
+]
 
 winston.emitErrs = true;
 updater.autoDownload = false;
@@ -154,7 +157,8 @@ function createWindow(file) {
     });
 
   	ApplicationWindow.loadURL(url.format({
-  		pathname: path.join(__dirname, '/app/' + settings_storage.get('theme').value() + '/' + file + '.html'),
+  		//pathname: path.join(__dirname, '/app/' + settings_storage.get('theme').value() + '/' + file + '.html'),
+  		pathname: path.join(__dirname, '/app/wrapper/index.html'),
     	protocol: 'file:',
     	slashes: true
   	}));
@@ -166,7 +170,7 @@ function createWindow(file) {
 
 app.on('ready', function() {
 	updater.checkForUpdates()
-    createWindow('index');
+	createWindow('index');
 	ApplicationWindow.webContents.on('new-window', function(event, url) {
   		event.preventDefault();
 	  	electron.shell.openExternal(url);
@@ -187,6 +191,28 @@ ipcMain.on('open_dev', () => {
 ipcMain.on('check_for_update', checkForUpdate);
 ipcMain.on('download_update', downloadUpdate);
 ipcMain.on('apply_update', applyUpdate);
+
+ipcMain.on('ask_for_theme', () => {
+	let current_theme = settings_storage.get('theme').value(),
+		theme_path, theme_name;
+
+	if (GLOBAL_THEMES.contains(current_theme)) {
+		theme_path = path.join('../', current_theme, 'index.html');
+		theme_name = current_theme;
+	} else {
+		if (fs.pathExistsSync(path.join(DATA_ROOT, 'themes', current_theme, 'index.html'))) {
+			theme_path = path.join(DATA_ROOT, 'themes', current_theme, 'index.html');
+			theme_name = current_theme;
+		} else {
+			theme_path = '../Flux/index.html';
+			theme_name = 'Flux';
+		}
+	}
+	ApplicationWindow.webContents.send('theme_change', {
+		name: theme_name,
+		path: theme_path
+	});
+});
 
 ipcMain.on('init', () => {
 	init();
@@ -309,17 +335,14 @@ function init() {
 	if (!settings_storage.get('cemu_paths').value() || settings_storage.get('cemu_paths').value().length < 1) {
 		settings_storage.set('cemu_paths', []).write();
 		screenCemu = true;
-		console.log('cemu')
 	}
 
 	if (!settings_storage.get('game_paths').value() || settings_storage.get('game_paths').value().length < 1) {
 		settings_storage.set('game_paths', []).write();
 		screenGames = true;
-		console.log('games')
 	}
     
     if (screenCemu || screenGames || screenWelcome) {
-		console.log('NEED TO OPEN MODALS');
         ApplicationWindow.webContents.send('show_screen', {games: screenGames, cemu: screenCemu, welcome: screenWelcome});
         return;
     }
@@ -356,7 +379,6 @@ function getSuggested(most_played, cb) {
 		genres.push(most_played[i].genres[Math.floor(Math.random() * most_played[i].genres.length)]);
 	}
 	request(API_ROOT + '/api/v2/GetSuggested/' + genres.join('|'), (error, response, body) => {
-		console.log(body)
 		if (error || response.statusCode !== 200 || !body || body.error) return cb(true);
 		try {
 			body = JSON.parse(body);
