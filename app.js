@@ -168,7 +168,7 @@ function createWindow(file) {
 	});
 }
 
-app.on('ready', function() {
+app.on('ready', () => {
 	updater.checkForUpdates()
 	createWindow('index');
 	ApplicationWindow.webContents.on('new-window', function(event, url) {
@@ -213,6 +213,29 @@ ipcMain.on('ask_for_theme', () => {
 		path: theme_path
 	});
 });
+
+ipcMain.on('change_theme', (event, data) => {
+	settings_storage.set('theme', data.name).write();
+	let current_theme = settings_storage.get('theme').value(),
+		theme_path, theme_name;
+
+	if (GLOBAL_THEMES.contains(current_theme)) {
+		theme_path = path.join('../', current_theme, 'index.html');
+		theme_name = current_theme;
+	} else {
+		if (fs.pathExistsSync(path.join(DATA_ROOT, 'themes', current_theme, 'index.html'))) {
+			theme_path = path.join(DATA_ROOT, 'themes', current_theme, 'index.html');
+			theme_name = current_theme;
+		} else {
+			theme_path = '../Flux/index.html';
+			theme_name = 'Flux';
+		}
+	}
+	ApplicationWindow.webContents.send('theme_change', {
+		name: theme_name,
+		path: theme_path
+	});
+})
 
 ipcMain.on('init', () => {
 	init();

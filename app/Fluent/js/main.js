@@ -1,5 +1,4 @@
 var ipcRenderer = window.ipcRenderer; // Gets ipcRenderer
-ipcRenderer.send('open_dev');
 var games_lib = document.getElementById('games-grid'),
     modal_list  = document.getElementById('modal-content-list'),
     modal_template = document.getElementById('TEMPLATE_gameModal'),

@@ -22,13 +22,28 @@
         </style>
     </head>
     <body>
+        <div class="theme-buttons">
+            <button class="flux">Flux</button>
+            <button class="fluent">Fluent</button>
+        </div>
         <iframe id="webview"></iframe>
         <script>
             const {ipcRenderer} = require('electron');
-            ipcRenderer.send('open_dev');
+            //ipcRenderer.send('open_dev');
             function addEvent(object, event, func) {
                 object.addEventListener(event, func, true);
             }
+
+            addEvent(document.getElementsByClassName('flux')[0], 'click', function() {
+                ipcRenderer.send('change_theme', {
+                    name: 'Flux'
+                });
+            });
+            addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
+                ipcRenderer.send('change_theme', {
+                    name: 'Fluent'
+                });
+            });
             
             addEvent(window, 'keypress', function(event) {
                 if (event.charCode == 112) {
