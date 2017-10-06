@@ -1,5 +1,4 @@
-//const {ipcRenderer} = require('electron'); // Gets ipcRenderer
-ipcRenderer = window.ipcR;
+ipcRenderer = window.ipcRenderer; // Gets ipcRenderer
 var games_lib = document.getElementById('games'),
     modal_list  = document.getElementById('modal-content-list'),
     modal_open = false,
