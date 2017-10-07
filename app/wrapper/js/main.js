@@ -21,12 +21,18 @@ addEvent(window, 'keypress', function(event) {
     }
 });
 function setTheme(event,data) {
-    document.body.removeChild(document.getElementById('webview'));
-    var webview = document.createElement('iframe');
-    webview.setAttribute('id','webview');
-    webview.setAttribute('src',data.path);
-    document.body.appendChild(webview);
-    webview.contentWindow.ipcRenderer = ipcRenderer;
+    let current_view = document.getElementById('webview'),
+        new_view = document.createElement('iframe');
+                   
+    addEvent(new_view, 'load', () => {
+        new_view.style.display = '';
+        document.body.removeChild(document.getElementById('webview'));
+        new_view.setAttribute('id','webview');
+    });
+    new_view.style.display = 'none';
+    new_view.setAttribute('src', data.path);
+    document.body.appendChild(new_view);
+    new_view.contentWindow.ipcRenderer = ipcRenderer;
 }
 ipcRenderer.on('theme_change',setTheme);
 ipcRenderer.send('ask_for_theme');
