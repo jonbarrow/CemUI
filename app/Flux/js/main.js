@@ -749,24 +749,17 @@ function clock() {
     var time = new Date(),
         hours = time.getHours() % 24,
         minutes = time.getMinutes(),
-        mid = 'am',
-        colm = ":";
-    if(hours==0) { //At 00 hours we need to show 12 am
+        mid = 'am';
+    if( hours == 0 ) { 
         hours=12;
     }
-    else if(hours>12) {
+    else if( hours > 12 ) {
         hours = hours%12;
         mid = 'pm';
     }
-    if (col) {
-        colm = " ";
-        col = false;
-    } else {
-        col = true;
-    }
     
     
-    document.getElementById('clock').innerHTML = harold(hours) + colm + harold(minutes) + " " + mid;
+    document.getElementById('clock').innerHTML = harold(hours) + ':' + harold(minutes) + " " + mid;
   
   function harold(standIn) {
     if (standIn < 10) {

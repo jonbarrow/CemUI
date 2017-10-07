@@ -3,23 +3,7 @@
     <head>
         <title>CemUI</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <style>
-            body,html {
-                height: 100%;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }
-            #webview {
-                display: block;
-                height: 100%;
-                width: 100%;
-                border: none;
-                margin: 0;
-                padding: 0;
-            }
-        
-        </style>
+        <link rel="stylesheet" href="css/main.css" type="text/css">
     </head>
     <body>
         <div class="theme-buttons">
@@ -27,42 +11,7 @@
             <button class="fluent">Fluent</button>
         </div>
         <iframe id="webview"></iframe>
-        <script>
-            const {ipcRenderer} = require('electron');
-            //ipcRenderer.send('open_dev');
-            function addEvent(object, event, func) {
-                object.addEventListener(event, func, true);
-            }
-
-            addEvent(document.getElementsByClassName('flux')[0], 'click', function() {
-                ipcRenderer.send('change_theme', {
-                    name: 'Flux'
-                });
-            });
-            addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
-                ipcRenderer.send('change_theme', {
-                    name: 'Fluent'
-                });
-            });
-            
-            addEvent(window, 'keypress', function(event) {
-                if (event.charCode == 112) {
-                    ipcRenderer.send('open_dev');
-                }
-            });
-            function setTheme(event,data) {
-                document.body.removeChild(document.getElementById('webview'));
-                var webview = document.createElement('iframe');
-                webview.setAttribute('id','webview');
-                webview.setAttribute('src',data.path);
-                document.body.appendChild(webview);
-                webview.contentWindow.ipcRenderer = ipcRenderer;
-            }
-            ipcRenderer.on('theme_change',setTheme);
-            ipcRenderer.send('ask_for_theme');
-            
-            //setTheme(null,"../Flux/index.html");
-        </script>
+        <script src="js/main.js"></script>
     </body>
 
 </html>
