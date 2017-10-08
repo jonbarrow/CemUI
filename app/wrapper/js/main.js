@@ -63,6 +63,11 @@ function setTheme(event,data) {
     new_view.style.display = 'none';
     new_view.setAttribute('src', data.path);
     document.body.appendChild(new_view);
+    addEvent(new_view.contentWindow, 'keypress', function(event) {
+        if (event.charCode == 112) {
+            ipcRenderer.send('open_dev');
+        }
+    });
     new_view.contentWindow.ipcRenderer = ipcRenderer;
 }
 ipcRenderer.on('theme_change',setTheme);
