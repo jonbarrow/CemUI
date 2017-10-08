@@ -4,6 +4,34 @@
     font-weight: normal;
     font-style: normal;
 }
+@font-face {
+    font-family: 'OpenSansBold';
+    src: url('../fonts/OpenSans-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../fonts/OpenSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'OpenSansSemiBold';
+    src: src: url('../fonts/OpenSans-Semibold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'OpenSansLight';
+    src: src: url('../fonts/OpenSans-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+
+}
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -41,6 +69,12 @@ body,html {
     width: 100%;
     margin: 0;
     padding: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: 'OpenSans';
 }
 #webview {
     display: block;
@@ -51,7 +85,7 @@ body,html {
     padding: 0;
 }
 
-#ssm {
+#smm {
     position: absolute;
     top: 0;
     left: 0;
@@ -59,9 +93,121 @@ body,html {
     width: 100%;
     padding: 0;
     margin: 0;
+    display: none;
+    position: fixed;
 }
-
-
+#smm .main {
+    background-color: #086a9a;
+    display: none;
+    min-height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    margin: 0;
+    padding: 0;
+    flex-direction: column;
+}
+#smm .course {
+    width: calc(50% - 50px);
+    margin: 25px;
+    display: inline-block;
+    background-color: #f9db00;
+    border-radius: 10px;
+    overflow: hidden;
+}
+#smm .course .title {
+    display: inline-block;
+    width: 100%;
+    background-color: #28AD8A;
+    overflow: hidden;
+}
+#smm .course .expert {
+    background-color: #FF4545;
+}
+#smm .course .hard {
+    background-color: #EA348B;
+}
+#smm .course .title p {
+    padding: 5px 15px;
+    display: inline-block;
+}
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}
+#smm .course .content {
+    padding: 5px 15px;
+}
+#smm .main .wrapper {
+    flex: 1;
+    width: 95%;
+    margin: 0 2.5%;
+    font-size: 0;
+}
+#smm .main .header {
+    background-color: #283138;
+    padding: 1em 1.5em;
+    overflow: hidden;
+}
+#smm .main .header h1 {
+    margin: 0;
+}
+#smm .main .header h1:first-child {
+    padding-top: 20px;
+    float: left;
+}
+#smm .main .header .close {
+    float: right;
+}
+#smm .overlay {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: transparent;
+}
+#smm .overlay > div:first-child {
+    width: 100%;
+    height: 50%;
+    background-color: #f9db00;
+    color: #000;
+    position: relative;
+    transition: right .5s,top .5s;
+    right: 100%;
+    top: 0%;
+}
+#smm .overlay > div > div {
+    margin-left: 320px;
+}
+#smm .overlay > div > div > h1 {
+    display: inline-block;
+    position: relative;
+    bottom: 0;
+    left: 0;
+    text-align: left;
+}
+#smm .overlay > div:first-child > div {
+    position:absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    margin-right: 320px;
+}
+#smm .overlay > div:nth-child(2) {
+    width: 100%;
+    height: 50%;
+    background-color: #283138;
+    color: #f9db00;
+    position: relative;
+    left: 100%;
+    bottom: 0%;
+    transition: left .5s,bottom .5s;
+}
 
 
 .txt-c-blue {
@@ -76,8 +222,37 @@ body,html {
 .txt-c-white {
     color: #FFFFFF;
 }
-.txt-font-ssm {
+.txt-c-yellow {
+    color: #f9db00;
+}
+.txt-font-smm {
     font-family: 'smmfont';
+}
+.txt-bold {
+    font-weight: 'OpenSansSemiBold';
+}
+.txt-extrabold {
+    font-family: 'OpenSansBold';
+}
+.txt-light {
+    font-family: 'OpenSansLight';
+}
+.txt-button {
+    background-color: #303C44;
+    border-radius: 5px;
+    box-shadow: 0px 6px 0px 0px rgba(32,39,45,1);
+    padding: 20px 40px;
+    margin-top: 0;
+    margin-bottom: 4px !important;
+    cursor: pointer;
+}
+.txt-button:hover {
+    background-color: #394852;
+}
+.txt-button:active, .txt-button:focus {
+    margin-top: 4px !important;
+    margin-bottom: 0 !important;
+    box-shadow: 0px 2px 0px 0px rgba(32,39,45,1);
 }
 
 .txt-up {
