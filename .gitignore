@@ -1,6 +1,5 @@
 node_modules
 builds
-certs
 *.log
 test.js
 logo.psd

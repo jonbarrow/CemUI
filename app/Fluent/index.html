@@ -153,7 +153,7 @@
         <template id="TEMPLATE_gameModal">
             <div class="modal">
                 <div class="modal-content">
-                    <span class="close txt-s-24" onclick="closeModal();">×</span>
+                    <span class="close txt-s-38" onclick="closeModal();">×</span>
                     <div class="modal-grid-game" style="position: relative; left: 0px;">
                         <div class="art">
                             <img>
@@ -199,11 +199,11 @@
                         </div>
                         <div class="sect1">
                             <p class="txt-s-16 txt-c-gray txt-hover" style="display: inline-block" onclick="closeExpandModal(this.parentElement.parentElement.parentElement.children[1]);">back</p>
-                            <h2 class="txt-s-48 txt-c-black">Settings</h2>
+                            <h2 class="txt-s-32 txt-c-black">Settings</h2>
                             <p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">Graphics</p>
                             <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Accurate shader MUL emulation</p>
                             <input data-for="accurateShaderMul" class="tgl tgl-light settings-accurateShaderMul" id="shadermul" type="checkbox"><label class="tgl-btn" for="shadermul"></label>
-                            <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">disable GPU fence</p>
+                            <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">Disable GPU fence</p>
                             <input data-for="disableGPUFence" class="tgl tgl-light settings-disableGPUFence" id="gpufence" type="checkbox"><label class="tgl-btn" for="gpufence"></label>
                             <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">GPU buffer cache accuracy</p>
                             <div class="dropdown settings-GPUBufferCacheAccuracy" data-value=0 data-for="GPUBufferCacheAccuracy">
@@ -219,7 +219,7 @@
                         </div>
                         <div class="sect2">
                             <p class="txt-s-16 txt-c-gray" style="opacity: 0;display: inline-block">back</p>
-                            <h2 style="opacity: 0;" class="txt-s-48 txt-c-black">Settings</h2>
+                            <h2 style="opacity: 0;" class="txt-s-32 txt-c-black">Settings</h2>
                             <p class="txt-bold txt-s-16 txt-c-black" style="padding-top: 10px;">CPU</p>
                             <p class="txt-s-16 txt-c-black" style="padding-top: 10px;">CPU timer</p>
                             <div class="dropdown settings-cpuTimer" data-value="cycleCounter" data-for="cpuTimer">
@@ -255,8 +255,8 @@
         <template id="TEMPLATE_gameModal_suggest">
             <div class="modal">
                 <div class="modal-content">
-                    <span class="close txt-s-24" onclick="closeModal();">×</span>
-                    <div class="modal-grid-game" style="position: relative; left: 0px;">
+                    <span class="close txt-s-38" onclick="closeModal();">×</span>
+                    <div class="modal-grid-game modal-grid-game-suggest" style="position: relative; left: 0px;">
                         <div class="art">
                             <img>
                         </div>
@@ -266,25 +266,22 @@
                         <div class="buttons">
                             <a class="txt-s-16 txt-bold button button-small button-visit" target="_blank">Visit game website</a>
                         </div>
-                        <div class="desc">
+                        <div class="desc desc2">
                             <p class="txt-s-16 txt-c-gray txt-desc"></p>
                             <br><h2 class="txt-s-16 txt-c-black">Playability</h2>
                             <p class="txt-s-16 txt-c-gray txt-play"></p>
-                        </div>
-                        <div class="ssT">
-                            <h2 class="txt-s-24 txt-c-black">Screenshots</h2>
-                        </div>
-                        <div class="ss">
                         </div>
                     </div>
                 </div>
             </div>
         </template>
-        
+
+        <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
         <script src="js/main.js"></script>
         <script src="js/Controller.js"></script>
         <script src="js/Controller.layouts.js"></script>
         <script src="js/gamepad.js"></script>
+        <script>if (window.module) module = window.module;</script>
     </body>
 
 </html>

@@ -1,0 +1,62 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,500,700);
+
+html, body {
+    color: #FFF;
+    font: 300 16px Roboto, Arial;
+    height: 100%;
+    margin: 0;
+    background: #222;
+}
+
+.games {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 300px);
+    grid-template-rows: repeat(auto-fill, auto);
+    grid-gap: 15px;
+    justify-content: center;
+
+    padding: 15px 0;
+}
+
+.game {
+    color: #222;
+    background: #EEE;
+}
+
+.game .box {
+    width: 100%;
+}
+
+.game-content {
+    padding: 0 16px;
+    background: #EEE;
+}
+
+.game-footer {
+    padding: 0 16px;
+    border-top: 1px solid #ddd;
+    background: #EEE;
+}
+
+.game-footer p {
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
+}
+
+.game-footer .game-dl-btn {
+    width: 100%;
+    height: 50px;
+    border: none;
+    background-color: #FBA030;
+    color: #EEE;
+    margin-right: 16px;
+    font-weight: bolder;
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+.game-footer .game-dl-btn:hover {
+    cursor: pointer;
+}

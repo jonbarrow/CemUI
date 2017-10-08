@@ -148,6 +148,7 @@ Main.prototype.downloadTicketCache = function(cb) {
     console.log('Updating ticket cache');
     request(this._config.ticket_vendor + '/json', (error, response, body) => {
         let titles = JSON.parse(body);
+        
 
         if (!fs.pathExistsSync(path.join(this._config.ticket_cache_folder, '_cache.json'))) {
             fs.writeJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'), titles);
@@ -339,6 +340,29 @@ Main.prototype._ripFile = function(url, file, cb) {
             cb();
         });
     });
+}
+
+Main.prototype._tagaya = function(host, path, callback) {
+    https.request({
+        key: certs.key,
+        cert: certs.cert,
+        rejectUnauthorized: false,
+        host: host,
+        path: path,
+        port: 443
+    }, (res) => {
+        var data = '';
+        
+        res.on('data', (d) => {
+            data += d;
+        });
+        
+        res.on('end', () => {
+            callback(data, null);
+        });
+    }).on('error', (error) => {
+        callback(null, error);
+    }).end();
 }
 
 

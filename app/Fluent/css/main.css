@@ -1,3 +1,10 @@
+/*
+fix button dropdown
+UI animations too slow
+remove grid items?
+
+
+*/
 /* global styles */
 @font-face {
     font-family: 'Raleway';
@@ -191,7 +198,7 @@ h2, p {
 /* grid-item styles */
 .grid-item {
     background-color: rgba(255, 255, 255, 0.43);
-    border-radius: 20px;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: inset 0px 0px 39px 0px rgba(0,0,0,0);
     transition: box-shadow .15s;
@@ -352,7 +359,7 @@ h2, p {
     padding: 20px;
     width: 80%;
     height: 80%;
-    border-radius: 30px;
+    border-radius: 20px;
     z-index: 4;
     overflow: hidden;
 }
@@ -392,6 +399,14 @@ h2, p {
         "ssT ssT"
         "ss ss";
 }
+.modal-grid-game-suggest {
+    grid-template-areas:
+        "art title"
+        "art buttons"
+        "art desc"
+        "ssT desc"
+        "ss desc";
+}
 .modal-grid-game > .art {
     grid-area: art;
     display: inline-block;
@@ -399,7 +414,7 @@ h2, p {
     height: 100%;
 }
 .art > img {
-    border-radius: 10px;
+    border-radius: 20px;
     max-width: 100%;
     max-height: 100%;
     overflow-y: hidden;
@@ -418,6 +433,12 @@ h2, p {
     max-height: 55%;
     overflow: auto;
 }
+.modal-grid-game > .desc2 {
+    grid-area: desc;
+    padding-right: 100px;
+    max-height: 80%;
+    overflow: auto;
+}
 .modal-grid-game > .ssT {
     grid-area: ssT;
 }
@@ -428,12 +449,12 @@ h2, p {
 .ss .screenshot {
     height: 90%;
     width: auto;
-    margin: 0 20px;
+    margin: 0 20px 0 0;
     border-radius: 20px;
 }
 .ss .screenshot.active {
     /*
-    stuff
+        stuff
     */
 }
 .ss .screenshot:hover {
@@ -489,7 +510,7 @@ h2, p {
     display: inline-block;
 }
 .dropdown .head:hover {
-    background-color: #d2d9ef;
+    background-color: #96a4cb;
 }
 .dropdownbutton .head {
     display: flex;
@@ -513,7 +534,7 @@ h2, p {
     padding: 5px 10px;
 }
 .dropdown .items .item:hover, .dropdownbutton .items .item:hover {
-    background-color: #d2deff;
+    background-color: #96a4cb;
     cursor: pointer;
 }
 .dropdown span,.dropdownbutton span {
@@ -600,7 +621,7 @@ h2, p {
     color: #0099FF;
 }
 .txt-c-gray {
-    color: #746c7b;
+    color: #635c69;
 }
 .txt-c-black {
     color: #000000;
@@ -622,7 +643,7 @@ h2, p {
     font-weight: bold;
 }
 .txt-hover:hover {
-    color: #000;
+    color: #000000;
     cursor: pointer;
 }
 

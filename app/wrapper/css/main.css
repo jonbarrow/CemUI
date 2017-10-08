@@ -1,0 +1,110 @@
+@font-face {
+    font-family: 'smmfont';
+    src: url('../fonts/smmfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-button {
+  width: 0;
+  height: 2px;
+}
+::-webkit-scrollbar-thumb {
+  background: #647788;
+  border: 0px none #ffffff;
+  border-radius: 72px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #675a71;
+}
+::-webkit-scrollbar-thumb:active {
+  background: #47455c;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  border: 0px none #ffffff;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-track:hover {
+  background: transparent;
+}
+::-webkit-scrollbar-track:active {
+  background: transparent;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+body,html {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+#webview {
+    display: block;
+    height: 100%;
+    width: 100%;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+#ssm {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+
+.txt-c-blue {
+    color: #0099FF;
+}
+.txt-c-gray {
+    color: #635c69;
+}
+.txt-c-black {
+    color: #000000;
+}
+.txt-c-white {
+    color: #FFFFFF;
+}
+.txt-font-ssm {
+    font-family: 'smmfont';
+}
+
+.txt-up {
+    text-transform: uppercase;
+}
+.txt-bold {
+    font-weight: bold;
+}
+
+.txt-s-64 {
+    font-size: 64px;
+}
+.txt-s-48 {
+    font-size: 48px;
+}
+.txt-s-38  {
+    font-size: 38px;
+}
+.txt-s-32 {
+    font-size: 32px;
+}
+.txt-s-24 {
+    font-size: 24px;
+}
+.txt-s-16 {
+    font-size: 16px;
+}
+.txt-s-12 {
+    font-size: 12px;
+}

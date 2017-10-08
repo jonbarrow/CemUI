@@ -1,3 +1,8 @@
+/*
+header too large
+remove time animation
+
+*/
 /* global styles */
 @font-face {
     font-family: 'OpenSansBold';
@@ -82,7 +87,7 @@ body {
     flex-direction: column;
 }
 #header {
-    padding: 1em;
+    padding: 0 1em;
     background-color: #F3F3F3;
     box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.25);
 }
@@ -165,7 +170,7 @@ body {
     width: 100%;
     overflow-y: scroll;
     left: 0vw;
-    transition: left 1s;
+    transition: left .7s;
     height: 100%;
 }
 #sectionContainer > .settings {
@@ -210,6 +215,13 @@ body {
     opacity: .7;
     background-color: #e2e2e2;
 }
+
+
+
+
+
+
+
 /* typography styles */
 .txt-c-blue {
     color: #0099FF;

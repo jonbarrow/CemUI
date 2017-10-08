@@ -1,8 +1,10 @@
 const APP_VERSION = '2.1.1';
 
-var electron = require('electron'),
+let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
 	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
+	NodeNUSRipper = require('./NodeNUSRipper.js'),
+    NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
 	smm = require('smm-api'),
 	ssl = require('ssl-root-cas').inject(),
@@ -35,7 +37,8 @@ var electron = require('electron'),
 const API_ROOT = 'http://cemui.com';
 const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
 const GLOBAL_THEMES = [
-	'Flux', 'Fluent', 'Metro', 'Switch'
+	'Flux', 'Fluent', 'Metro', 'Switch',
+	'_dlgames', '_smmdb'
 ]
 
 winston.emitErrs = true;
@@ -237,8 +240,19 @@ ipcMain.on('change_theme', (event, data) => {
 	});
 })
 
-ipcMain.on('init', () => {
-	init();
+ipcMain.on('init', (event, data) => {
+	if (data && data.page == '_dlgames') {
+		// init for downloading games
+		NUSRipper.downloadTicketCache(() => {
+			
+		});
+	} else if (data && data.page == '_smmdb') {
+		// init for smmdb
+	} else {
+		// normal page init
+		init();
+	}
+	
 });
 
 ipcMain.on('create_emulator_instance', (name, cemu_path) => {
