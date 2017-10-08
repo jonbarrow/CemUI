@@ -69,7 +69,14 @@ if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
 game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
 game_storage.defaults({games: []}).write();
 settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
-settings_storage.defaults({cemu_paths: [], game_paths: [], theme: 'Fluent'}).write();
+settings_storage.defaults({
+	cemu_paths: [],
+	game_paths: [],
+	theme: 'Fluent',
+	ticket_cache_folder: path.join(DATA_ROOT, 'ticketcache'),
+	ticket_cache_vendor: 'http://localhost/api/v2/ticketcache',
+	ticket_vendor: 'http://wiiu.titlekeys.gq/'
+}).write();
 
 updater.on('checking-for-update', () => {
 	ApplicationWindow.webContents.send('update_status', {
@@ -243,8 +250,11 @@ ipcMain.on('change_theme', (event, data) => {
 ipcMain.on('init', (event, data) => {
 	if (data && data.page == '_dlgames') {
 		// init for downloading games
+		console.log('dl ticket cache')
+		NUSRipper.setTicketVendor(settings_storage.get('ticket_vendor').value());
+		NUSRipper.setTicketCacheVendor(settings_storage.get('ticket_cache_vendor').value());
 		NUSRipper.downloadTicketCache(() => {
-			
+			console.log('done dl ticket cache')
 		});
 	} else if (data && data.page == '_smmdb') {
 		// init for smmdb

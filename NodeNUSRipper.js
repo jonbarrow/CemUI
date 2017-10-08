@@ -5,20 +5,6 @@
  Designed for use only in the free OSS CemUI.
 
  Copyright (C) 2017 Jonathan Barrow (RedDucks(s))
-
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
- 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -----------------------------------------------------------------------------*/
 
 var EventEmitter = require('events').EventEmitter,
@@ -47,6 +33,7 @@ util.inherits(Main, EventEmitter);
 Main.prototype._config = {
     cdecrypt_location: '',
     cdecrypt_folder_location: '',
+    ticket_cache_vendor: '',
     ticket_vendor: '',
     ticket_cache_folder: './ticketcache' 
 }
@@ -146,13 +133,13 @@ Main.prototype.downloadTicketCache = function(cb) {
     let self = this;
     fs.ensureDirSync(this._config.ticket_cache_folder);
     console.log('Updating ticket cache');
-    request(this._config.ticket_vendor + '/json', (error, response, body) => {
-        let titles = JSON.parse(body);
-        
+    request(this._config.ticket_cache_vendor, (error, response, body) => {
 
-        if (!fs.pathExistsSync(path.join(this._config.ticket_cache_folder, '_cache.json'))) {
-            fs.writeJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'), titles);
-        }
+        if (error || response.statusCode != 200) return cb(true);
+
+        let titles = JSON.parse(body);
+
+        fs.writeJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'), titles);
 
         var queue = async.queue((title, callback) => {
             if (title.ticket == 1) {
@@ -186,6 +173,10 @@ Main.prototype.downloadTicketCache = function(cb) {
 
 Main.prototype.setTicketVendor = function(vendor) {
     this._config.ticket_vendor = vendor;
+}
+
+Main.prototype.setTicketCacheVendor = function(vendor) {
+    this._config.ticket_cache_vendor = vendor;
 }
 
 Main.prototype.setTicketCacheLocation = function(location) {
