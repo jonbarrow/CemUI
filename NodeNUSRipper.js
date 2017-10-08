@@ -132,7 +132,6 @@ Main.prototype.parseTMD = function(file, cb) {
 Main.prototype.downloadTicketCache = function(cb) {
     let self = this;
     fs.ensureDirSync(this._config.ticket_cache_folder);
-    console.log('Updating ticket cache');
     request(this._config.ticket_cache_vendor, (error, response, body) => {
 
         if (error || response.statusCode != 200) return cb(true);
@@ -145,15 +144,18 @@ Main.prototype.downloadTicketCache = function(cb) {
             if (title.ticket == 1) {
                 if (!fs.pathExistsSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik'))) {
                     this._downloadTicket(title.titleID, () => {
+                        self.emit('cached_game', title);
                         callback();
                     });
                 } else {
                     let size = fs.statSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik')).size;
                     if (size < 172) { // 172 seems to be the standard size
                         this._downloadTicket(title.titleID, () => {
+                            self.emit('cached_game', title);
                             callback();
                         });
                     } else {
+                        self.emit('cached_game', title);
                         callback();
                     }
                 }
@@ -252,7 +254,6 @@ Main.prototype._downloadTicket = function(tid, cb) {
         return cb();
     })
     .on('finish', () => {
-        console.log(tid)
         return cb();
     });
 }

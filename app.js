@@ -16,8 +16,6 @@ let electron = require('electron'),
 	ini = require('ini'),
 	low = require('lowdb'),
 	FileSync = require('lowdb/adapters/FileSync'),
-	game_storage,
-	settings_storage,
     path = require('path'),
 	url = require('url'),
 	tga2png = require('tga2png'),
@@ -33,6 +31,7 @@ let electron = require('electron'),
     ipcMain = electron.ipcMain,
 	app = electron.app;
 
+let game_storage, settings_storage, ticket_cache_storage;
 
 const API_ROOT = 'http://cemui.com';
 const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
@@ -40,6 +39,10 @@ const GLOBAL_THEMES = [
 	'Flux', 'Fluent', 'Metro', 'Switch',
 	'_dlgames', '_smmdb'
 ]
+
+NUSRipper.on('cached_game', (data) => {
+	ApplicationWindow.webContents.send('cached_game', data)
+});
 
 winston.emitErrs = true;
 updater.autoDownload = false;
@@ -74,7 +77,7 @@ settings_storage.defaults({
 	game_paths: [],
 	theme: 'Fluent',
 	ticket_cache_folder: path.join(DATA_ROOT, 'ticketcache'),
-	ticket_cache_vendor: 'http://localhost/api/v2/ticketcache',
+	ticket_cache_vendor: 'http://cemui.com/api/v2/ticketcache',
 	ticket_vendor: 'http://wiiu.titlekeys.gq/'
 }).write();
 
@@ -181,6 +184,7 @@ function createWindow(file) {
 app.on('ready', () => {
 	updater.checkForUpdates()
 	createWindow('index');
+	//ApplicationWindow.webContents.openDevTools();
 	ApplicationWindow.webContents.on('new-window', function(event, url) {
   		event.preventDefault();
 	  	electron.shell.openExternal(url);
@@ -248,12 +252,16 @@ ipcMain.on('change_theme', (event, data) => {
 })
 
 ipcMain.on('init', (event, data) => {
+	console.log(data)
 	if (data && data.page == '_dlgames') {
 		// init for downloading games
 		console.log('dl ticket cache')
+		NUSRipper.setTicketCacheLocation(settings_storage.get('ticket_cache_folder').value());
 		NUSRipper.setTicketVendor(settings_storage.get('ticket_vendor').value());
 		NUSRipper.setTicketCacheVendor(settings_storage.get('ticket_cache_vendor').value());
 		NUSRipper.downloadTicketCache(() => {
+			ticket_cache_storage = low(new FileSync(settings_storage.get('ticket_cache_folder').value() + '/_cache.json'));
+			ApplicationWindow.webContents.send('ticket_cache_downloaded')
 			console.log('done dl ticket cache')
 		});
 	} else if (data && data.page == '_smmdb') {

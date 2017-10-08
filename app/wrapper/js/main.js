@@ -14,6 +14,11 @@ addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
         name: 'Fluent'
     });
 });
+addEvent(document.getElementsByClassName('dlgames')[0], 'click', function() {
+    ipcRenderer.send('change_theme', {
+        name: '_dlgames'
+    });
+});
             
 addEvent(window, 'keypress', function(event) {
     if (event.charCode == 112) {
