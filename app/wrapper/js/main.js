@@ -45,6 +45,11 @@ function toggleSMMDB() {
         },0);
     }
 }
+addEvent(document.getElementsByClassName('dlgames')[0], 'click', function() {
+    ipcRenderer.send('change_theme', {
+        name: '_dlgames'
+    });
+});
             
 addEvent(window, 'keypress', function(event) {
     if (event.charCode == 112) {

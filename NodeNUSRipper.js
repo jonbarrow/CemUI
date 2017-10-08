@@ -5,20 +5,6 @@
  Designed for use only in the free OSS CemUI.
 
  Copyright (C) 2017 Jonathan Barrow (RedDucks(s))
-
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
- 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -----------------------------------------------------------------------------*/
 
 var EventEmitter = require('events').EventEmitter,
@@ -47,6 +33,7 @@ util.inherits(Main, EventEmitter);
 Main.prototype._config = {
     cdecrypt_location: '',
     cdecrypt_folder_location: '',
+    ticket_cache_vendor: '',
     ticket_vendor: '',
     ticket_cache_folder: './ticketcache' 
 }
@@ -145,27 +132,30 @@ Main.prototype.parseTMD = function(file, cb) {
 Main.prototype.downloadTicketCache = function(cb) {
     let self = this;
     fs.ensureDirSync(this._config.ticket_cache_folder);
-    console.log('Updating ticket cache');
-    request(this._config.ticket_vendor + '/json', (error, response, body) => {
+    request(this._config.ticket_cache_vendor, (error, response, body) => {
+
+        if (error || response.statusCode != 200) return cb(true);
+
         let titles = JSON.parse(body);
 
-        if (!fs.pathExistsSync(path.join(this._config.ticket_cache_folder, '_cache.json'))) {
-            fs.writeJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'), titles);
-        }
+        fs.writeJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'), titles);
 
         var queue = async.queue((title, callback) => {
             if (title.ticket == 1) {
                 if (!fs.pathExistsSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik'))) {
                     this._downloadTicket(title.titleID, () => {
+                        self.emit('cached_game', title);
                         callback();
                     });
                 } else {
                     let size = fs.statSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik')).size;
                     if (size < 172) { // 172 seems to be the standard size
                         this._downloadTicket(title.titleID, () => {
+                            self.emit('cached_game', title);
                             callback();
                         });
                     } else {
+                        self.emit('cached_game', title);
                         callback();
                     }
                 }
@@ -185,6 +175,10 @@ Main.prototype.downloadTicketCache = function(cb) {
 
 Main.prototype.setTicketVendor = function(vendor) {
     this._config.ticket_vendor = vendor;
+}
+
+Main.prototype.setTicketCacheVendor = function(vendor) {
+    this._config.ticket_cache_vendor = vendor;
 }
 
 Main.prototype.setTicketCacheLocation = function(location) {
@@ -260,7 +254,6 @@ Main.prototype._downloadTicket = function(tid, cb) {
         return cb();
     })
     .on('finish', () => {
-        console.log(tid)
         return cb();
     });
 }
@@ -339,6 +332,29 @@ Main.prototype._ripFile = function(url, file, cb) {
             cb();
         });
     });
+}
+
+Main.prototype._tagaya = function(host, path, callback) {
+    https.request({
+        key: certs.key,
+        cert: certs.cert,
+        rejectUnauthorized: false,
+        host: host,
+        path: path,
+        port: 443
+    }, (res) => {
+        var data = '';
+        
+        res.on('data', (d) => {
+            data += d;
+        });
+        
+        res.on('end', () => {
+            callback(data, null);
+        });
+    }).on('error', (error) => {
+        callback(null, error);
+    }).end();
 }
 
 
