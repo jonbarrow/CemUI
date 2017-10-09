@@ -2,7 +2,7 @@ const APP_VERSION = '2.1.1';
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
-	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
+	electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
@@ -252,7 +252,6 @@ ipcMain.on('change_theme', (event, data) => {
 })
 
 ipcMain.on('init', (event, data) => {
-	console.log(data)
 	if (data && data.page == '_dlgames') {
 		// init for downloading games
 		console.log('dl ticket cache')
