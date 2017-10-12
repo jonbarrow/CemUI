@@ -711,38 +711,6 @@ for(var i = 0, length = closeList.length; i < length; i++)
 
 //FLUX JS
 
-function openSection(id) {
-    var library = document.getElementById('library'),
-        home = document.getElementById('home'),
-        settings = document.getElementById('settings'),
-        menu = document.getElementById('menuIndicator');
-    menu.classList.remove('one');
-    menu.classList.remove('two');
-    menu.classList.remove('three');
-    if (id == 'home') {
-        
-        menu.classList.add('two');
-        home.style.left = '0vw';
-        settings.style.left = '-100vw';
-        library.style.left = '100vw';
-        
-    } else if (id == 'library') {
-        
-        menu.classList.add('three');
-        home.style.left = '-100vw';
-        settings.style.left = '-200vw';
-        library.style.left = '0vw';
-        
-    } else {
-        
-        menu.classList.add('one');
-        home.style.left = '100vw';
-        settings.style.left = '0vw';
-        library.style.left = '200vw';
-        
-    }
-}
-
 //flux clock
 var col = true;
 function clock() {

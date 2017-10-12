@@ -158,12 +158,15 @@ function createWindow(file) {
   	ApplicationWindow = new BrowserWindow({
 		icon: './ico.png',
 		minHeight: 561,
-  		minWidth: 837
+  		minWidth: 837,
+        webPreferences: {
+            experimentalFeatures: true //for backdrop-filter css. if causes issues we will find an alternative.
+        }
 	});
 
 	ApplicationWindow.setMenu(null);
 	ApplicationWindow.maximize();
-	  
+    
 	ApplicationWindow.webContents.on('did-finish-load', () => {
         ApplicationWindow.show();
 		ApplicationWindow.focus();

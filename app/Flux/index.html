@@ -7,46 +7,32 @@
         <link href="css/main.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-        
-        <div id="header">
-            <div class="left"><h2 class="txt-s-32 txt-c-black txt-up txt-extrabold">CEM<span class="txt-c-blue">UI</span> <span class="txt-c-purple">flux</span></h2></div>
-            <div class="right"><h2 class="txt-s-32 txt-c-purple txt-extrabold" id="clock">12:00 AM</h2></div>
-        </div>
-        <div id="menu" class="txt-c-purple txt-s-16 txt-up">
-            <ul>
-                <li onclick="openSection('settings',this)"><h2>Settings</h2></li><!--
-                --><li onclick="openSection('home',this)"><h2>Home</h2></li><!--
-                --><li onclick="openSection('library',this)"><h2>Library</h2></li><!--
-                --><hr id="menuIndicator" class="two"/>
-            </ul>
-        </div>
-        <div id="sectionContainer">
-            <div class="settings" id="settings">
-                <h2>Hello</h2>
+        <div id="main">
+            <div id="header">
+                <h2 class="txt-s-32 txt-pad-lr txt-c-black txt-up txt-extrabold">CEM<span class="txt-c-blue">UI</span></h2>
+                <h2 class="txt-s-24 txt-pad-lr txt-up txt-c-black" id="clock">12:00 AM</h2>
             </div>
-            <div class="home" id="home">
-                <div id="mostPlayed" class="gamesRows"><div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                </div>
-                <div id="recentPlayed" class="gamesRows"><div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                    <div class="grid-item"><div class="game"></div></div>
-                </div>
+            <h2 class="txt-up txt-c-purple txt-s-24 txt-pad-lr">Recently played</h2>
+            <div class="square-cont" id="recent">
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
             </div>
-            <div class="library" id="library">
-                <div id="games" class="games">
-                </div>
+            <h2 class="txt-up txt-c-purple txt-s-24 txt-pad-lr">Library</h2>
+            <div class="square-cont" id="library">
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
+                <div class="item img-cap-white" style="background-image: url('https://ak1.picdn.net/shutterstock/videos/17694211/thumb/1.jpg');"><div><p>A random game <span>More</span></p></div></div>
             </div>
         </div>
         <script src="js/main.js"></script>
