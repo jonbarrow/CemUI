@@ -94,7 +94,6 @@ body,html {
     padding: 0;
     margin: 0;
     display: none;
-    position: fixed;
 }
 #smm .main {
     background-color: #086a9a;
@@ -105,15 +104,32 @@ body,html {
     top: 0;
     margin: 0;
     padding: 0;
-    flex-direction: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+            flex-direction: column;
+}
+#smm .colm {
+    width: calc(50% - 50px);
+    padding: 25px;
+    display: inline-block;
+}
+#smm .colm:nth-child(2) {
+    position: absolute;
+    left: 50%;
+    top: 0;
 }
 #smm .course {
-    width: calc(50% - 50px);
-    margin: 25px;
+    width: 100%;
+    margin-bottom: 25px;
     display: inline-block;
     background-color: #f9db00;
     border-radius: 10px;
     overflow: hidden;
+    height: 355px;
+    transition: height .5s;
+}
+#smm .course:hover {
+    height: 530px;
 }
 #smm .course .title {
     display: inline-block;
@@ -165,30 +181,38 @@ body,html {
     height: 24px;
     width: 50px;
 }
+#smm .course .content .details .owner {
+    padding: .75em;
+    display: inline-block;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
 #smm .course .content .details .type-0 {
-    background: url('images/image.png') 0 0;
+    background: url('../images/image.png') 0 0;
 }
 #smm .course .content .details .type-1 {
-    background: url('images/image.png') 0 -29px;
+    background: url('../images/image.png') 0 -29px;
 }
 #smm .course .content .details .type-2 {
-    background: url('images/image.png') 0 -87px;
+    background: url('../images/image.png') 0 -87px;
 }
 #smm .course .content .details .type-3 {
-    background: url('images/image.png') 0 -58px;
+    background: url('../images/image.png') 0 -58px;
 }
 #smm .course .content .details div {
     margin-bottom: 10px;
 }
 #smm .course .footer {
     clear: both;
-    padding: 5px 15px;
+    padding: 10px 15px;
 }
 #smm .main .wrapper {
-    flex: 1;
-    width: 95%;
-    margin: 0 2.5%;
+    -webkit-box-flex: 1;
+            flex: 1;
     font-size: 0;
+    width: 100%;
+    position: relative;
+        overflow-y: auto;
 }
 #smm .main .header {
     background-color: #283138;
@@ -284,7 +308,7 @@ body,html {
 .txt-button {
     background-color: #303C44;
     border-radius: 5px;
-    box-shadow: 0px 6px 0px 0px rgba(32,39,45,1);
+    box-shadow: 0px 6px 0px 0px rgba(1,1,1,0.1);
     padding: 20px 40px;
     margin-top: 0;
     margin-bottom: 4px !important;
@@ -292,7 +316,7 @@ body,html {
 }
 .txt-button-white {
     background-color: #FFFFFF;
-    box-shadow: 0px 6px 0px 0px #CECECE;
+    box-shadow: 0px 6px 0px 0px rgba(1,1,1,0.1);
     width: 50%;
     margin: auto;
     text-align: center;
@@ -301,12 +325,12 @@ body,html {
     background-color: #394852;
 }
 .txt-button-white:hover  {
-    background-color: #CECECE;
+    background-color: #e6e6e6;
 }
 .txt-button:active, .txt-button:focus {
     margin-top: 4px !important;
     margin-bottom: 0 !important;
-    box-shadow: 0px 2px 0px 0px rgba(32,39,45,1);
+    box-shadow: 0px 2px 0px 0px rgba(1,1,1,0.1);
 }
 
 .txt-up {
