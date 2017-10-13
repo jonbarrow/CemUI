@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
  NodeNUSRipper
 
- The in-house NUS (Nintendo Update Server) game/update/DLC downloader.
+ The in-house NUS (Nintendo Update Server) game/update/DLC downloader for CemUI 2.0.
  Designed for use only in the free OSS CemUI.
 
  Copyright (C) 2017 Jonathan Barrow (RedDucks(s))
@@ -14,11 +14,12 @@ var EventEmitter = require('events').EventEmitter,
     url = require('url'),
     util = require('util'),
     path = require('path'),
+    http = require('http'),
     async = require('async'),
     request = require('request'),
     struct = require('python-struct');
 
-const NINTENDO_CDN_URL = 'http://ccs.cdn.c.shop.nintendowifi.net/ccs/download/';
+const NINTENDO_CCS_URL = 'http://ccs.cdn.c.shop.nintendowifi.net/ccs/download/';
 const NINTENDO_NUS_URL = 'http://nus.cdn.c.shop.nintendowifi.net/ccs/download/';
 const TITLE_TYPES = [
     '0000',  // application
@@ -97,12 +98,13 @@ Main.prototype._config = {
     ticket_cache_folder: './ticketcache' 
 }
 
-Main.prototype.decrypt = function(location) {
+Main.prototype.decrypt = function(location, cb) {
     let self = this;
 
     if (!this._config.cdecrypt_location || this._config.cdecrypt_location.trim() == '' || !fs.pathExistsSync(this._config.cdecrypt_location)) {
         return;
     }
+    self.emit('rom_decryption_started', location);
 
     fs.copySync(this._config.cdecrypt_location, path.join(location, 'cdecrypt.exe'));
     fs.copySync(path.join(this._config.cdecrypt_folder_location, 'libeay32.dll'), path.join(location, 'libeay32.dll'));
@@ -110,7 +112,7 @@ Main.prototype.decrypt = function(location) {
 
     console.log('CemUI does not ship with any means to decrypt rom files.\nWhile we would love to do so, we cannot for legal reasons.\nIn order to decrypt the files, CemUI makes use of CDecrypt, which is also not shipped with CemUI due to legal reasons.\nPlease obtain a copy of CDecrypt and tell CemUI where to look for it.');
     
-    let decrypter = child_process.execFile('cdecrypt.exe', [ 
+    let decrypter = child_process.spawn('cdecrypt.exe', [ 
         'title.tmd', 'title.tik' 
     ], { 
         cwd: path.resolve(process.cwd(), location)
@@ -142,6 +144,9 @@ Main.prototype.decrypt = function(location) {
         }
 
         self.emit('rom_decryption_completed', location);
+        if (cb) {
+            return cb();
+        }
     })
 }
 
@@ -156,7 +161,7 @@ Main.prototype.getTIDType = function(TID) {
 Main.prototype.getTIDURL= function(TID) {
     const TID_TYPE = this.getTIDType(TID);
     if (TITLE_TYPES.indexOf(TID_TYPE) > -1) {
-        URL_BASE = url.resolve(NINTENDO_CDN_URL, TID);
+        URL_BASE = url.resolve(NINTENDO_CCS_URL, TID);
     } else URL_BASE = url.resolve(NINTENDO_NUS_URL, TID);
 
     return URL_BASE;
@@ -167,8 +172,11 @@ Main.prototype.parseTMD = function(file, cb) {
     
     var tmd_object = {},
         tmd_contents_count = struct.unpack('>H', tmd.subarray(0x1DE, 0x1E0))[0],
-        tmd_contents = [];
-    
+        tmd_contents = [],
+        tid_buffer = tmd.subarray(0x18C, 0x194),
+        version_buffer = tmd.subarray(0x1DC, 0x1DE),
+        version = struct.unpack('>H', version_buffer)[0];
+ 
     for (var i=0;i<tmd_contents_count;i++) {
         let offset = 0xB04 + (0x30 * i),
             content_binary = new Buffer.from(tmd.subarray(offset, offset + 0x4)).toString('binary');
@@ -182,6 +190,7 @@ Main.prototype.parseTMD = function(file, cb) {
     }
 
     tmd_object.contents = tmd_contents;
+    tmd_object.version = version;
 
     if (cb) {
         return cb(tmd_object);
@@ -200,10 +209,13 @@ Main.prototype._patchDLC = function(ticket) {
 }
 
 Main.prototype._generateTicket = function(tid, version, key, output, cb) {
-    var ticket = blank_ticket,
-        version_buffer = new Buffer.from(version),
-        tid_buffer = new Buffer.from(stringToBin(tid), 'binary'),
-        key_buffer = new Buffer.from(stringToBin(key), 'binary');
+    console.log(tid)
+    console.log(version)
+    console.log(key)
+    var ticket = TIK,
+        version_buffer = new Buffer.from(version.toString()),
+        tid_buffer = new Buffer.from(this._stringToBin(tid), 'binary'),
+        key_buffer = new Buffer.from(this._stringToBin(key), 'binary');
 
     version_buffer.copy(ticket, 0x1E6, 0);
     tid_buffer.copy(ticket, 0x1DC, 0);
@@ -211,7 +223,9 @@ Main.prototype._generateTicket = function(tid, version, key, output, cb) {
 
     fs.writeFileSync(output, ticket);
 
-    return cb();
+    if (cb) {
+        return cb();
+    }
 }
 
 Main.prototype.downloadTicketCache = function(cb) {
@@ -276,30 +290,71 @@ Main.prototype.setCDecryptLocation = function(location) {
     this._config.cdecrypt_folder_location = location.replace(/\/[^\/]+\/?$/, '');
 }
 
-Main.prototype.downloadTID = function(TID, location, cb) {
+Main.prototype.verifyEncryptedContents = function(location, tid, cb) {
+    var tmd = this.parseTMD(path.join(location, 'title.tmd'));
+    this._checkApplicationFiles(tmd.contents, location, tid, () => {
+        this._checkHashFiles(tmd.contents.filter(item => {return item.type>=8195}), location, tid, () => {
+            return cb();
+        });
+    });
+}
+
+Main.prototype._checkApplicationFiles = function(contents, location, tid, cb) {
+    var queue = async.queue((file, callback) => {
+        if (fs.pathExistsSync(path.join(location, file.id + '.app'))) {
+            var size = fs.statSync(path.join(location, file.id + '.app')).size;
+            if (size < file.size) {
+                this._ripFile(this.getTIDURL(tid) + '/' +  file.id, path.join(location, file.id + '.app'), () => {
+                    callback();
+                });
+            } else {
+                callback();
+            }
+        } else {
+            this._ripFile(this.getTIDURL(tid) + '/' +  file.id, path.join(location, file.id + '.app'), () => {
+                callback();
+            });
+        }
+    });
+
+    queue.drain = () => {
+        return cb();
+    }
+
+    queue.push(contents);
+}
+
+Main.prototype._checkHashFiles = function(contents, location, tid, cb) {
+    var queue = async.queue((file, callback) => {
+        if (fs.pathExistsSync(path.join(location, file.id + '.h3'))) {
+            var size = fs.statSync(path.join(location, file.id + '.h3')).size;
+            this._getHeaders(this.getTIDURL(tid) + '/' +  file.id + '.h3', (headers) => {
+                if (size < headers['content-length']) {
+                    this._ripFile(this.getTIDURL(tid) + '/' +  file.id + '.h3', path.join(location, file.id + '.h3'), () => {
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            });
+        } else {
+            this._ripFile(this.getTIDURL(tid) + '/' +  file.id + '.h3', path.join(location, file.id + '.h3'), () => {
+                callback();
+            });
+        }
+    });
+
+    queue.drain = () => {
+        return cb();
+    }
+
+    queue.push(contents);
+}
+
+Main.prototype.downloadTID = function(TID, location, update, cb) {
     let self = this;
     TID = this.formatTID(TID);
     fs.ensureDirSync(location);
-
-    if (fs.pathExistsSync(path.join(this._config.ticket_cache_folder, TID.toLowerCase() + '.tik'))) {
-        fs.createReadStream(path.join(this._config.ticket_cache_folder, TID.toLowerCase() + '.tik'))
-            .pipe(fs.createWriteStream(path.join(location, 'title.tik')));
-    } else if (this.getTIDType(TID) == '000E') {
-        let URL_BASE = this.getTIDURL(TID);
-        this._ripFile(URL_BASE + '/cetk', path.join(location, 'title.tik'), (error) => {
-            self.emit('downloaded_ticket', TID);
-        });
-    } else {
-        self.emit('error', {
-            message: 'No valid ticket available'
-        });
-        return;
-    }
-
-    if (this.getTIDType(TID) == '000C') {
-        this._patchDLC(path.join(location, 'title.tik'));
-    }
-
     
     fs.createReadStream('uni.cert').pipe(fs.createWriteStream(path.join(location, 'title.cert')));
 
@@ -308,17 +363,82 @@ Main.prototype.downloadTID = function(TID, location, cb) {
         let tmd = this.parseTMD(path.join(location, 'title.tmd')),
             URL_BASE = this.getTIDURL(TID);
 
-        var queue = async.queue((file, callback) => {
-            this._ripFile(URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
-                this._ripFile(URL_BASE + '/' + file.id, path.join(location, file.id + '.app'), (error) => {
-                    callback();
-                });
+        if (fs.pathExistsSync(path.join(this._config.ticket_cache_folder, TID.toLowerCase() + '.tik'))) {
+            fs.createReadStream(path.join(this._config.ticket_cache_folder, TID.toLowerCase() + '.tik'))
+                .pipe(fs.createWriteStream(path.join(location, 'title.tik')));
+        } else if (this.getTIDType(TID) == '000E') {
+            let URL_BASE = this.getTIDURL(TID);
+            this._ripFile(URL_BASE + '/cetk', path.join(location, 'title.tik'), (error) => {
+                self.emit('downloaded_ticket', TID);
             });
+        } else {
+            let cache = fs.readJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'));
+            for (var i=0;i<cache.length;i++) {
+                var game = cache[i];
+                if (game.titleID == TID.toLowerCase()) {
+                    i = cache.length;
+                    if (!game.titleKey) {
+                        self.emit('error', {
+                            message: 'No valid ticket available'
+                        });
+                        return;
+                    }
+                    this._generateTicket(TID.toLowerCase(), tmd.version, game.titleKey, path.join(location, 'title.tik'));
+                }
+            }
+        }
 
+        if (this.getTIDType(TID) == '000C') {
+            this._patchDLC(path.join(location, 'title.tik'));
+        }
+
+        var queue = async.queue((file, callback) => {
+            if (fs.pathExistsSync(path.join(location, file.id + '.app'))) {
+                var size = fs.statSync(path.join(location, file.id + '.app')).size;
+                if (size < file.size) {
+                    this._ripFile(URL_BASE + '/' +  file.id, path.join(location, file.id + '.app'), () => {
+                        if (file.type >= 8195) {
+                            this._ripFile(URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
+                                return callback();
+                            });
+                        } else {
+                            return callback();
+                        }
+                    });
+                } else {
+                    self.emit('download_status', {
+                        status: 'exists',
+                        name: file.id + '.app',
+                        path: path.join(location, file.id + '.app'),
+                        received_bytes: size,
+                        total_bytes: size
+                    });
+                    if (file.type >= 8195) {
+                        this._ripFile(URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
+                            return callback();
+                        });
+                    } else {
+                        return callback();
+                    }
+                }
+            } else {
+                this._ripFile(URL_BASE + '/' +  file.id, path.join(location, file.id + '.app'), () => {
+                    if (file.type >= 8195) {
+                        this._ripFile(URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
+                            return callback();
+                        });
+                    } else {
+                        return callback();
+                    }
+                });
+            }
         });
 
         queue.drain = () => {
-            self.emit('rom_rip_completed', location)
+            self.emit('rom_rip_completed', location);
+            if (cb) {
+                return cb(location);
+            }
         }
 
         queue.push(tmd.contents);
@@ -351,10 +471,10 @@ Main.prototype._ripFile = function(url, file, cb) {
     let self = this,
         files = file.split('\\');
 
-    request.head(url, (error, response, body) => {
-        if (fs.pathExistsSync(file) && response.statusCode == 200) {
+    this._getHeaders(url, (headers) => {
+        if (fs.pathExistsSync(file)) {
             var size = fs.statSync(file).size;
-            if (size == response.headers['content-length']) {
+            if (size >= headers['content-length']) {
                 self.emit('download_status', {
                     status: 'exists',
                     name: files[files.length-1],
@@ -365,85 +485,74 @@ Main.prototype._ripFile = function(url, file, cb) {
                 return cb();
             }
         }
-        if (error || response.statusCode != 200) {
-            if (error) return cb(true);
-            if (response.statusCode != 404) {
-                setTimeout(() => { // there seems to be some kind of request rate limit in place by Nintendo, resulting in 500/504 errors. Sleeping for a bit may help this
-                    this._ripFile(url, file, cb);
-                    return;
-                }, 1000);
+
+        let received_bytes = 0,
+            total_bytes = headers['content-length'],
+            req = request.get(url);
+
+        req.on('response', (response) => {
+            if (response.statusCode !== 200) {
+                if (response.statusCode == 404) {
+                    console.log(file);
+                    return cb();
+                }
+                console.log(url);
+                console.log(file);
+                console.log(response.statusCode)
+                throw new Error('Invalid response code', response.statusCode);
             } else {
                 self.emit('download_status', {
-                    status: 'not_found',
+                    status: 'started',
                     name: files[files.length-1],
                     path: file,
                     received_bytes: 0,
-                    total_bytes: 0
+                    total_bytes: headers['content-length']
                 });
-                return cb(true);
-            }
-        }
 
-        self.emit('download_status', {
-            status: 'started',
-            name: files[files.length-1],
-            path: file,
-            received_bytes: 0,
-            total_bytes: response.headers['content-length']
-        });
+                var out = fs.createWriteStream(file);
+                req.pipe(out);
 
-        let received_bytes = 0,
-            total_bytes = response.headers['content-length'],
-            dl = request(url),
-            out = fs.createWriteStream(file);
-
-        dl.on('data', function(chunk) {
-            received_bytes += chunk.length;
-            self.emit('download_status', {
-                status: 'downloading',
-                name: files[files.length-1],
-                path: file,
-                chunk: chunk.length,
-                received_bytes: received_bytes,
-                total_bytes: total_bytes
-            });
-        });
+                out.on('finish', () => {
+                    self.emit('download_status', {
+                        status: 'finished',
+                        name: files[files.length-1],
+                        path: file,
+                        received_bytes: received_bytes,
+                        total_bytes: total_bytes
+                    });
+                    out.close(cb);
+                });
         
-        dl.pipe(out)
-        .on('finish', () => {
-            self.emit('download_status', {
-                status: 'finished',
-                name: files[files.length-1],
-                path: file,
-                received_bytes: received_bytes,
-                total_bytes: total_bytes
-            });
-            cb();
+                out.on('error', (error) => {
+                    console.log(error);
+                    console.log(error.message);
+                    console.log(url);
+                    console.log(file);
+                    throw error
+                });
+
+                req.on('data', (chunk) => {
+                    received_bytes += chunk.length;
+                    self.emit('download_status', {
+                        status: 'downloading',
+                        name: files[files.length-1],
+                        path: file,
+                        chunk_length: chunk.length,
+                        received_bytes: received_bytes,
+                        total_bytes: total_bytes
+                    });
+                });
+        
+                req.on('error', (error) => {
+                    console.log(error);
+                    console.log(error.message);
+                    console.log(url);
+                    console.log(file);
+                    throw error;
+                });
+            }
         });
     });
-}
-
-Main.prototype._tagaya = function(host, path, callback) {
-    https.request({
-        key: certs.key,
-        cert: certs.cert,
-        rejectUnauthorized: false,
-        host: host,
-        path: path,
-        port: 443
-    }, (res) => {
-        var data = '';
-        
-        res.on('data', (d) => {
-            data += d;
-        });
-        
-        res.on('end', () => {
-            callback(data, null);
-        });
-    }).on('error', (error) => {
-        callback(null, error);
-    }).end();
 }
 
 Main.prototype._stringToBin = function(string) {
@@ -455,3 +564,12 @@ Main.prototype._stringToBin = function(string) {
 }
 
 module.exports = Main;
+
+Main.prototype._getHeaders = function(uri, cb) {
+    let url_tmp = new url.URL(uri);
+    var options = {method: 'HEAD', host: url_tmp.host, port: 80, path: url_tmp.pathname};
+    var req = http.request(options, function(res) {
+        return cb(res.headers);
+    });
+    req.end();
+}
