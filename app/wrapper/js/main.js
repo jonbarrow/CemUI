@@ -14,6 +14,7 @@ addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
         name: 'Fluent'
     });
 });
+addEvent(document.getElementsByClassName('dlgames')[0], 'click', toggleGAMES );
 addEvent(document.getElementsByClassName('smmdb')[0], 'click', toggleSMMDB );
 
 function toggleSMMDB() {
@@ -45,11 +46,21 @@ function toggleSMMDB() {
         },0);
     }
 }
-addEvent(document.getElementsByClassName('dlgames')[0], 'click', function() {
+
+function toggleGAMES() {
+    var el = document.getElementById('dl');
+    if (el.style.display == "flex") {
+        el.style.display = 'none';
+    } else {
+        el.style.display = 'flex';
+    }
+}
+
+/*addEvent(document.getElementsByClassName('dlgames')[0], 'click', function() {
     ipcRenderer.send('change_theme', {
         name: '_dlgames'
     });
-});
+});*/
             
 addEvent(window, 'keypress', function(event) {
     if (event.charCode == 112) {
