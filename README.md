@@ -18,17 +18,17 @@
 | <img src="https://i.imgur.com/Rc3lGbO.png" height="32"> | Somebody2804(BenTheHuman)   | UI/Frontend designer.                                                            |                                    |                                  |
 |                                                         | dragnu5(Dragnus)            | Creator of over 400 custom images for CemUI.                                     |                                    |                                  |
 
-# How can I help? / I have a suggestion!
-We **always** welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone with experience in JavaScript, Node, HTML, CSS, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules!
-![Fork](https://img.shields.io/github/forks/RedDuckss/CemUI.svg?style=social&label=Fork)
-
-**If you have a suggestion, and do not know any of the required languages, you can reach us on our [Discord server][1]**
-
 # Changelog & FAQ
 ### [Changelog](https://github.com/RedDuckss/CemUI/blob/master/CHANGELOG.md)
 
 ### [FAQ](https://github.com/RedDuckss/CemUI/blob/master/FAQ.md)
 
+
+# How can I help? / I have a suggestion!
+We **always** welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone with experience in JavaScript, Node, HTML, CSS, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules!
+![Fork](https://img.shields.io/github/forks/RedDuckss/CemUI.svg?style=social&label=Fork)
+
+**If you have a suggestion, and do not know any of the required languages, you can reach us on our [Discord server][1]**
 
 # How to get the latest version of CemUI
 
