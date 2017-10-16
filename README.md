@@ -10,6 +10,14 @@
 **Note:**
 > CemUI v2.0 is currently a WIP and is not guaranteed to be stable.
 
+# Credits
+| Icon                                                    | Name                        | Credit                                                                           | Twitter                            | GitHub                           |
+|---------------------------------------------------------|-----------------------------|----------------------------------------------------------------------------------|------------------------------------|----------------------------------|
+| <img src="https://i.imgur.com/5QshX3v.png" height="32"> | RedDucks(s)/Jonathan Barrow | Founder/lead developer. Handles all backend functionality and maintains the API. | [Redducks Twitter](https://twitter.com/jondbarrow) | [Redducks GitHub](https://github.com/RedDuckss) |
+| <img src="https://i.imgur.com/OFFt3eK.png" height="32"> | MrJVS                       | 2.0 co-founder. Handles all frontend functionality and presentation.             | [MrJVS GitHub Twitter](https://twitter.com/TWmrjvs)    | [MrJVS GitHub](https://github.com/mrjvs)     |
+| <img src="https://i.imgur.com/Rc3lGbO.png" height="32"> | Somebody2804(BenTheHuman)   | UI/Frontend designer.                                                            |                                    |                                  |
+|                                                         | dragnu5(Dragnus)            | Creator of over 400 custom images for CemUI.                                     |                                    |                                  |
+
 # How can I help? / I have a suggestion!
 We **always** welcome suggestions and Pull Requests! This program is written in NodeJS and packaged with Electron. This means that anyone with experience in JavaScript, Node, HTML, CSS, and C++ can contribute just fine! With Node, C++ users can contribute as well, due to Node supporting C++ modules!
 ![Fork](https://img.shields.io/github/forks/RedDuckss/CemUI.svg?style=social&label=Fork)
@@ -23,7 +31,10 @@ We **always** welcome suggestions and Pull Requests! This program is written in 
 
 
 # How to get the latest version of CemUI
-To get CemUI v2.0 right now, you must build from source. To do this, follow these steps:
+
+The latest official builds can be found in the [GitHub Releases section](https://github.com/RedDuckss/CemUI/releases).
+
+To get the latest developer version of CemUI right now, you may run from source. To do this, follow these steps:
 
 1. Install [NodeJS](https://nodejs.org/)
 2. Clone/Download this repo
