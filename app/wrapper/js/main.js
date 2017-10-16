@@ -4,6 +4,28 @@ function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
 }
 
+ipcRenderer.on('ticket_cache_downloaded', () => {
+    document.querySelectorAll('#dl .loading-overlay')[0].classList.add('hidden');
+    document.querySelectorAll('#dl .main')[0].classList.remove('hidden');
+});
+
+ipcRenderer.on('cached_game', (event, data) => {
+    let game = document.createElement('div'),
+        inner = document.createElement('div'),
+        title = document.createElement('p'),
+        expand_btn = document.createElement('span');
+    
+    game.classList = 'item img-cap-white';
+    game.style.backgroundImage = 'url("http://cemui.com/api/v2/image/grid/' + data.titleID + '")'
+    title.innerHTML = data.name;
+    expand_btn.innerHTML = 'More';
+
+    title.appendChild(expand_btn);
+    inner.appendChild(title);
+    game.appendChild(inner);
+    document.querySelectorAll('#dl .main')[0].appendChild(game);
+});
+
 addEvent(document.getElementsByClassName('flux')[0], 'click', function() {
     ipcRenderer.send('change_theme', {
         name: 'Flux'
@@ -51,9 +73,14 @@ function toggleGAMES() {
     var el = document.getElementById('dl');
     if (el.style.display == "flex") {
         el.style.display = 'none';
-    } else {
-        el.style.display = 'flex';
+        return;
     }
+    
+    el.style.display = 'flex';
+    el.getElementsByClassName('main')[0].innerHTML = '';
+    ipcRenderer.send('init', {
+        page: '_dlgames'
+    });
 }
 
 /*addEvent(document.getElementsByClassName('dlgames')[0], 'click', function() {
@@ -88,3 +115,11 @@ function setTheme(event,data) {
 }
 ipcRenderer.on('theme_change',setTheme);
 ipcRenderer.send('ask_for_theme');
+
+String.prototype.insert = function(index, string) {
+    if (index > 0) {
+        return this.substring(0, index) + string + this.substring(index, this.length);
+    } else {
+        return string + this;
+    }
+};

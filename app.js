@@ -261,6 +261,7 @@ ipcMain.on('init', (event, data) => {
 		NUSRipper.setTicketCacheLocation(settings_storage.get('ticket_cache_folder').value());
 		NUSRipper.setTicketVendor(settings_storage.get('ticket_vendor').value());
 		NUSRipper.setTicketCacheVendor(settings_storage.get('ticket_cache_vendor').value());
+
 		NUSRipper.downloadTicketCache(() => {
 			ticket_cache_storage = low(new FileSync(settings_storage.get('ticket_cache_folder').value() + '/_cache.json'));
 			ApplicationWindow.webContents.send('ticket_cache_downloaded')

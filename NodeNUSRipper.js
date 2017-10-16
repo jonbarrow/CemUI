@@ -232,21 +232,21 @@ Main.prototype.downloadTicketCache = function(cb) {
     let self = this;
     fs.ensureDirSync(this._config.ticket_cache_folder);
     request(this._config.ticket_cache_vendor, (error, response, body) => {
-
-        if (error || response.statusCode != 200) return cb(true);
-
+        if (error || response.statusCode != 200) {
+            return cb(true);
+        }
         let titles = JSON.parse(body);
 
         fs.writeJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'), titles);
 
         var queue = async.queue((title, callback) => {
-            if (title.ticket == 1) {
-                if (!fs.pathExistsSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik'))) {
+            if (title.titleKey && title.titleKey.trim() != '') {
+                if (!fs.pathExistsSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik')) && title.ticket == 1) {
                     this._downloadTicket(title.titleID, () => {
                         self.emit('cached_game', title);
                         callback();
                     });
-                } else {
+                } else if (fs.pathExistsSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik'))) {
                     let size = fs.statSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik')).size;
                     if (size < 172) { // 172 seems to be the standard size
                         this._downloadTicket(title.titleID, () => {
@@ -257,6 +257,9 @@ Main.prototype.downloadTicketCache = function(cb) {
                         self.emit('cached_game', title);
                         callback();
                     }
+                } else {
+                    self.emit('cached_game', title);
+                    callback();
                 }
             } else {
                 callback();

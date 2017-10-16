@@ -34,7 +34,7 @@
 }
 @font-face {
     font-family: 'OpenSansLight';
-    src: src: url('../fonts/OpenSans-Light.ttf') format('truetype');
+    src: url('../fonts/OpenSans-Light.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 
@@ -82,6 +82,9 @@ body,html {
     -ms-user-select: none;
     user-select: none;
     font-family: 'OpenSans';
+}
+.hidden {
+    display: none !important;
 }
 #webview {
     display: block;
@@ -307,6 +310,18 @@ body,html {
 }
 .header h2 {
     margin: 0;
+}
+
+#dl .loading-overlay {
+    position: fixed;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    background: rgb(0,0,0);
+    color: #FFFFFF;
 }
 #dl .main {
     overflow-x: hidden;
