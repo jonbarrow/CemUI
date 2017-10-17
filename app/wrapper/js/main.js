@@ -5,6 +5,7 @@ function addEvent(object, event, func) {
 }
 
 ipcRenderer.on('smm_courses_list', (event, data) => {
+    document.querySelectorAll('#smm .main .wrapper')[0].innerHTML = '';
     let i = 0,
         course_cols = document.querySelectorAll('.colm');
     for (var level of data) {
