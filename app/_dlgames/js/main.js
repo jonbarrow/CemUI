@@ -10,6 +10,7 @@ ipcRenderer.on('ticket_cache_downloaded', () => {
 });
 
 ipcRenderer.on('cached_game', (event, data) => {
+    console.log(data.titleID)
     let game = document.createElement('div'),
         box = document.createElement('img'),
         game_content = document.createElement('div'),

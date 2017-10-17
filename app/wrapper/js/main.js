@@ -10,13 +10,22 @@ ipcRenderer.on('ticket_cache_downloaded', () => {
 });
 
 ipcRenderer.on('cached_game', (event, data) => {
+    let bg_test = new Image(),
+        src = 'http://cemui.com/api/v2/image/grid/' + data.titleID;
+
     let game = document.createElement('div'),
         inner = document.createElement('div'),
         title = document.createElement('p'),
         expand_btn = document.createElement('span');
+
+    bg_test.onerror = function () {
+        game.style.backgroundImage = 'url("../../defaults/grid.jpg")';
+    };
+
+    bg_test.src = src;
     
     game.classList = 'item img-cap-white';
-    game.style.backgroundImage = 'url("http://cemui.com/api/v2/image/grid/' + data.titleID + '")'
+    game.style.backgroundImage = 'url("' + src + '")'
     title.innerHTML = data.name;
     expand_btn.innerHTML = 'More';
 

@@ -41,7 +41,9 @@ const GLOBAL_THEMES = [
 ]
 
 NUSRipper.on('cached_game', (data) => {
-	ApplicationWindow.webContents.send('cached_game', data)
+	if (data.titleID.toUpperCase().substring(4, 8) == '0000') {
+		ApplicationWindow.webContents.send('cached_game', data);
+	}
 });
 
 winston.emitErrs = true;
