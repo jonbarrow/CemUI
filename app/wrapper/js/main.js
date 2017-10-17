@@ -5,9 +5,11 @@ function addEvent(object, event, func) {
 }
 
 ipcRenderer.on('smm_courses_list', (event, data) => {
-    document.querySelectorAll('#smm .main .wrapper')[0].innerHTML = '';
     let i = 0,
         course_cols = document.querySelectorAll('.colm');
+    
+    course_cols[0].innerHTML = course_cols[1].innerHTML = '';
+    
     for (var level of data) {
         i++;
         let level_wrapper = document.getElementById("TEMPLATE_SMMDB_COURSE").content.firstElementChild.cloneNode(true);
