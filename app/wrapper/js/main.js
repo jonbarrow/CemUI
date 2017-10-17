@@ -5,11 +5,60 @@ function addEvent(object, event, func) {
 }
 
 ipcRenderer.on('smm_courses_list', (event, data) => {
+    let i = 0,
+        course_cols = document.querySelectorAll('.colm');
     for (var level of data) {
+        i++;
         let level_wrapper = document.getElementById("TEMPLATE_SMMDB_COURSE").content.firstElementChild.cloneNode(true);
-        /*
-            DO STUFF WITH DATA
-        */
+        
+        switch (level.difficulty) {
+            case 3:
+                level_wrapper.querySelectorAll('.title')[0].classList.add('super-expert');
+                level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Super Expert';
+                break;
+            case 2:
+                level_wrapper.querySelectorAll('.title')[0].classList.add('expert');
+                level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Expert';
+                break;
+            case 1:
+                level_wrapper.querySelectorAll('.title')[0].classList.add('normal');
+                level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Normal';
+                break;
+            case 0:
+            default:
+                level_wrapper.querySelectorAll('.title')[0].classList.add('easy');
+                level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Easy';
+                break;
+        }
+
+        switch (level.gameStyle) {
+            case 3:
+                level_wrapper.querySelectorAll('.type')[0].classList.add('type-3');
+                break;
+            case 2:
+                level_wrapper.querySelectorAll('.type')[0].classList.add('type-2');
+                break;
+            case 1:
+                level_wrapper.querySelectorAll('.type')[0].classList.add('type-1');
+                break;
+            case 0:
+            default:
+                level_wrapper.querySelectorAll('.type')[0].classList.add('type-0');
+                break;
+        }
+
+        level_wrapper.querySelectorAll('.course-name')[0].innerHTML = level.title;
+        level_wrapper.querySelectorAll('.owner')[0].innerHTML = level.maker;
+        level_wrapper.querySelectorAll('.course-star-count')[0].innerHTML = level.stars;
+        level_wrapper.querySelectorAll('.img_preview img')[0].src = 'http://smmdb.ddns.net/courseimg/' + level.id + '_full';
+        level_wrapper.querySelectorAll('.img_thumbnail img')[0].src = 'http://smmdb.ddns.net/courseimg/' + level.id;
+        level_wrapper.querySelectorAll('.upload-date')[0].innerHTML = getFormattedDate(new Date(level.uploaded * 1000));
+
+        if (i % 2 != 0) {
+            course_cols[0].appendChild(level_wrapper)
+        } else {
+            course_cols[1].appendChild(level_wrapper)
+        }
     }
 });
 
@@ -136,3 +185,19 @@ String.prototype.insert = function(index, string) {
         return string + this;
     }
 };
+
+function formatDate(input) {
+    function pad(s) { return (s < 10) ? '0' + s : s; }
+    var d = new Date(input);
+    return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/');
+}
+
+function getFormattedDate(date) {
+    var year = date.getFullYear();
+    /// Add 1 because JavaScript months start at 0
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : '0' + day;
+    return month + '/' + day + '/' + year;
+}
