@@ -4,6 +4,15 @@ function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
 }
 
+ipcRenderer.on('smm_courses_list', (event, data) => {
+    for (var level of data) {
+        let level_wrapper = document.getElementById("TEMPLATE_SMMDB_COURSE").content.firstElementChild.cloneNode(true);
+        /*
+            DO STUFF WITH DATA
+        */
+    }
+});
+
 ipcRenderer.on('ticket_cache_downloaded', () => {
     document.querySelectorAll('#dl .loading-overlay')[0].classList.add('hidden');
     document.querySelectorAll('#dl .main')[0].classList.remove('hidden');
@@ -52,6 +61,7 @@ function toggleSMMDB() {
         el.querySelector('.overlay > div:first-child').style.top = '0%';
         el.querySelector('.overlay > div:nth-child(2)').style.bottom = '0%';
     } else {
+        ipcRenderer.send('smm_search_courses', {});
         el.style.display = 'block';
         el.querySelector('.overlay').style.display = 'block';
         setTimeout(function () {

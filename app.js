@@ -369,7 +369,7 @@ ipcMain.on('smm_search_courses', (event, data) => {
 	data.limit = 50;
 	smm.searchCourses(data, (error, courses) => {
 		if (error) throw error;
-		console.log(courses);
+		ApplicationWindow.webContents.send('smm_courses_list', courses)
 	});
 });
 
