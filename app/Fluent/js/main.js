@@ -362,9 +362,6 @@ function createModal(game, isSuggest) {
         modal.querySelector('.desc > .txt-desc').innerHTML = game.game_overview;
         modal.querySelector('.desc > .txt-play').innerHTML = game.game_playability;
         modal.querySelector('.button-visit').href = 'http://www.nintendo.com/games/detail/' + game.game_slug;
-
-        //screenshots here?
-        // how does suggest modals get screenshots??  <<<------
         
     } else {
         var modal = modal_template.content.firstElementChild.cloneNode(true);

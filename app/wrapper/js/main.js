@@ -10,29 +10,23 @@ ipcRenderer.on('ticket_cache_downloaded', () => {
 });
 
 ipcRenderer.on('cached_game', (event, data) => {
+    const tid = data.titleID.slice(0, 8) + "-" + data.titleID.slice(8);
     let bg_test = new Image(),
-        src = 'http://cemui.com/api/v2/image/grid/' + data.titleID;
-
-    let game = document.createElement('div'),
-        inner = document.createElement('div'),
-        title = document.createElement('p'),
-        expand_btn = document.createElement('span');
+        src = 'http://cemui.com/api/v2/image/boxart/' + tid;
+    
+    let item = document.getElementById("TEMPLATE_DL_GRID").content.firstElementChild.cloneNode(true);
 
     bg_test.onerror = function () {
-        game.style.backgroundImage = 'url("../../defaults/grid.jpg")';
+        item.querySelector('img').src = "../../defaults/box.jpg";
     };
 
     bg_test.src = src;
     
-    game.classList = 'item img-cap-white';
-    game.style.backgroundImage = 'url("' + src + '")'
-    title.innerHTML = data.name;
-    expand_btn.innerHTML = 'More';
+    item.querySelector('img').src = src;
+    item.querySelector('.title').innerHTML = data.name;
+    item.querySelector('.desc').innerHTML = "lorem ipsum description.";
 
-    title.appendChild(expand_btn);
-    inner.appendChild(title);
-    game.appendChild(inner);
-    document.querySelectorAll('#dl .main')[0].appendChild(game);
+    document.querySelectorAll('#dl .main')[0].appendChild(item);
 });
 
 addEvent(document.getElementsByClassName('flux')[0], 'click', function() {
