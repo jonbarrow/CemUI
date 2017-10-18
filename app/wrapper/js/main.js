@@ -79,7 +79,7 @@ ipcRenderer.on('cached_game', (event, data) => {
 
     bg_test.onerror = function () {
         item.querySelector('img').src = "../../defaults/box.jpg";
-        return true;
+        item.querySelector('.title').innerHTML = tid + " | " + data.name;
     };
 
     bg_test.src = src;
