@@ -14,7 +14,10 @@
             <div class="main">
                 <div class="header">
                     <h1 class="txt-s-32 txt-c-yellow txt-font-smm">Super Mario Maker Database</h1>
-                    <h1 class="close txt-button txt-s-24 txt-c-yellow txt-font-smm" onclick="toggleSMMDB();">Back</h1>
+                    <div class="close">
+                        <input type="text" placeholder="Search..." class="input-text-smm txt-s-24 txt-c-yellow">
+                        <h1 class="txt-button close txt-s-24 txt-c-yellow txt-font-smm" onclick="toggleSMMDB();">Back</h1>
+                    </div>
                 </div>
                 <div class="wrapper">
                     <div class="colm"></div>
@@ -38,13 +41,27 @@
         <div id="dl">
             <div class="loading-overlay">
                 <div class="title">
-                    <div class="head"><h1>Downloading ticket cache...</h1></div>
-                    <div class="small"><small>This may take a while on the first go.</small></div>
+                    <div class="head"><h1 class="txt-s-32 txt-center txt-c-purple">Downloading ticket cache</h1></div>
+                    <div class="small"><small class="txt-c-gray txt-center txt-s-16">This may take a while</small></div>
+                </div>
+            </div>
+            <div id="mySidenav" class="sidenav">
+                <div id="download_list" class="sidenavcontainer">
+                    <div class="close_btn">
+                         <p class="txt-s-24 txt-center txt-c-blue txt-button txt-button-large txt-button-white" onclick="closeNav();">back</p>
+                    </div>
                 </div>
             </div>
             <div class="header">
                 <h2 class="txt-s-32 txt-pad-lr txt-c-black txt-up txt-extrabold">CEM<span class="txt-c-blue">UI</span> <span class="txt-c-purple txt-up txt-extrabold">Downloads center</span></h2>
-                <h2 class="txt-s-24 txt-pad-lr txt-up txt-c-black"><span class="txt-link txt-link-black">back</span></h2>
+                <div class="close txt-s-24 txt-pad-lr txt-c-black">
+                    <div class="close">
+                        <p class="txt-s-24 txt-c-blue txt-button txt-button-white" onclick="toggleGAMES();">back</p>
+                    </div>
+                    <div class="close">
+                        <p style="margin-right: 25px;" class="txt-s-24 txt-c-blue download txt-button txt-button-white" onclick="openNav()">downloads</p>
+                    </div>
+                </div>
             </div>
             <div class="menu">
                 <h2 class="txt-up txt-center txt-c-purple txt-s-24 txt-pad-lr"><span class="txt-link txt-link-white-blue menu-active">popular</span> <span class="txt-link txt-link-white-blue">mario</span> <span class="txt-link txt-link-white-blue">search</span></h2> 
@@ -53,18 +70,27 @@
         </div>
         <template id="TEMPLATE_DL_GRID">
             <div class="item_container">
+                <div class="overlayL">EUR</div>
+                <div class="overlayR">DLC</div>
                 <img>
                 <h2 class="title content txt-s-24 txt-c-purple"></h2>
-                <p class="desc content txt-s-18 txt-c-black"></p>
-                <p class="txt-s-24 txt-c-blue download txt-button txt-button-white">download</p>
+                <p class="txt-s-24 txt-c-blue download txt-button txt-button-large txt-button-white">download</p>
                 <div class="download_container">
-                    <p class="txt-s-18">Downloading...</p>
-                    <div class="download_bar"><div class="download_ind"></div></div>
+                    <p class="txt-s-18 txt-center txt-c-black">Downloading...</p>
+                    <div class="download_bar"><div style="width: 25%;" class="download_ind"></div></div>
                 </div>
             </div>
         </template>
-        
-        
+        <template id="TEMPLATE_DL_LIST">
+            <div class="dl_item">
+                <div style="overflow: hidden">
+                    <h2 class="txt-s-18 txt-c-purple" style="float: left; margin: 0; display: inline-block">Super mario maker</h2>
+                    <p class="txt-s-18 txt-center txt-c-blue txt-button txt-button-white" style="float: right; padding: 10px 20px;">cancel</p>
+                </div>
+                <p class="txt-s-18 txt-center txt-c-black">Downloading...</p>
+                <div class="download_bar"><div style="width: 25%;" class="download_ind"></div></div>
+            </div>
+        </template>
         <template id="TEMPLATE_SMMDB_COURSE">
             <div class="course">
                 <div class="title">
@@ -90,8 +116,8 @@
                         <img>
                     </div>
                 </div>
-                <div class="footer">
-                    <h1 class="download txt-button txt-button-white txt-s-24 txt-c-black txt-font-smm">Download</h1>
+                <div class="footer txt-center">
+                    <h1 class="download txt-button txt-button-large txt-button-white txt-s-24 txt-c-black txt-font-smm">Download</h1>
                 </div>
             </div>
         </template>

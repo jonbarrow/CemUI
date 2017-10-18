@@ -71,7 +71,7 @@ ipcRenderer.on('ticket_cache_downloaded', () => {
 });
 
 ipcRenderer.on('cached_game', (event, data) => {
-    const tid = data.titleID.slice(0, 8) + "-" + data.titleID.slice(8);
+    const tid = data.titleID.insert(8, "-");
     let bg_test = new Image(),
         src = 'http://cemui.com/api/v2/image/boxart/' + tid;
     
@@ -79,13 +79,13 @@ ipcRenderer.on('cached_game', (event, data) => {
 
     bg_test.onerror = function () {
         item.querySelector('img').src = "../../defaults/box.jpg";
+        return true;
     };
 
     bg_test.src = src;
     
     item.querySelector('img').src = src;
     item.querySelector('.title').innerHTML = data.name;
-    item.querySelector('.desc').innerHTML = "lorem ipsum description.";
 
     document.querySelectorAll('#dl .main')[0].appendChild(item);
 });
@@ -106,12 +106,17 @@ addEvent(document.getElementsByClassName('smmdb')[0], 'click', toggleSMMDB );
 function toggleSMMDB() {
     var el = document.getElementById('smm');
     if (el.style.display == "block") {
-        el.style.display = 'none';
-        el.querySelector('.main').style.display = 'none';
-        el.querySelector('.overlay > div:first-child').style.right = '100%';
-        el.querySelector('.overlay > div:nth-child(2)').style.left = '100%';
-        el.querySelector('.overlay > div:first-child').style.top = '0%';
-        el.querySelector('.overlay > div:nth-child(2)').style.bottom = '0%';
+        el.style.top = '-100%';
+        setTimeout(function () {
+            var el = document.getElementById('smm');
+            el.style.display = 'none';
+            el.style.top = '0';
+            el.querySelector('.main').style.display = 'none';
+            el.querySelector('.overlay > div:first-child').style.right = '100%';
+            el.querySelector('.overlay > div:nth-child(2)').style.left = '100%';
+            el.querySelector('.overlay > div:first-child').style.top = '0%';
+            el.querySelector('.overlay > div:nth-child(2)').style.bottom = '0%';
+        },500);
     } else {
         ipcRenderer.send('smm_search_courses', {});
         el.style.display = 'block';
@@ -137,22 +142,23 @@ function toggleSMMDB() {
 function toggleGAMES() {
     var el = document.getElementById('dl');
     if (el.style.display == "flex") {
-        el.style.display = 'none';
+        el.style.top = '-100%';
+        setTimeout(function () {
+            var el = document.getElementById('dl');
+            el.style.display = 'none';
+        },500);
         return;
     }
     
     el.style.display = 'flex';
     el.getElementsByClassName('main')[0].innerHTML = '';
-    ipcRenderer.send('init', {
-        page: '_dlgames'
-    });
+    setTimeout(function () {
+        ipcRenderer.send('init', {
+            page: '_dlgames'
+        });
+        el.style.top = '0%';
+    },0);
 }
-
-/*addEvent(document.getElementsByClassName('dlgames')[0], 'click', function() {
-    ipcRenderer.send('change_theme', {
-        name: '_dlgames'
-    });
-});*/
             
 addEvent(window, 'keypress', function(event) {
     if (event.charCode == 112) {
@@ -204,3 +210,12 @@ function getFormattedDate(date) {
     day = day.length > 1 ? day : '0' + day;
     return month + '/' + day + '/' + year;
 }
+
+function openNav() {
+    document.getElementById("mySidenav").style.width = "500px";
+}
+
+/* Set the width of the side navigation to 0 and the left margin of the page content to 0 */
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+} 
