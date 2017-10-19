@@ -51,14 +51,6 @@ ipcRenderer.on('update_status',function(e,data) {
             break;
     }
     
-    if (data.type == "") {
-        
-    } else if (data.type == "")  {
-        
-    } else if (data.type == "") {
-        
-    }
-    
 });
 
 ipcRenderer.on('init_complete', function(event, data) {
