@@ -51,6 +51,10 @@ ipcRenderer.on('smm_courses_list', (event, data) => {
                 break;
         }
 
+        addEvent(level_wrapper.querySelectorAll('h1.download')[0], 'click', () => {
+            ipcRenderer.send('smm_dl_level', level_wrapper.querySelectorAll('h1.download')[0].getAttribute('data-smm-course-id'));
+        });
+        level_wrapper.querySelectorAll('h1.download')[0].setAttribute('data-smm-course-id', level.id)
         level_wrapper.querySelectorAll('.course-name')[0].innerHTML = level.title;
         level_wrapper.querySelectorAll('.owner')[0].innerHTML = level.maker;
         level_wrapper.querySelectorAll('.course-star-count')[0].innerHTML = level.stars;
@@ -103,6 +107,10 @@ addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
 });
 addEvent(document.getElementsByClassName('dlgames')[0], 'click', toggleGAMES );
 addEvent(document.getElementsByClassName('smmdb')[0], 'click', toggleSMMDB );
+
+addEvent(document.querySelectorAll('.input-text-smm')[0], 'keyup', () => {
+    ipcRenderer.send('smm_search_courses', {title: document.querySelectorAll('.input-text-smm')[0].value});
+});
 
 function toggleSMMDB() {
     var el = document.getElementById('smm');

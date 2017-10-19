@@ -7,6 +7,8 @@ let electron = require('electron'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
 	smm = require('smm-api'),
+	zipFolder = require('zip-folder'),
+	_7zip = require("7zip-standalone"),
 	ssl = require('ssl-root-cas').inject(),
     fs = require('fs-extra'),
 	fs_o = require('original-fs'),
@@ -392,7 +394,88 @@ ipcMain.on('update_game_settings', (event, data) => {
 	}
 	
 	fs.writeFileSync(settings_storage.get('cemu_paths').find({name: data.emu}).value().cemu_folder_path + '/gameProfiles/' + id + '.ini', ini.encode(settings));
-})
+});
+
+ipcMain.on('smm_dl_level', function(event, data) {
+	var SMMLevelFolder = pickSMMLevelFolder();
+	if (!SMMLevelFolder) {
+		return;
+	}
+	SMMLevelFolder = SMMLevelFolder[0];
+
+	async.waterfall([
+		function(callback) {
+			event.sender.send("smm_level_dl_start");
+			zipFolder(SMMLevelFolder, path.join(SMMLevelFolder, 'backup.zip'), function(err) {
+			    if(err) {
+			        console.log(err);
+			        callback(null);
+			    } else {
+			        callback(null);
+			    }
+			});
+		},
+		function(callback) {
+
+			var received_bytes = 0,
+				total_bytes = 0;
+
+			var req = request({
+		        method: 'GET',
+		        uri: 'https://smmdb.ddns.net/api/downloadcourse?type=zip&id=' + data
+		    });
+
+		    var out = fs.createWriteStream(path.join(SMMLevelFolder, 'new_level.zip'));
+		    req.pipe(out);
+
+		    req.on('response', function(data) {
+		        total_bytes = parseInt(data.headers['content-length']);
+		    });
+
+		    req.on('data', function(chunk) {
+		        received_bytes += chunk.length;
+		        var percent = (received_bytes * 100) / total_bytes;
+		        event.sender.send("smm_level_progress", {progress: percent});
+		    });
+
+		    req.on('end', function() {
+		    	callback(null);
+		    });
+		},
+		function(callback) {
+			event.sender.send("smm_level_extract");
+			_7zip.extract(path.join(SMMLevelFolder, 'new_level.zip'), SMMLevelFolder).then(function() {
+				callback(null);
+			});
+		},
+		function(callback) {
+			fs.unlink(path.join(SMMLevelFolder, 'new_level.zip'), function() {
+	    		callback(null);
+	    	});
+		},
+		function(callback) {
+			var dir = getDirectories(SMMLevelFolder)[0];
+			fs.readdir(path.join(SMMLevelFolder, dir), (err, files) => {
+				for (var i = 0; i < files.length; i++) {
+					var file_data = fs.readFileSync(path.join(SMMLevelFolder, dir, files[i]));
+					fs.writeFileSync(path.join(SMMLevelFolder, files[i]), file_data);
+				}
+			});
+			callback(null, dir);
+		},
+		function(dir, callback) {
+			fs.remove(path.join(SMMLevelFolder, dir), err => {
+			  	if (err) {
+			  		console.error(err);
+			  		callback(null);
+			  	}
+			  	callback(null);
+			});
+		}
+	], function() {
+		event.sender.send("smm_level_dl_end");
+	});
+});
 
 function sendScreens() {
 
@@ -834,6 +917,29 @@ function loadGames(dir, master_callback) {
 	});
 }
 
+function pickSMMLevelFolder() {
+	// SMM valid dir paths: ['fe31b7f2', '44fc5929'];
+	let smm_base_folder = path.join(settings_storage.get('cemu_paths').find({name: 'Default'}).value().cemu_folder_path, 'mlc01', 'emulatorSave'),
+		smm_valid_paths = ['fe31b7f2', '44fc5929'],
+		smm_save_dir = smm_base_folder;
+	
+	for (let smm_save_path of smm_valid_paths) {
+		if (fs.pathExistsSync(path.join(smm_base_folder, smm_save_path))) {
+			smm_save_dir = path.join(smm_base_folder, smm_save_path);
+			break;
+		}
+	}
+	var SMMLevelFolder = dialog.showOpenDialog({
+		title: 'Select a Super Mario Maker level to overwrite.',
+		defaultPath: smm_save_dir,
+		properties: ['openDirectory']
+	});
+
+	if (!SMMLevelFolder) {
+		return;
+	}
+	return SMMLevelFolder;
+}
 function pickGameFolder() {
 	var gameFolder = dialog.showOpenDialog({
 		title: 'Select your games folder',
@@ -959,6 +1065,10 @@ function createShortcut(emulator, id) {
 			throw Error(error);
 		}
 	});
+}
+
+function getDirectories(src) {  // Gets dirs
+	return fs.readdirSync(src).filter(file => fs.statSync(path.join(src, file)).isDirectory());
 }
 
 Array.prototype.contains = function(el) {
