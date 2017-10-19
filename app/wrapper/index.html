@@ -10,6 +10,39 @@
         
         <iframe id="webview"></iframe>
         
+        <div class="screens">
+            <div class="screen-overlay closed" id="select_games">
+                <div class="title txt-center">
+                    <div class="head"><h1 class="txt-s-32 txt-c-purple">Select your games folder</h1></div>
+                    <div class="small"><small class="txt-c-gray txt-s-16">To know what to display we need to know where your games are</small></div>
+                    <br>
+                    <h2 class="txt-button txt-button-blue txt-s-16 txt-c-white">Select games</h2>
+                </div>
+            </div>
+            <div class="screen-overlay closed" id="select_cemu">
+                <div class="title txt-center">
+                    <div class="head"><h1 class="txt-s-32 txt-c-purple">Select your Cemu executable</h1></div>
+                    <div class="small"><small class="txt-c-gray txt-s-16">To run the games we need to know where Cemu is installed</small></div>
+                    <br>
+                    <h2 class="txt-button txt-button-blue txt-s-16 txt-c-white">Select Cemu</h2>
+                </div>
+            </div>
+            <div class="screen-overlay closed" id="screen_start">
+                <div class="title txt-center">
+                    <div class="head"><h1 class="txt-s-32 txt-c-purple">Welcome to CemUI</h1></div>
+                    <div class="small"><small class="txt-c-gray txt-s-16">Before you can start you need to configure some things</small></div>
+                    <br>
+                    <h2 class="txt-button txt-button-blue txt-s-16 txt-c-white" onclick="closeScreen('screen_start');">Next</h2>
+                </div>
+            </div>
+            <div class="progress" id="progress_balls">
+            </div>
+        </div>
+        
+        
+    
+        
+        
         <div id="smm">
             <div class="main">
                 <div class="header">
@@ -121,7 +154,6 @@
                 </div>
             </div>
         </template>
-        
         
         <div class="theme-buttons">
             <button class="flux">Flux</button>

@@ -95,6 +95,47 @@ body,html {
     padding: 0;
 }
 
+
+
+.screens .screen-overlay {
+    position: absolute;
+    z-index: 99;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-box-align: center;
+            align-items: center;
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-pack: center;
+            justify-content: center;
+    background: #fefefe;
+    color: #FFFFFF;
+    transition: left 1s;
+}
+.screens .closed {
+    display: none;
+}
+.screens .progress {
+    position: absolute;
+    z-index: 100;
+    bottom: 0;
+    right: 0;
+    padding: 25px;
+    overflow: hidden;
+}
+.screens .progress .ball {
+    width: 15px;
+    height: 15px;
+    float: left;
+    margin-right: 5px;
+    border-radius: 50%;
+    background-color: #d6d6d6;
+}
+.screens .progress .selected {
+    background-color: #4696f4;
+}
 #smm {
     position: absolute;
     top: 0;
@@ -592,6 +633,12 @@ body,html {
     margin: auto;
     text-align: center;
 }
+.txt-button-blue {
+    background-color: #0085de;
+    box-shadow: 0px 6px 0px 0px #0068ad;
+    margin: auto;
+    text-align: center;
+}
 .txt-button-large {
     width: 50%;
 }
@@ -601,10 +648,18 @@ body,html {
 .txt-button-white:hover  {
     background-color: #e6e6e6;
 }
+.txt-button-blue:hover  {
+    background-color: #0071bc;
+}
 .txt-button:active, .txt-button:focus {
     margin-top: 4px !important;
     margin-bottom: 0 !important;
     box-shadow: 0px 2px 0px 0px rgba(1,1,1,0.1);
+}
+.txt-button-blue:active, .txt-button-blue:focus {
+    margin-top: 4px !important;
+    margin-bottom: 0 !important;
+    box-shadow: 0px 2px 0px 0px #0068ad;
 }
 
 .txt-up {

@@ -1,5 +1,6 @@
 const {ipcRenderer} = require('electron');
-//ipcRenderer.send('open_dev');
+var progress_balls_ind = 0;
+
 function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
 }
@@ -215,7 +216,87 @@ function openNav() {
     document.getElementById("mySidenav").style.width = "500px";
 }
 
-/* Set the width of the side navigation to 0 and the left margin of the page content to 0 */
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 } 
+//screen section
+addEvent(document.getElementById('select_cemu').getElementsByClassName('txt-button')[0], 'click', function() {
+    if (this.classList.contains('disabled')) {
+        return false;
+    }
+    ipcRenderer.send('load_cemu_folder');
+    this.classList.add('disabled');
+});
+
+addEvent(document.getElementById('select_games').getElementsByClassName('txt-button')[0], 'click', function() {
+    if (this.classList.contains('disabled')) {
+        return false;
+    }
+    ipcRenderer.send('load_games_folder');
+    this.classList.add('disabled');
+});
+
+ipcRenderer.on('show_screen', function(event, data) {
+    var balls = document.getElementById('progress_balls');
+    if (data.cemu) {
+        openScreen('select_cemu');
+        balls.innerHTML += '<div class="ball"></div>';
+    }
+    if (data.games) {
+        openScreen('select_games');
+        balls.innerHTML += '<div class="ball"></div>';
+    }
+    if (data.welcome){
+        openScreen('screen_start');
+        balls.innerHTML += '<div class="ball"></div>';
+    }
+    balls.children[progress_balls_ind].classList.add('selected');
+});
+
+ipcRenderer.on('cemu_folder_loaded', function(event, data) {
+    setTimeout(function () {
+        closeScreen('select_cemu');
+    },0);
+});
+
+ipcRenderer.on('games_folder_loaded', function(event, data) {
+    closeScreen('select_games');
+});
+
+ipcRenderer.on('game_folder_loading', function(event, data) {
+    console.log('loading, this may take a while');
+});
+
+function openScreen(id) {
+    var el = document.getElementById(id);
+    el.classList.remove('closed');
+}
+function closeScreen(id) {
+    progress_balls_ind++;
+    var el = document.getElementById(id);
+    var balls = document.getElementById('progress_balls');
+    el.style.left = '-100%';
+    setTimeout(function () {
+        var el = document.getElementById(id);
+        el.classList.add('closed');
+    },500);
+    balls.querySelector('.selected').classList.remove('selected');
+    if (!balls.children[progress_balls_ind]) {
+        balls.innerHTML = "";
+        setTimeout(function () {
+            var screens = document.getElementById('screens');
+            screens.style.display = 'none';
+        },500);
+        startLoading();
+    } else {
+        balls.children[progress_balls_ind].classList.add('selected');
+    }
+}
+function startLoading() {
+    ipcRenderer.send('ask_for_theme');
+    //TODO setup loading screen.
+    //TODO make it work so startLoading() also runs if no screens are opened.
+}
+ipcRenderer.on('finished_loading',function () {
+    //TODO remove loading screen
+});
