@@ -46,14 +46,17 @@
             <div class="progress" id="progress_balls">
             </div>
         </div>
-        <div class="screen-overlay" id="update_screen">
-            <div class="title txt-center">
-                <div class="head"><h1 class="txt-s-32 txt-c-purple" id="update-txt">There is an update available</h1></div>
-                <div id="update-bar" class="download_bar"><div style="width: 25%;" class="download_ind"></div></div>
-                <div class="small"><small class="txt-c-gray txt-s-16" id="update-caption"></small></div>
-                <br><div>
-                    <h2 class="txt-button txt-button-blue txt-s-16 txt-c-white" onclick="">Cancel</h2>   
-                    <h2 class="txt-button txt-button-blue txt-s-16 txt-c-white" onclick="">Update</h2>
+        <div class="screens closed" id="update_screen">
+            <div class="screen-overlay">
+                <div class="title txt-center">
+                    <div class="head"><h1 class="txt-s-32 txt-c-purple" id="update-txt">There is an update available</h1></div>
+                    <div id="update-progress" class="download_bar"><div id="update-bar" style="width: 25%;" class="download_ind"></div></div>
+                    <div class="small"><small class="txt-c-gray txt-s-16" id="update-caption">Would you like to update?</small></div>
+                    <br>
+                    <div id="update-buttons">
+                        <h2 class="txt-button txt-button-blue txt-s-16 txt-c-white" onclick="closeUpdate();">Cancel</h2>   
+                        <h2 class="txt-button txt-button-blue txt-s-16 txt-c-white" onclick="startUpdate();">Update</h2>
+                    </div>
                 </div>
             </div>
         </div>

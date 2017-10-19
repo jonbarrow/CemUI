@@ -240,31 +240,22 @@ ipcRenderer.on('update_status',function(e,data) {
 
     switch (data.type) {
         case 'available':
-            /*openScreen('screen_update');
-            document.getElementById('update_txt').innerHTML = "Update available";
-            document.getElementById('update_button').innerHTML = "Start updating";
-            document.getElementById('update_button').onclick = function () {
-                ipcRenderer.send('download_update');
-                this.onclick = "";
-                this.innerHTML = "downloading";
-            };*/
+            openUpdate();
             break;
         case 'progress':
-            document.getElementById('update_txt').innerHTML = "Loading";
-            document.getElementById('progress_update').style.width = data.progress.percent + '%';
+            document.getElementById('update-txt').innerHTML = "Update in progress";
+            document.getElementById('update-caption').innerHTML = "Downloading";
+            document.getElementById('update-bar').style.width = data.progress.percent + '%';
             console.log(data.progress);
             break;
         case 'completed':
-            document.getElementById('update_txt').innerHTML = "Applying update";
-            document.getElementById('update_button').innerHTML = "applying";
-            document.getElementById('update_button').onclick = '';
+            document.getElementById('update-txt').innerHTML = "Almost finished";
+            document.getElementById('update-caption').innerHTML = "Applying update";
             ipcRenderer.send('apply_update');
             break;
         case 'notification_clicked_start':
-            document.getElementById('update_button').onclick = "";
-            document.getElementById('update_button').innerHTML = "Downloading " + data.message;
-            openScreen('screen_update');
-            ipcRenderer.send('download_update');
+            openUpdate();
+            startUpdate();
             break;
     
         default:
@@ -274,13 +265,21 @@ ipcRenderer.on('update_status',function(e,data) {
 
 function openUpdate() {
     document.getElementById('update_screen').classList.remove('closed');
+    document.getElementById('update-progress').classList.add('closed');
+    document.getElementById('update-txt').innerHTML = "Update available";
+    document.getElementById('update-caption').innerHTML = "There is an update available, would you like to update?";
+    document.getElementById('update-bar').style.width = '0%';
 }
-
+function startUpdate() {
+    document.getElementById('update-buttons').classList.add('closed');
+    document.getElementById('update-progress').classList.remove('closed');
+    ipcRenderer.send('download_update');
+}
 function closeUpdate() {
-    document.getElementById('update_screen').style.left = "-100%";
+    document.getElementById('update_screen').children[0].style.left = "-100%";
     setTimeout(function() {
         document.getElementById('update_screen').classList.add('closed');
-        document.getElementById('update_screen').style.left = "0%";
+        document.getElementById('update_screen').children[0].style.left = "0%";
     },1000);
 }
 

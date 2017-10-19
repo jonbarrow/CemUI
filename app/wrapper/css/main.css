@@ -114,7 +114,7 @@ body,html {
     color: #FFFFFF;
     transition: left 1s;
 }
-.screens .closed {
+.closed, .screens .closed {
     display: none;
 }
 .screens .progress {
