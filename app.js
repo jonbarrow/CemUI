@@ -477,8 +477,88 @@ ipcMain.on('smm_dl_level', function(event, data) {
 });
 
 ipcMain.on('dl_game', (event, data) => {
-	//settings_storage
-	console.log(data);
+	async.waterfall([
+		function(callback) {
+			var gameFolder = dialog.showOpenDialog({
+				title: 'Select where you want to download this title',
+				message: 'Select where you want to download this title',
+				properties: ['openDirectory']
+			});
+		
+			if (!gameFolder) {
+				return callback(true);
+			}
+			gameFolder = gameFolder[0];
+			callback(null, gameFolder);
+		},
+		function(gameFolder, callback) {
+			NUSRipper.downloadTID(data.tid, path.join(gameFolder, data.tid), null, () => {
+				console.log('Verifying encrypted download...');
+				NUSRipper.verifyEncryptedContents(path.join(gameFolder, data.tid), data.tid, () => {
+					console.log('Decrypting files...');
+					NUSRipper.decrypt(path.join(gameFolder, data.tid), () => {
+						console.log('GAME DOWNLOADED');
+						callback();
+					});
+				});
+			});
+		},
+		function(callback) {
+			if (data.dl_update_version) {
+				var gameUpdateFolder = dialog.showOpenDialog({
+					title: 'Select where you want to download title update',
+					message: 'Select where you want to download title update',
+					properties: ['openDirectory']
+				});
+				if (gameUpdateFolder) {
+					gameUpdateFolder = gameUpdateFolder[0];
+					callback(null, gameUpdateFolder);
+				} else {
+					callback();
+				}
+			} else {
+				callback();
+			}
+		},
+		function(gameUpdateFolder, callback) {
+			if (gameUpdateFolder) {
+				console.log('dl update')
+				callback();
+			} else {
+				console.log('no dl update')
+				callback();
+			}
+		}
+	], (cancel) => {
+		if (cancel) return;
+		console.log('Done')
+	})
+	
+	
+	/*
+	if (data.dl_update_version) {
+		var gameUpdateFolder = dialog.showOpenDialog({
+			title: 'Select where you want to download title update',
+			message: 'Select where you want to download title update',
+			properties: ['openDirectory']
+		});
+		if (gameUpdateFolder) {
+			gameUpdateFolder = gameUpdateFolder[0];
+		}
+	}
+	if (data.dl_dlc) {
+		var gameDLCFolder = dialog.showOpenDialog({
+			title: 'Select where you want to download title DLC',
+			message: 'Select where you want to download title DLC',
+			properties: ['openDirectory']
+		});
+		if (gameDLCFolder) {
+			gameDLCFolder = gameDLCFolder[0];
+		}
+	}
+	*/
+
+
 });
 
 function sendScreens() {

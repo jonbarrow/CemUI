@@ -83,8 +83,7 @@ ipcRenderer.on('cached_game', (event, data) => {
     let item = document.getElementById("TEMPLATE_DL_GRID").content.firstElementChild.cloneNode(true);
 
     addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
-        alert(tid)
-        ipcRenderer.send('dl_game', tid)
+        ipcRenderer.send('dl_game', {tid: tid})
     });
     bg_test.onerror = function () {
         item.querySelector('img').src = "../../defaults/box.jpg";
@@ -369,6 +368,7 @@ function openLoadingScreen() {
     document.getElementById('loading_screen').parentElement.style.display = 'block';
 }
 ipcRenderer.on('wrapper_close_loading',function () {
+    console.log('wrapper_close_loading')
     document.getElementById('loading_screen').style.left = "-100%";
 });
 

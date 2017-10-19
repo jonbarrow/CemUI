@@ -54,6 +54,8 @@ ipcRenderer.on('update_status',function(e,data) {
 });
 
 ipcRenderer.on('init_complete', function(event, data) {
+    console.log('init main.js fluent')
+    ipcRenderer.send('theme_finished_loading');
     setTimeout(function () {
         var games = data.library;
         for (var i=0,length = games.length ;i<length;i++) {
@@ -120,14 +122,16 @@ ipcRenderer.on('init_complete', function(event, data) {
             games_lib.appendChild(item);
         }
 
-        document.getElementById('main').style.display = 'grid';
+        /*document.getElementById('main').style.display = 'grid';
         openModal('modal1');
         setTimeout(function () {
             closeModal();
         },1000);
         setTimeout(function () {
-            ipcRenderer.send('theme_finished_loading');
+            console.log('DEBUG')
+            //ipcRenderer.send('theme_finished_loading');
         },2000);
+        */
 
         createCemuDropdowns();
     },0);

@@ -107,6 +107,7 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
 
 ipcRenderer.on('init_complete', function(event, data) {
     ipcRenderer.send('theme_finished_loading');
+    console.log('init main.js flux')
     setTimeout(function () {
         var games = data.library;
         for (var i=0,length = games.length ;i<length;i++) {
