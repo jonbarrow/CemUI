@@ -51,6 +51,10 @@ ipcRenderer.on('smm_courses_list', (event, data) => {
                 break;
         }
 
+        addEvent(level_wrapper.querySelectorAll('h1.download')[0], 'click', () => {
+            ipcRenderer.send('smm_dl_level', level_wrapper.querySelectorAll('h1.download')[0].getAttribute('data-smm-course-id'));
+        });
+        level_wrapper.querySelectorAll('h1.download')[0].setAttribute('data-smm-course-id', level.id)
         level_wrapper.querySelectorAll('.course-name')[0].innerHTML = level.title;
         level_wrapper.querySelectorAll('.owner')[0].innerHTML = level.maker;
         level_wrapper.querySelectorAll('.course-star-count')[0].innerHTML = level.stars;
