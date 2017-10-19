@@ -207,6 +207,11 @@ ipcMain.on('open_dev', () => {
 	ApplicationWindow.webContents.openDevTools(); // debug stuff
 });
 
+ipcMain.on('theme_finished_loading', (event, data) => {
+    console.log("theme finished loading, closing loading screen");
+	ApplicationWindow.webContents.send('wrapper_close_loading');
+});
+
 ipcMain.on('check_for_update', checkForUpdate);
 ipcMain.on('download_update', downloadUpdate);
 ipcMain.on('apply_update', applyUpdate);
@@ -271,8 +276,11 @@ ipcMain.on('init', (event, data) => {
 		});
 	} else if (data && data.page == '_smmdb') {
 		// init for smmdb
-	} else {
-		// normal page init
+	} else if (data && data.page == 'wrapper') {
+        //wrapper screens init, sends screens
+        sendScreens();
+    } else {
+		//normal theme init, sends games
 		init();
 	}
 	
@@ -386,11 +394,11 @@ ipcMain.on('update_game_settings', (event, data) => {
 	fs.writeFileSync(settings_storage.get('cemu_paths').find({name: data.emu}).value().cemu_folder_path + '/gameProfiles/' + id + '.ini', ini.encode(settings));
 })
 
-function init() {
+function sendScreens() {
 
 	var screenGames = false,
 		screenCemu = false,
-		screenWelcome = false;
+		screenWelcome = false; //screen welcome is always false, can you fix that red. it needs to show when you first launch (when json file is created for example.)
 
 	if (!settings_storage.get('cemu_paths').value() || settings_storage.get('cemu_paths').value().length < 1) {
 		settings_storage.set('cemu_paths', []).write();
@@ -405,8 +413,13 @@ function init() {
     if (screenCemu || screenGames || screenWelcome) {
         ApplicationWindow.webContents.send('show_screen', {games: screenGames, cemu: screenCemu, welcome: screenWelcome});
         return;
+    } else {
+        ApplicationWindow.webContents.send('show_screen', null);
+        return;
     }
+}
 
+function init() {
 	verifyGames(() => {
 		async.each(settings_storage.get('game_paths').value(), (game_path, callback) => {
 			loadGames(game_path, () => {

@@ -12,45 +12,9 @@ function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
 }
 
-addEvent(window, 'keypress', function(event) {
-    if (event.charCode == 112) {
-        ipcRenderer.send('open_dev');
-    }
-});
-
-addEvent(document.getElementById('select_cemu').getElementsByClassName('button')[0], 'click', function() {
-    if (this.classList.contains('disabled')) {
-        return false;
-    }
-    this.classList.add('disabled');
-    ipcRenderer.send('load_cemu_folder');
-});
-
-addEvent(document.getElementById('select_games').getElementsByClassName('button')[0], 'click', function() {
-    if (this.classList.contains('disabled')) {
-        return false;
-    }
-    ipcRenderer.send('load_games_folder');
-});
-
 ipcRenderer.on('emulator_list', function(event, data) {
     emulators_list = data;
 })
-
-ipcRenderer.on('show_screen', function(event, data) {
-    document.getElementById('screen_start').style.display = "none";
-    document.getElementById('select_games').style.display = "none";
-    document.getElementById('select_cemu').style.display = "none";
-    if (data.cemu) {
-        openScreen('select_cemu');
-    }
-    if (data.games) {
-        openScreen('select_games');
-    }
-    if (data.welcome){
-        openScreen('screen_start');
-    }
-});
 
 ipcRenderer.on('update_status',function(e,data) {
 
@@ -94,30 +58,6 @@ ipcRenderer.on('update_status',function(e,data) {
     } else if (data.type == "") {
         
     }
-    
-});
-
-ipcRenderer.on('cemu_folder_loaded', function(event, data) {
-    var button = document.getElementById('select_cemu').getElementsByClassName('button')[0];
-    console.log(button);
-    setTimeout(function () {
-        closeScreen(document.getElementById('select_cemu').getElementsByClassName('button')[0]);
-    },1000);
-});
-
-ipcRenderer.on('games_folder_loaded', function(event, data) {
-    var button = document.getElementById('select_games').getElementsByClassName('button')[0];
-    console.log(button);
-    closeScreen(button);
-});
-
-ipcRenderer.on('game_folder_loading', function(event, data) {
-    var button = document.getElementById('select_games').getElementsByClassName('button')[0];
-        spinner = document.createElement('span');
-    button.classList.add('disabled');
-    button.innerHTML = '(This may take a moment) Downloading game data... ';
-    spinner.classList = 'fa fa-spinner fa-spin';
-    button.appendChild(spinner);
     
 });
 
@@ -194,17 +134,11 @@ ipcRenderer.on('init_complete', function(event, data) {
             closeModal();
         },1000);
         setTimeout(function () {
-            closeScreen(document.getElementById('loading'),true);
+            ipcRenderer.send('theme_finished_loading');
         },2000);
 
         createCemuDropdowns();
-
-        /*
-        ipcRenderer.send('smm_search_courses', {
-            title: 'sand'
-        });
-        */
-    },0); //This is to let the rendering catch up before proceeding.
+    },0);
 });
 
 addEvent(window, 'load', function() {
@@ -465,6 +399,8 @@ function closeExpandModal(el) {
     grid.style.left = "0";
     expandgrid.style.left = "100%";
 }
+
+
 function closeScreen(el,bool) {
     el.parentElement.style.opacity = "0";
     el.parentElement.parentElement.classList.add('closed');

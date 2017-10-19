@@ -106,6 +106,7 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
 */
 
 ipcRenderer.on('init_complete', function(event, data) {
+    ipcRenderer.send('theme_finished_loading');
     setTimeout(function () {
         var games = data.library;
         for (var i=0,length = games.length ;i<length;i++) {
@@ -170,9 +171,7 @@ ipcRenderer.on('init_complete', function(event, data) {
     },0);
 });
 
-addEvent(window, 'load', function() {
     ipcRenderer.send('init');
-});
 
 /*
 function addToGrid(arr,id) {

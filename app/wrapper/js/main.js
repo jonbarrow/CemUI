@@ -167,26 +167,28 @@ addEvent(window, 'keypress', function(event) {
     }
 });
 function setTheme(event,data) {
-    let current_view = document.getElementById('webview'),
-        new_view = document.createElement('iframe');
-                   
-    addEvent(new_view, 'load', () => {
-        new_view.style.display = '';
-        document.body.removeChild(document.getElementById('webview'));
-        new_view.setAttribute('id','webview');
-    });
-    new_view.style.display = 'none';
-    new_view.setAttribute('src', data.path);
-    document.body.appendChild(new_view);
-    addEvent(new_view.contentWindow, 'keypress', function(event) {
-        if (event.charCode == 112) {
-            ipcRenderer.send('open_dev');
-        }
-    });
-    new_view.contentWindow.ipcRenderer = ipcRenderer;
+    openLoadingScreen();
+    setTimeout(function () {
+        let current_view = document.getElementById('webview'),
+            new_view = document.createElement('iframe');
+
+        addEvent(new_view, 'load', () => {
+            new_view.style.display = '';
+            document.body.removeChild(document.getElementById('webview'));
+            new_view.setAttribute('id','webview');
+        });
+        new_view.style.display = 'none';
+        new_view.setAttribute('src', data.path);
+        document.body.appendChild(new_view);
+        addEvent(new_view.contentWindow, 'keypress', function(event) {
+            if (event.charCode == 112) {
+                ipcRenderer.send('open_dev');
+            }
+        });
+        new_view.contentWindow.ipcRenderer = ipcRenderer;
+    },1000);
 }
 ipcRenderer.on('theme_change',setTheme);
-ipcRenderer.send('ask_for_theme');
 
 String.prototype.insert = function(index, string) {
     if (index > 0) {
@@ -219,7 +221,8 @@ function openNav() {
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 } 
-//screen section
+
+//screen functionality
 addEvent(document.getElementById('select_cemu').getElementsByClassName('txt-button')[0], 'click', function() {
     if (this.classList.contains('disabled')) {
         return false;
@@ -237,20 +240,25 @@ addEvent(document.getElementById('select_games').getElementsByClassName('txt-but
 });
 
 ipcRenderer.on('show_screen', function(event, data) {
-    var balls = document.getElementById('progress_balls');
-    if (data.cemu) {
-        openScreen('select_cemu');
-        balls.innerHTML += '<div class="ball"></div>';
-    }
-    if (data.games) {
-        openScreen('select_games');
-        balls.innerHTML += '<div class="ball"></div>';
-    }
-    if (data.welcome){
-        openScreen('screen_start');
-        balls.innerHTML += '<div class="ball"></div>';
-    }
-    balls.children[progress_balls_ind].classList.add('selected');
+    console.log('set loading');
+    if (!data) {
+        startLoading();
+    } else {
+        var balls = document.getElementById('progress_balls');
+        if (data.cemu) {
+            openScreen('select_cemu');
+            balls.innerHTML += '<div class="ball"></div>';
+        }
+        if (data.games) {
+            openScreen('select_games');
+            balls.innerHTML += '<div class="ball"></div>';
+        }
+        if (data.welcome){
+            openScreen('screen_start');
+            balls.innerHTML += '<div class="ball"></div>';
+        }
+        balls.children[progress_balls_ind].classList.add('selected');
+    }   
 });
 
 ipcRenderer.on('cemu_folder_loaded', function(event, data) {
@@ -279,14 +287,14 @@ function closeScreen(id) {
     setTimeout(function () {
         var el = document.getElementById(id);
         el.classList.add('closed');
-    },500);
+    },1000);
     balls.querySelector('.selected').classList.remove('selected');
     if (!balls.children[progress_balls_ind]) {
         balls.innerHTML = "";
         setTimeout(function () {
             var screens = document.getElementById('screens');
             screens.style.display = 'none';
-        },500);
+        },1000);
         startLoading();
     } else {
         balls.children[progress_balls_ind].classList.add('selected');
@@ -294,9 +302,14 @@ function closeScreen(id) {
 }
 function startLoading() {
     ipcRenderer.send('ask_for_theme');
-    //TODO setup loading screen.
-    //TODO make it work so startLoading() also runs if no screens are opened.
 }
-ipcRenderer.on('finished_loading',function () {
-    //TODO remove loading screen
+function openLoadingScreen() {
+    document.getElementById('loading_screen').style.left = "0%";
+    document.getElementById('loading_screen').parentElement.style.display = 'block';
+}
+ipcRenderer.on('wrapper_close_loading',function () {
+    document.getElementById('loading_screen').style.left = "-100%";
 });
+
+//get screen info
+ipcRenderer.send('init',{page: 'wrapper'});
