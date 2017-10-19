@@ -16,43 +16,6 @@ ipcRenderer.on('emulator_list', function(event, data) {
     emulators_list = data;
 })
 
-ipcRenderer.on('update_status',function(e,data) {
-
-    switch (data.type) {
-        case 'available':
-            /*openScreen('screen_update');
-            document.getElementById('update_txt').innerHTML = "Update available";
-            document.getElementById('update_button').innerHTML = "Start updating";
-            document.getElementById('update_button').onclick = function () {
-                ipcRenderer.send('download_update');
-                this.onclick = "";
-                this.innerHTML = "downloading";
-            };*/
-            break;
-        case 'progress':
-            document.getElementById('update_txt').innerHTML = "Loading";
-            document.getElementById('progress_update').style.width = data.progress.percent + '%';
-            console.log(data.progress);
-            break;
-        case 'completed':
-            document.getElementById('update_txt').innerHTML = "Applying update";
-            document.getElementById('update_button').innerHTML = "applying";
-            document.getElementById('update_button').onclick = '';
-            ipcRenderer.send('apply_update');
-            break;
-        case 'notification_clicked_start':
-            document.getElementById('update_button').onclick = "";
-            document.getElementById('update_button').innerHTML = "Downloading " + data.message;
-            openScreen('screen_update');
-            ipcRenderer.send('download_update');
-            break;
-    
-        default:
-            break;
-    }
-    
-});
-
 ipcRenderer.on('init_complete', function(event, data) {
     console.log('init main.js fluent')
     ipcRenderer.send('theme_finished_loading');
@@ -394,33 +357,6 @@ function closeExpandModal(el) {
     var expandgrid = grid.parentElement.children[2];
     grid.style.left = "0";
     expandgrid.style.left = "100%";
-}
-
-
-function closeScreen(el,bool) {
-    el.parentElement.style.opacity = "0";
-    el.parentElement.parentElement.classList.add('closed');
-    if (document.getElementById('screen_start').classList.contains('closed') &&
-        document.getElementById('select_games').classList.contains('closed') &&
-        document.getElementById('select_cemu').classList.contains('closed') &&
-       !bool) {
-        ipcRenderer.send('init');
-    }
-    setTimeout(function () {
-        el.parentElement.parentElement.style.opacity = "0";
-        setTimeout(function () {
-            el.parentElement.parentElement.style.display = "none";
-            el.parentElement.style.opacity = "1";
-        },1000);
-    },750);
-}
-function openScreen(id) {
-    var el = document.getElementById(id);
-    el.style.display = "inline-block";
-    el.classList.remove('closed');
-    setTimeout(function () {
-        el.style.opacity = "1";
-    },100);
 }
 
 function closeDropdown() {
