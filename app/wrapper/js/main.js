@@ -1,102 +1,9 @@
-const {ipcRenderer} = require('electron');
+var {ipcRenderer} = require('electron');
 var progress_balls_ind = 0;
 
 function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
 }
-
-ipcRenderer.on('smm_courses_list', (event, data) => {
-    let i = 0,
-        course_cols = document.querySelectorAll('.colm');
-    
-    course_cols[0].innerHTML = course_cols[1].innerHTML = '';
-    
-    for (var level of data) {
-        i++;
-        let level_wrapper = document.getElementById("TEMPLATE_SMMDB_COURSE").content.firstElementChild.cloneNode(true);
-        
-        switch (level.difficulty) {
-            case 3:
-                level_wrapper.querySelectorAll('.title')[0].classList.add('super-expert');
-                level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Super Expert';
-                break;
-            case 2:
-                level_wrapper.querySelectorAll('.title')[0].classList.add('expert');
-                level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Expert';
-                break;
-            case 1:
-                level_wrapper.querySelectorAll('.title')[0].classList.add('normal');
-                level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Normal';
-                break;
-            case 0:
-            default:
-                level_wrapper.querySelectorAll('.title')[0].classList.add('easy');
-                level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Easy';
-                break;
-        }
-
-        switch (level.gameStyle) {
-            case 3:
-                level_wrapper.querySelectorAll('.type')[0].classList.add('type-3');
-                break;
-            case 2:
-                level_wrapper.querySelectorAll('.type')[0].classList.add('type-2');
-                break;
-            case 1:
-                level_wrapper.querySelectorAll('.type')[0].classList.add('type-1');
-                break;
-            case 0:
-            default:
-                level_wrapper.querySelectorAll('.type')[0].classList.add('type-0');
-                break;
-        }
-
-        addEvent(level_wrapper.querySelectorAll('h1.download')[0], 'click', () => {
-            ipcRenderer.send('smm_dl_level', level_wrapper.querySelectorAll('h1.download')[0].getAttribute('data-smm-course-id'));
-        });
-        level_wrapper.querySelectorAll('h1.download')[0].setAttribute('data-smm-course-id', level.id)
-        level_wrapper.querySelectorAll('.course-name')[0].innerHTML = level.title;
-        level_wrapper.querySelectorAll('.owner')[0].innerHTML = level.maker;
-        level_wrapper.querySelectorAll('.course-star-count')[0].innerHTML = level.stars;
-        level_wrapper.querySelectorAll('.img_preview img')[0].src = 'http://smmdb.ddns.net/courseimg/' + level.id + '_full';
-        level_wrapper.querySelectorAll('.img_thumbnail img')[0].src = 'http://smmdb.ddns.net/courseimg/' + level.id;
-        level_wrapper.querySelectorAll('.upload-date')[0].innerHTML = getFormattedDate(new Date(level.uploaded * 1000));
-
-        if (i % 2 != 0) {
-            course_cols[0].appendChild(level_wrapper)
-        } else {
-            course_cols[1].appendChild(level_wrapper)
-        }
-    }
-});
-
-ipcRenderer.on('ticket_cache_downloaded', () => {
-    document.querySelectorAll('#dl .loading-overlay')[0].classList.add('hidden');
-    document.querySelectorAll('#dl .main')[0].classList.remove('hidden');
-});
-
-ipcRenderer.on('cached_game', (event, data) => {
-    const tid = data.titleID.insert(8, "-");
-    let bg_test = new Image(),
-        src = 'http://cemui.com/api/v2/image/boxart/' + tid;
-    
-    let item = document.getElementById("TEMPLATE_DL_GRID").content.firstElementChild.cloneNode(true);
-
-    addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
-        ipcRenderer.send('dl_game', {tid: tid})
-    });
-    bg_test.onerror = function () {
-        item.querySelector('img').src = "../../defaults/box.jpg";
-        item.querySelector('.title').innerHTML = tid + " | " + data.name;
-    };
-
-    bg_test.src = src;
-    
-    item.querySelector('img').src = src;
-    item.querySelector('.title').innerHTML = data.name;
-
-    document.querySelectorAll('#dl .main')[0].appendChild(item);
-});
 
 addEvent(document.getElementsByClassName('flux')[0], 'click', function() {
     ipcRenderer.send('change_theme', {
@@ -180,15 +87,17 @@ addEvent(window, 'keypress', function(event) {
 function setTheme(event,data) {
     openLoadingScreen();
     setTimeout(function () {
-        let current_view = document.getElementById('webview'),
-            new_view = document.createElement('iframe');
-
-        addEvent(new_view, 'load', () => {
-            new_view.style.display = '';
-            document.body.removeChild(document.getElementById('webview'));
-            new_view.setAttribute('id','webview');
-        });
-        new_view.style.display = 'none';
+        let current_view = document.getElementById('webview');
+        var new_view = document.createElement('iframe');
+        
+        console.log('setting theme');
+        
+        current_view.src = '';
+        document.body.removeChild(current_view);
+        
+        ipcRenderer.removeAllListeners('init_complete');
+        
+        new_view.setAttribute('id','webview');
         new_view.setAttribute('src', data.path);
         document.body.appendChild(new_view);
         addEvent(new_view.contentWindow, 'keypress', function(event) {
@@ -199,7 +108,6 @@ function setTheme(event,data) {
         new_view.contentWindow.ipcRenderer = ipcRenderer;
     },1000);
 }
-ipcRenderer.on('theme_change',setTheme);
 
 String.prototype.insert = function(index, string) {
     if (index > 0) {
@@ -234,33 +142,6 @@ function closeNav() {
 } 
 
 //update functionality
-
-ipcRenderer.on('update_status',function(e,data) {
-
-    switch (data.type) {
-        case 'available':
-            openUpdate();
-            break;
-        case 'progress':
-            document.getElementById('update-txt').innerHTML = "Update in progress";
-            document.getElementById('update-caption').innerHTML = "Downloading";
-            document.getElementById('update-bar').style.width = data.progress.percent + '%';
-            console.log(data.progress);
-            break;
-        case 'completed':
-            document.getElementById('update-txt').innerHTML = "Almost finished";
-            document.getElementById('update-caption').innerHTML = "Applying update";
-            ipcRenderer.send('apply_update');
-            break;
-        case 'notification_clicked_start':
-            openUpdate();
-            startUpdate();
-            break;
-    
-        default:
-            break;
-    }
-});
 
 function openUpdate() {
     document.getElementById('update_screen').classList.remove('closed');
@@ -299,42 +180,6 @@ addEvent(document.getElementById('select_games').getElementsByClassName('txt-but
     this.classList.add('disabled');
 });
 
-ipcRenderer.on('show_screen', function(event, data) {
-    console.log('set loading');
-    if (!data) {
-        startLoading();
-    } else {
-        var balls = document.getElementById('progress_balls');
-        if (data.cemu) {
-            openScreen('select_cemu');
-            balls.innerHTML += '<div class="ball"></div>';
-        }
-        if (data.games) {
-            openScreen('select_games');
-            balls.innerHTML += '<div class="ball"></div>';
-        }
-        if (data.welcome){
-            openScreen('screen_start');
-            balls.innerHTML += '<div class="ball"></div>';
-        }
-        balls.children[progress_balls_ind].classList.add('selected');
-    }   
-});
-
-ipcRenderer.on('cemu_folder_loaded', function(event, data) {
-    setTimeout(function () {
-        closeScreen('select_cemu');
-    },0);
-});
-
-ipcRenderer.on('games_folder_loaded', function(event, data) {
-    closeScreen('select_games');
-});
-
-ipcRenderer.on('game_folder_loading', function(event, data) {
-    console.log('loading, this may take a while');
-});
-
 function openScreen(id) {
     var el = document.getElementById(id);
     el.classList.remove('closed');
@@ -367,10 +212,174 @@ function openLoadingScreen() {
     document.getElementById('loading_screen').style.left = "0%";
     document.getElementById('loading_screen').parentElement.style.display = 'block';
 }
-ipcRenderer.on('wrapper_close_loading',function () {
-    console.log('wrapper_close_loading')
-    document.getElementById('loading_screen').style.left = "-100%";
-});
 
 //get screen info
+
+function setIPCevents() {
+    
+    ipcRenderer.on('wrapper_close_loading',function () {
+        console.log('wrapper_close_loading')
+        document.getElementById('loading_screen').style.left = "-100%";
+    });
+    
+    ipcRenderer.on('show_screen', function(event, data) {
+        console.log('set loading');
+        if (!data) {
+            startLoading();
+        } else {
+            var balls = document.getElementById('progress_balls');
+            if (data.cemu) {
+                openScreen('select_cemu');
+                balls.innerHTML += '<div class="ball"></div>';
+            }
+            if (data.games) {
+                openScreen('select_games');
+                balls.innerHTML += '<div class="ball"></div>';
+            }
+            if (data.welcome){
+                openScreen('screen_start');
+                balls.innerHTML += '<div class="ball"></div>';
+            }
+            balls.children[progress_balls_ind].classList.add('selected');
+        }   
+    });
+
+    ipcRenderer.on('cemu_folder_loaded', function(event, data) {
+        setTimeout(function () {
+            closeScreen('select_cemu');
+        },0);
+    });
+
+    ipcRenderer.on('games_folder_loaded', function(event, data) {
+        closeScreen('select_games');
+    });
+
+    ipcRenderer.on('game_folder_loading', function(event, data) {
+        console.log('loading, this may take a while');
+    });
+    
+    ipcRenderer.on('update_status',function(e,data) {
+
+        switch (data.type) {
+            case 'available':
+                openUpdate();
+                break;
+            case 'progress':
+                document.getElementById('update-txt').innerHTML = "Update in progress";
+                document.getElementById('update-caption').innerHTML = "Downloading";
+                document.getElementById('update-bar').style.width = data.progress.percent + '%';
+                console.log(data.progress);
+                break;
+            case 'completed':
+                document.getElementById('update-txt').innerHTML = "Almost finished";
+                document.getElementById('update-caption').innerHTML = "Applying update";
+                ipcRenderer.send('apply_update');
+                break;
+            case 'notification_clicked_start':
+                openUpdate();
+                startUpdate();
+                break;
+
+            default:
+                break;
+        }
+    });
+    
+    ipcRenderer.on('smm_courses_list', (event, data) => {
+        let i = 0,
+            course_cols = document.querySelectorAll('.colm');
+
+        course_cols[0].innerHTML = course_cols[1].innerHTML = '';
+
+        for (var level of data) {
+            i++;
+            let level_wrapper = document.getElementById("TEMPLATE_SMMDB_COURSE").content.firstElementChild.cloneNode(true);
+
+            switch (level.difficulty) {
+                case 3:
+                    level_wrapper.querySelectorAll('.title')[0].classList.add('super-expert');
+                    level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Super Expert';
+                    break;
+                case 2:
+                    level_wrapper.querySelectorAll('.title')[0].classList.add('expert');
+                    level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Expert';
+                    break;
+                case 1:
+                    level_wrapper.querySelectorAll('.title')[0].classList.add('normal');
+                    level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Normal';
+                    break;
+                case 0:
+                default:
+                    level_wrapper.querySelectorAll('.title')[0].classList.add('easy');
+                    level_wrapper.querySelectorAll('.title p')[0].innerHTML = 'Easy';
+                    break;
+            }
+
+            switch (level.gameStyle) {
+                case 3:
+                    level_wrapper.querySelectorAll('.type')[0].classList.add('type-3');
+                    break;
+                case 2:
+                    level_wrapper.querySelectorAll('.type')[0].classList.add('type-2');
+                    break;
+                case 1:
+                    level_wrapper.querySelectorAll('.type')[0].classList.add('type-1');
+                    break;
+                case 0:
+                default:
+                    level_wrapper.querySelectorAll('.type')[0].classList.add('type-0');
+                    break;
+            }
+
+            addEvent(level_wrapper.querySelectorAll('h1.download')[0], 'click', () => {
+                ipcRenderer.send('smm_dl_level', level_wrapper.querySelectorAll('h1.download')[0].getAttribute('data-smm-course-id'));
+            });
+            level_wrapper.querySelectorAll('h1.download')[0].setAttribute('data-smm-course-id', level.id)
+            level_wrapper.querySelectorAll('.course-name')[0].innerHTML = level.title;
+            level_wrapper.querySelectorAll('.owner')[0].innerHTML = level.maker;
+            level_wrapper.querySelectorAll('.course-star-count')[0].innerHTML = level.stars;
+            level_wrapper.querySelectorAll('.img_preview img')[0].src = 'http://smmdb.ddns.net/courseimg/' + level.id + '_full';
+            level_wrapper.querySelectorAll('.img_thumbnail img')[0].src = 'http://smmdb.ddns.net/courseimg/' + level.id;
+            level_wrapper.querySelectorAll('.upload-date')[0].innerHTML = getFormattedDate(new Date(level.uploaded * 1000));
+
+            if (i % 2 != 0) {
+                course_cols[0].appendChild(level_wrapper)
+            } else {
+                course_cols[1].appendChild(level_wrapper)
+            }
+        }
+    });
+
+    ipcRenderer.on('ticket_cache_downloaded', () => {
+        document.querySelectorAll('#dl .loading-overlay')[0].classList.add('hidden');
+        document.querySelectorAll('#dl .main')[0].classList.remove('hidden');
+    });
+
+    ipcRenderer.on('cached_game', (event, data) => {
+        const tid = data.titleID.insert(8, "-");
+        let bg_test = new Image(),
+            src = 'http://cemui.com/api/v2/image/boxart/' + tid;
+
+        let item = document.getElementById("TEMPLATE_DL_GRID").content.firstElementChild.cloneNode(true);
+
+        addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
+            ipcRenderer.send('dl_game', {tid: tid})
+        });
+        bg_test.onerror = function () {
+            item.querySelector('img').src = "../../defaults/box.jpg";
+            item.querySelector('.title').innerHTML = tid + " | " + data.name;
+        };
+
+        bg_test.src = src;
+
+        item.querySelector('img').src = src;
+        item.querySelector('.title').innerHTML = data.name;
+
+        document.querySelectorAll('#dl .main')[0].appendChild(item);
+    });
+    
+    ipcRenderer.on('theme_change',setTheme);
+}
+
+setIPCevents();
 ipcRenderer.send('init',{page: 'wrapper'});

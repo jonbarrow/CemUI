@@ -106,7 +106,8 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
 */
 
 ipcRenderer.on('init_complete', function(event, data) {
-    console.log('init main.js flux')
+    console.log('init main.js flux');
+    ipcRenderer.send('theme_finished_loading'); 
     setTimeout(function () {
         var games = data.library;
         for (var i=0,length = games.length ;i<length;i++) {
@@ -159,9 +160,7 @@ ipcRenderer.on('init_complete', function(event, data) {
             closeModal();
         },1000);
         */
-        setTimeout(function () {
-            ipcRenderer.send('theme_finished_loading');
-        },3000); // This was 2000, but the timeout above was removed so i added the 1000 here
+    // This was 2000, but the timeout above was removed so i added the 1000 here
 
         //createCemuDropdowns();
         
