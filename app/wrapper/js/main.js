@@ -108,6 +108,10 @@ addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
 addEvent(document.getElementsByClassName('dlgames')[0], 'click', toggleGAMES );
 addEvent(document.getElementsByClassName('smmdb')[0], 'click', toggleSMMDB );
 
+addEvent(document.querySelectorAll('.input-text-smm')[0], 'keyup', () => {
+    ipcRenderer.send('smm_search_courses', {title: document.querySelectorAll('.input-text-smm')[0].value});
+});
+
 function toggleSMMDB() {
     var el = document.getElementById('smm');
     if (el.style.display == "block") {
