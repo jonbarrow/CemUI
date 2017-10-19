@@ -284,8 +284,7 @@ ipcMain.on('init', (event, data) => {
     } else {
 		//normal theme init, sends games
 		init();
-	}
-	
+	}	
 });
 
 ipcMain.on('create_emulator_instance', (name, cemu_path) => {
@@ -475,6 +474,11 @@ ipcMain.on('smm_dl_level', function(event, data) {
 	], function() {
 		event.sender.send("smm_level_dl_end");
 	});
+});
+
+ipcMain.on('dl_game', (event, data) => {
+	//settings_storage
+	console.log(data);
 });
 
 function sendScreens() {
