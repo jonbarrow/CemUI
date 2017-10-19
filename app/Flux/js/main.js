@@ -106,7 +106,6 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
 */
 
 ipcRenderer.on('init_complete', function(event, data) {
-    ipcRenderer.send('theme_finished_loading');
     console.log('init main.js flux')
     setTimeout(function () {
         var games = data.library;
@@ -138,7 +137,7 @@ ipcRenderer.on('init_complete', function(event, data) {
 
             wrapper.appendChild(box);
 
-            games_lib.appendChild(wrapper);
+            //games_lib.appendChild(wrapper);
         }
 
         //addToGrid(data.suggested,'suggest_grid');
@@ -155,19 +154,16 @@ ipcRenderer.on('init_complete', function(event, data) {
         /*
         document.getElementById('main').style.display = 'grid';
         openModal('modal1');
+        
         setTimeout(function () {
             closeModal();
         },1000);
-        setTimeout(function () {
-            closeScreen(document.getElementById('loading'),true);
-        },2000);
-
-        createCemuDropdowns();
-        
-        ipcRenderer.send('smm_search_courses', {
-            title: 'sand'
-        });
         */
+        setTimeout(function () {
+            ipcRenderer.send('theme_finished_loading');
+        },3000); // This was 2000, but the timeout above was removed so i added the 1000 here
+
+        //createCemuDropdowns();
         
     },0);
 });
