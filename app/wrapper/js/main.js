@@ -82,6 +82,10 @@ ipcRenderer.on('cached_game', (event, data) => {
     
     let item = document.getElementById("TEMPLATE_DL_GRID").content.firstElementChild.cloneNode(true);
 
+    addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
+        alert(tid)
+        ipcRenderer.send('dl_game', tid)
+    });
     bg_test.onerror = function () {
         item.querySelector('img').src = "../../defaults/box.jpg";
         item.querySelector('.title').innerHTML = tid + " | " + data.name;
