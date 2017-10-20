@@ -102,6 +102,10 @@ Main.prototype.decrypt = function(location, cb) {
     let self = this;
 
     if (!this._config.cdecrypt_location || this._config.cdecrypt_location.trim() == '' || !fs.pathExistsSync(this._config.cdecrypt_location)) {
+        self.emit('rom_decryption_missing', location);
+        if (cb) {
+            cb();
+        }
         return;
     }
     self.emit('rom_decryption_started', location);
@@ -158,7 +162,8 @@ Main.prototype.getTIDType = function(TID) {
     return TID.toUpperCase().substring(4, 8);
 }
 
-Main.prototype.getTIDURL= function(TID) {
+Main.prototype.getTIDURL = function(TID) {
+    TID = this.formatTID(TID);
     const TID_TYPE = this.getTIDType(TID);
     if (TITLE_TYPES.indexOf(TID_TYPE) > -1) {
         URL_BASE = url.resolve(NINTENDO_CCS_URL, TID);
@@ -171,10 +176,10 @@ Main.prototype.parseTMD = function(file, cb) {
     var tmd = fs.readFileSync(file);
     
     var tmd_object = {},
-        tmd_contents_count = struct.unpack('>H', tmd.subarray(0x1DE, 0x1E0))[0],
+        tmd_contents_count = struct.unpack('>H', new Buffer.from(tmd.subarray(0x1DE, 0x1E0)))[0],
         tmd_contents = [],
-        tid_buffer = tmd.subarray(0x18C, 0x194),
-        version_buffer = tmd.subarray(0x1DC, 0x1DE),
+        tid_buffer = new Buffer.from(tmd.subarray(0x18C, 0x194)),
+        version_buffer = new Buffer.from(tmd.subarray(0x1DC, 0x1DE)),
         version = struct.unpack('>H', version_buffer)[0];
  
     for (var i=0;i<tmd_contents_count;i++) {
@@ -183,8 +188,8 @@ Main.prototype.parseTMD = function(file, cb) {
             content_id = new Buffer(content_binary, 'ascii').toString('hex');
 
         tmd_contents.push({
-            type: struct.unpack('>H', tmd.subarray(0xB0A + (0x30 * i), 0xB0A + (0x30 * i) + 0x2))[0],
-            size: struct.unpack('>Q', tmd.subarray(0xB0C + (0x30 * i), 0xB0C + (0x30 * i) + 0x8))[0].low,
+            type: struct.unpack('>H', new Buffer.from(tmd.subarray(0xB0A + (0x30 * i), 0xB0A + (0x30 * i) + 0x2)))[0],
+            size: struct.unpack('>Q', new Buffer.from(tmd.subarray(0xB0C + (0x30 * i), 0xB0C + (0x30 * i) + 0x8)))[0].low,
             id: content_id,
         });
     }
