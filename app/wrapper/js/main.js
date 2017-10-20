@@ -380,7 +380,11 @@ function setIPCevents() {
             let item = document.getElementById("TEMPLATE_DL_GRID").content.firstElementChild.cloneNode(true);
     
             addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
-                ipcRenderer.send('dl_game', {tid: tid})
+                ipcRenderer.send('dl_game', {
+                    tid: tid,
+                    title: title.name.replace(/[^\w\s]/gi, '').replace(/\n/g, ' ').replace(/\r/g, ' '),
+                    region: title.region
+                })
             });
             bg_test.onerror = function () {
                 item.querySelector('img').src = "../../defaults/box.jpg";

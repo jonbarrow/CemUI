@@ -505,13 +505,28 @@ ipcMain.on('dl_game', (event, data) => {
 			callback(null, gameFolder);
 		},
 		function(gameFolder, callback) {
-			NUSRipper.downloadTID(data.tid, path.join(gameFolder, data.tid), null, () => {
+			request('http://cemui.com/api/v2/image/icon/' + data.tid.toUpperCase(), {encoding: null}, (error, response, body) => {
+				callback(null, gameFolder, body);
+			})
+		},
+		function(gameFolder, image_buffer, callback) {
+			let rom_dl_path = path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']');
+			NUSRipper.downloadTID(data.tid, rom_dl_path, null, () => {
 				console.log('Verifying encrypted download...');
-				NUSRipper.verifyEncryptedContents(path.join(gameFolder, data.tid), data.tid, () => {
+				NUSRipper.verifyEncryptedContents(rom_dl_path, data.tid, () => {
 					console.log('Decrypting files...');
-					NUSRipper.decrypt(path.join(gameFolder, data.tid), () => {
+					NUSRipper.decrypt(rom_dl_path, () => {
 						console.log('GAME DOWNLOADED');
-						callback();
+						var notification = new notifications({
+							title: 'Finished downloading ' + data.title + ' (' + data.region + ')',
+							body: 'Game has downloaded successfully',
+							icon: electron.nativeImage.createFromBuffer(image_buffer)
+						});
+						notification.show();
+						
+						notification.on('click', (event) => {
+							shell.openItem(path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']'));
+						});
 					});
 				});
 			});
