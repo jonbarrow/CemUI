@@ -22,6 +22,21 @@ addEvent(document.querySelectorAll('.input-text-smm')[0], 'keyup', () => {
     ipcRenderer.send('smm_search_courses', {title: document.querySelectorAll('.input-text-smm')[0].value});
 });
 
+/*
+addEvent(document.querySelectorAll('.input-button-game-dl')[0], 'click', () => {
+    ipcRenderer.send('games_search_cache', document.querySelectorAll('.input-text-game-dl')[0].value.trim());
+});
+
+addEvent(document.querySelectorAll('.input-text-game-dl')[0], 'keyup', (event) => {
+    if (event.code == 'Enter' || event.code == 'Return') {
+        ipcRenderer.send('games_search_cache', document.querySelectorAll('.input-text-game-dl')[0].value.trim());
+    }
+});
+*/
+addEvent(document.querySelectorAll('.input-text-game-dl')[0], 'keyup', (event) => {
+    ipcRenderer.send('games_search_cache', document.querySelectorAll('.input-text-game-dl')[0].value.trim());
+});
+
 function toggleSMMDB() {
     var el = document.getElementById('smm');
     if (el.style.display == "block") {
@@ -350,32 +365,39 @@ function setIPCevents() {
         }
     });
 
-    ipcRenderer.on('ticket_cache_downloaded', () => {
+    ipcRenderer.on('ticket_cache_downloaded', (event, data) => {
         document.querySelectorAll('#dl .loading-overlay')[0].classList.add('hidden');
         document.querySelectorAll('#dl .main')[0].classList.remove('hidden');
     });
 
-    ipcRenderer.on('cached_game', (event, data) => {
-        const tid = data.titleID.insert(8, "-");
-        let bg_test = new Image(),
-            src = 'http://cemui.com/api/v2/image/boxart/' + tid;
+    ipcRenderer.on('ticket_cache_search_results', (event, data) => {
+        document.querySelectorAll('#dl .main')[0].innerHTML = '';
+        for(let title of data) {
+            const tid = title.titleID.insert(8, "-").toUpperCase();
+            let bg_test = new Image(),
+                src = 'http://cemui.com/api/v2/image/boxart/' + tid;
+    
+            let item = document.getElementById("TEMPLATE_DL_GRID").content.firstElementChild.cloneNode(true);
+    
+            addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
+                ipcRenderer.send('dl_game', {tid: tid})
+            });
+            bg_test.onerror = function () {
+                item.querySelector('img').src = "../../defaults/box.jpg";
+            };
+    
+            bg_test.src = src;
+    
+            item.querySelector('.overlayL').innerHTML = title.region;
+            item.querySelector('img').src = src;
+            item.querySelector('.title').innerHTML = title.name;
 
-        let item = document.getElementById("TEMPLATE_DL_GRID").content.firstElementChild.cloneNode(true);
+            if (!title.dlc || title.dlc.length < 1) {
+                item.querySelector('.overlayR').classList.add('hidden');
+            }
 
-        addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
-            ipcRenderer.send('dl_game', {tid: tid})
-        });
-        bg_test.onerror = function () {
-            item.querySelector('img').src = "../../defaults/box.jpg";
-            item.querySelector('.title').innerHTML = tid + " | " + data.name;
-        };
-
-        bg_test.src = src;
-
-        item.querySelector('img').src = src;
-        item.querySelector('.title').innerHTML = data.name;
-
-        document.querySelectorAll('#dl .main')[0].appendChild(item);
+            document.querySelectorAll('#dl .main')[0].appendChild(item)
+        }
     });
     
     ipcRenderer.on('theme_change',setTheme);

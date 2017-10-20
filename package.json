@@ -12,10 +12,12 @@
   "dependencies": {
     "7zip-standalone": "0.0.2",
     "async": "^2.5.0",
+    "cemu-smm": "^2.1.4",
     "electron-log": "^2.2.9",
     "electron-updater": "^2.8.9",
     "fs-extra": "^4.0.1",
     "fsmonitor": "^0.2.4",
+    "fuse.js": "^3.2.0",
     "ini": "^1.3.4",
     "jimp": "^0.2.28",
     "lowdb": "^0.17.2",

@@ -235,7 +235,8 @@ Main.prototype.downloadTicketCache = function(cb) {
         if (error || response.statusCode != 200) {
             return cb(true);
         }
-        let titles = JSON.parse(body);
+        let titles = JSON.parse(body),
+            cache = [];
 
         fs.writeJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'), titles);
 
@@ -243,22 +244,30 @@ Main.prototype.downloadTicketCache = function(cb) {
             if (title.titleKey && title.titleKey.trim() != '') {
                 if (!fs.pathExistsSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik')) && title.ticket == 1) {
                     this._downloadTicket(title.titleID, () => {
-                        self.emit('cached_game', title);
+                        if (this.getTIDType(title.titleID) == '0000') {
+                            cache.push(title);
+                        }
                         callback();
                     });
                 } else if (fs.pathExistsSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik'))) {
                     let size = fs.statSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik')).size;
                     if (size < 172) { // 172 seems to be the standard size
                         this._downloadTicket(title.titleID, () => {
-                            self.emit('cached_game', title);
+                            if (this.getTIDType(title.titleID) == '0000') {
+                                cache.push(title);
+                            }
                             callback();
                         });
                     } else {
-                        self.emit('cached_game', title);
+                        if (this.getTIDType(title.titleID) == '0000') {
+                            cache.push(title);
+                        }
                         callback();
                     }
                 } else {
-                    self.emit('cached_game', title);
+                    if (this.getTIDType(title.titleID) == '0000') {
+                        cache.push(title);
+                    }
                     callback();
                 }
             } else {
@@ -267,8 +276,11 @@ Main.prototype.downloadTicketCache = function(cb) {
         });
 
         queue.drain = () => {
-            self.emit('ticket_cache_downloaded');
-            return cb();
+            self.emit('ticket_cache_downloaded', cache);
+            if (cb) {
+                cb(cache);
+            }
+            return;
         }
 
         queue.push(titles);

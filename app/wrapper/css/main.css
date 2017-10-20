@@ -422,6 +422,7 @@ body,html {
     .sidenav {padding-top: 15px;}
     .sidenav a {font-size: 18px;}
 }
+
 #dl .main {
     overflow-x: hidden;
     overflow-y: auto;
@@ -616,6 +617,18 @@ body,html {
     outline: none;
     border-color: #394852;
     background-color: #475864;
+}
+.input-text-game-dl {
+    height: 100%;
+    width: 400px;
+    padding: 18px 40px;
+    border: none;
+    border-radius: 5px;
+    margin: 0 20px;
+    box-shadow: 0px 6px 0px 0px rgba(1,1,1,0.1);
+}
+.input-text-game-dl:focus, .input-text-game-dl:active {
+    outline: none;
 }
 .txt-button {
     background-color: #303C44;

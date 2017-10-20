@@ -7,6 +7,7 @@ let electron = require('electron'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
 	smm = require('smm-api'),
+	fusejs = require('fuse.js'),
 	zipFolder = require('zip-folder'),
 	_7zip = require("7zip-standalone"),
 	ssl = require('ssl-root-cas').inject(),
@@ -33,20 +34,26 @@ let electron = require('electron'),
     ipcMain = electron.ipcMain,
 	app = electron.app;
 
-let game_storage, settings_storage, ticket_cache_storage;
+let game_storage, settings_storage, ticket_cache_storage, fuse_searchable;
 
 const API_ROOT = 'http://cemui.com';
 const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
 const GLOBAL_THEMES = [
 	'Flux', 'Fluent', 'Metro', 'Switch',
 	'_dlgames', '_smmdb'
-]
-
-NUSRipper.on('cached_game', (data) => {
-	if (data.titleID.toUpperCase().substring(4, 8) == '0000') {
-		ApplicationWindow.webContents.send('cached_game', data);
-	}
-});
+];
+const FUSE_OPTIONS = {
+	shouldSort: true,
+	tokenize: true,
+	matchAllTokens: true,
+	findAllMatches: true,
+	threshold: 0.6,
+	location: 0,
+	distance: 100,
+	keys: [
+	  	'name'
+  	]
+};
 
 winston.emitErrs = true;
 updater.autoDownload = false;
@@ -271,9 +278,10 @@ ipcMain.on('init', (event, data) => {
 		NUSRipper.setTicketVendor(settings_storage.get('ticket_vendor').value());
 		NUSRipper.setTicketCacheVendor(settings_storage.get('ticket_cache_vendor').value());
 
-		NUSRipper.downloadTicketCache(() => {
-			ticket_cache_storage = low(new FileSync(settings_storage.get('ticket_cache_folder').value() + '/_cache.json'));
-			ApplicationWindow.webContents.send('ticket_cache_downloaded')
+		NUSRipper.downloadTicketCache((data) => {
+			//ticket_cache_storage = low(new FileSync(settings_storage.get('ticket_cache_folder').value() + '/_cache.json'));
+			fuse_searchable = new fusejs(data, FUSE_OPTIONS);
+			ApplicationWindow.webContents.send('ticket_cache_downloaded');
 			console.log('done dl ticket cache')
 		});
 	} else if (data && data.page == '_smmdb') {
@@ -380,6 +388,10 @@ ipcMain.on('smm_search_courses', (event, data) => {
 		if (error) throw error;
 		ApplicationWindow.webContents.send('smm_courses_list', courses)
 	});
+});
+
+ipcMain.on('games_search_cache', (event, data) => {
+	ApplicationWindow.webContents.send('ticket_cache_search_results', fuse_searchable.search(data).slice(0, 50));
 });
 
 ipcMain.on('update_game_settings', (event, data) => {
