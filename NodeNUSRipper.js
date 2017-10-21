@@ -104,7 +104,7 @@ Main.prototype.decrypt = function(location, cb) {
     if (!this._config.cdecrypt_location || this._config.cdecrypt_location.trim() == '' || !fs.pathExistsSync(this._config.cdecrypt_location)) {
         self.emit('rom_decryption_missing', location);
         if (cb) {
-            cb();
+            cb(true);
         }
         return;
     }

@@ -7,6 +7,7 @@ let electron = require('electron'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
 	smm = require('smm-api'),
+	smm_editor = require('cemu-smm'),
 	fusejs = require('fuse.js'),
 	zipFolder = require('zip-folder'),
 	_7zip = require("7zip-standalone"),
@@ -54,6 +55,11 @@ const FUSE_OPTIONS = {
 	  	'name'
   	]
 };
+const SMM_VALID_SAVE_PATHS = [
+	'fe31b7f2',
+	'44fc5929',
+	'20660681'
+];
 
 winston.emitErrs = true;
 updater.autoDownload = false;
@@ -505,17 +511,22 @@ ipcMain.on('dl_game', (event, data) => {
 			callback(null, gameFolder);
 		},
 		function(gameFolder, callback) {
+			request('http://cemui.com/api/v2/image/icon/' + data.tid.toUpperCase(), {encoding: null}, (error, response, body) => {
+				callback(null, gameFolder, body);
+			})
+		},
+		function(gameFolder, image_buffer, callback) {
 			let rom_dl_path = path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']');
 			NUSRipper.downloadTID(data.tid, rom_dl_path, null, () => {
 				console.log('Verifying encrypted download...');
 				NUSRipper.verifyEncryptedContents(rom_dl_path, data.tid, () => {
 					console.log('Decrypting files...');
-					NUSRipper.decrypt(rom_dl_path, () => {
+					NUSRipper.decrypt(rom_dl_path, (cdecrypt_missing) => {
 						console.log('GAME DOWNLOADED');
-						tga2png(path.join(rom_dl_path, 'meta', 'iconTex.tga')).then(buffer => {
+						if (cdecrypt_missing) {
 							var notification = new notifications({
 								title: 'Finished downloading ' + data.title + ' (' + data.region + ')',
-								body: 'Game has downloaded successfully',
+								body: 'Game downloaded successfully (IS NOT DECRYPTED)',
 								icon: electron.nativeImage.createFromBuffer(buffer)
 							});
 							notification.show();
@@ -523,7 +534,31 @@ ipcMain.on('dl_game', (event, data) => {
 							notification.on('click', (event) => {
 								shell.openItem(path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']'));
 							});
-						});
+						} else if (fs.pathExistsSync(path.join(rom_dl_path, 'meta', 'iconTex.tga'))) {
+							tga2png(path.join(rom_dl_path, 'meta', 'iconTex.tga')).then(buffer => {
+								var notification = new notifications({
+									title: 'Finished downloading ' + data.title + ' (' + data.region + ')',
+									body: 'Game downloaded and decrypted successfully',
+									icon: electron.nativeImage.createFromBuffer(buffer)
+								});
+								notification.show();
+								
+								notification.on('click', (event) => {
+									shell.openItem(path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']'));
+								});
+							});
+						} else {
+							var notification = new notifications({
+								title: 'ERROR',
+								body: data.title + ' (' + data.region + ') DID NOT DOWNLOAD/EXTRACT CORRECTLY\nPLEASE TRY AGAIN',
+								icon: './defaults/error.png'
+							});
+							notification.show();
+							
+							notification.on('click', (event) => {
+								shell.openItem(path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']'));
+							});
+						}
 					});
 				});
 			});
@@ -582,8 +617,54 @@ ipcMain.on('dl_game', (event, data) => {
 		}
 	}
 	*/
+});
 
+ipcMain.on('smm_load_client_courses', async () => {
+	let smm_courses = [];
+		
+	for (let cemu_path of settings_storage.get('cemu_paths').value()) {
+		for (let smm_save_path of SMM_VALID_SAVE_PATHS) {
+			if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
+				console.log(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))
+				let courses = {
+					save_dir: smm_save_path,
+					cemu_path: cemu_path.cemu_folder_path,
+					courses: []
+				}
+				for (let smm_save_dir of getDirectories(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
+					let course = await smm_editor.loadCourse(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, smm_save_dir));
+					course.exportThumbnailSync();
+					courses.courses.push({
+						title: course.title,
+						maker: course.maker
+					});
+				}
+				smm_courses.push(courses);
+				console.log(smm_courses)
+			}
+		}
+		/*
+		if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave/44fc5929'))) {
+			console.log('yes 1')
+			let save = await smm.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave/44fc5929'));
+			//await save.reorder();
+			//await save.exportThumbnail();
+			smm_save_folders.push(save);
+			console.log('yes 3')
+		}
+		if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave/fe31b7f2'))) {
+			console.log('yes 2')
+			let save = await smm.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave/fe31b7f2'));
+			//await save.reorder();
+			//await save.exportThumbnail();
+			smm_save_folders.push(save);
+		}
+		//20660681
+		*/
+	}
 
+	//console.log(smm_courses);
+	
 });
 
 function sendScreens() {
@@ -1027,12 +1108,10 @@ function loadGames(dir, master_callback) {
 }
 
 function pickSMMLevelFolder() {
-	// SMM valid dir paths: ['fe31b7f2', '44fc5929'];
 	let smm_base_folder = path.join(settings_storage.get('cemu_paths').find({name: 'Default'}).value().cemu_folder_path, 'mlc01', 'emulatorSave'),
-		smm_valid_paths = ['fe31b7f2', '44fc5929'],
 		smm_save_dir = smm_base_folder;
 	
-	for (let smm_save_path of smm_valid_paths) {
+	for (let smm_save_path of SMM_VALID_SAVE_PATHS) {
 		if (fs.pathExistsSync(path.join(smm_base_folder, smm_save_path))) {
 			smm_save_dir = path.join(smm_base_folder, smm_save_path);
 			break;

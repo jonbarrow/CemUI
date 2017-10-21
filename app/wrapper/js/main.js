@@ -409,3 +409,4 @@ function setIPCevents() {
 
 setIPCevents();
 ipcRenderer.send('init',{page: 'wrapper'});
+//ipcRenderer.send('smm_load_client_courses');
