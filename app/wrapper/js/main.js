@@ -365,14 +365,19 @@ function setIPCevents() {
 
     ipcRenderer.on('ticket_cache_search_results', (event, data) => {
         document.querySelectorAll('#dl .main')[0].innerHTML = '';
-        for(let title of data) {
+        for (let title of data) {
             const tid = title.titleID.insert(8, "-").toUpperCase();
             let bg_test = new Image(),
                 src = 'http://cemui.com/api/v2/image/boxart/' + tid;
     
             let item = document.getElementById("TEMPLATE_DL_GRID").content.firstElementChild.cloneNode(true);
     
+            item.setAttribute('data-dl-grid', tid);
+
             addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
+                if (item.querySelectorAll('p.download')[0].classList.contains('disabled')) {
+                    return;
+                }
                 ipcRenderer.send('dl_game', {
                     tid: tid,
                     title: title.name.replace(/[^\w\s]/gi, '').replace(/\n/g, ' ').replace(/\r/g, ' '),
@@ -400,12 +405,18 @@ function setIPCevents() {
     ipcRenderer.on('theme_change',setTheme);
 
     ipcRenderer.on('game_dl_started', (event, data) => {
+
+        document.querySelector('div[data-dl-grid="' + data.tid + '"]').querySelector('p.download').classList.add('disabled');
+
         let item = document.getElementById("TEMPLATE_DL_LIST").content.firstElementChild.cloneNode(true);
         
         addEvent(item.querySelector('p.cancel'), 'click', () => {
+            document.querySelector('div[data-dl-grid="' + data.tid + '"]').querySelector('p.download').classList.remove('disabled');
             item.parentElement.removeChild(item);
             ipcRenderer.send('cancel_game', data.tid);
         });
+
+        item.setAttribute('data-dl-location', data.location);
 
         item.querySelector('h2.title').innerHTML = data.title + ' (' + data.region + ')';
         item.id = 'dl-list-entry-' + data.tid;
@@ -433,6 +444,17 @@ function setIPCevents() {
         //item.querySelector('.title').innerHTML = total_size + '/' + data.received_bytes_raw;
         item.querySelector('.download_ind').style.width = ((current_size / total_size) * 100) + '%';
         item.querySelector('.status').innerHTML = 'Downloading... ' + Math.round((current_size / total_size) * 100) + '%';
+    });
+
+    ipcRenderer.on('rom_decryption_started', (event, data) => {
+        let item = document.querySelector('div[data-dl-location="' + data.replace(/\\/g, '\\\\') + '"]');
+        item.querySelector('div').removeChild(item.querySelector('p.cancel'));
+        item.querySelector('.status').innerHTML = 'Decrypting...';
+    });
+
+    ipcRenderer.on('rom_decryption_completed', (event, data) => {
+        let item = document.querySelector('div[data-dl-location="' + data.replace(/\\/g, '\\\\') + '"]');
+        item.querySelector('.status').innerHTML = 'Finished';
     });
 }
 

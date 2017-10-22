@@ -674,6 +674,10 @@ body,html {
     margin-bottom: 0 !important;
     box-shadow: 0px 2px 0px 0px #0068ad;
 }
+.txt-button.disabled {
+    cursor: not-allowed;
+    color: #394852;
+}
 
 .txt-up {
     text-transform: uppercase;

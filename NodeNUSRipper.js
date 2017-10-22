@@ -109,6 +109,7 @@ Main.prototype.decrypt = function(location, cb) {
 
     if (!this._config.cdecrypt_location || this._config.cdecrypt_location.trim() == '' || !fs.pathExistsSync(this._config.cdecrypt_location)) {
         self.emit('rom_decryption_missing', location);
+        self.emit('rom_decryption_completed', location);
         if (cb) {
             cb(true);
         }
@@ -312,8 +313,12 @@ Main.prototype.setTicketCacheLocation = function(location) {
 }
 
 Main.prototype.setCDecryptLocation = function(location) {
+    let self = this;
     this._config.cdecrypt_location = location;
-    this._config.cdecrypt_folder_location = location.replace(/\/[^\/]+\/?$/, '');
+    this._config.cdecrypt_folder_location = path.join(location, '../');
+    if (!this._config.cdecrypt_location || this._config.cdecrypt_location.trim() == '' || !fs.pathExistsSync(this._config.cdecrypt_location)) {
+        self.emit('rom_decryption_missing', location);
+    }
 }
 
 Main.prototype.verifyEncryptedContents = function(location, tid, cb) {

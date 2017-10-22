@@ -93,9 +93,11 @@ settings_storage.defaults({
 	cemu_paths: [],
 	game_paths: [],
 	theme: 'Fluent',
+	smmdb_api_key: '',
 	ticket_cache_folder: path.join(DATA_ROOT, 'ticketcache'),
 	ticket_cache_vendor: 'http://cemui.com/api/v2/ticketcache',
-	ticket_vendor: 'http://wiiu.titlekeys.gq/'
+	ticket_vendor: 'http://wiiu.titlekeys.gq/',
+	cdecrypt_location: '',
 }).write();
 
 updater.on('checking-for-update', () => {
@@ -155,6 +157,39 @@ updater.on('update-downloaded', (info) => {
   	console.log('Update downloaded');
 });
 
+NUSRipper.on('rom_decryption_missing', () => {
+	console.log('d')
+	dialog.showMessageBox(ApplicationWindow, {
+		type: 'error',
+		title: 'CDecrypt Error',
+		message: 'CDecrypt Missing',
+		detail: 'CemUI does not ship with any means to decrypt rom files.\nWhile we would love to do so, we cannot for legal reasons.\nIn order to decrypt the files, CemUI makes use of CDecrypt, which is also not shipped with CemUI due to legal reasons.\nPlease obtain a copy of CDecrypt and tell CemUI where to look for it.',
+		icon: './defaults/error.png'
+	}, () => {
+		var cdecrypt_location = dialog.showOpenDialog({
+			title: 'Select your CDecrypt executable',
+			message: 'Select your CDecrypt executable',
+			properties: ['openFile'],
+			filters: [
+				{name: 'CDecrypt.exe', extensions: ['exe']}
+			]
+		});
+	
+		if (!cdecrypt_location) {
+			dialog.showMessageBox(ApplicationWindow, {
+				type: 'error',
+				title: 'CDecrypt Error',
+				message: 'CDecrypt Not Set',
+				detail: 'CDecrypt was not set. Games will not auto-decrypt',
+				icon: './defaults/error.png'
+			}, () => {
+				return;
+			});
+		}
+		settings_storage.set('cdecrypt_location', cdecrypt_location[0]).write();
+		NUSRipper.setCDecryptLocation(settings_storage.get('cdecrypt_location').value());
+	});
+});
 
 NUSRipper.on('download_status', (data) => {
 	ApplicationWindow.webContents.send('download_status', data);
@@ -163,6 +198,14 @@ NUSRipper.on('download_status', (data) => {
 NUSRipper.on('download_total_size', (data) => {
 	ApplicationWindow.webContents.send('download_total_size', data);
 	console.log(data);
+});
+
+NUSRipper.on('rom_decryption_started', (data) => {
+	ApplicationWindow.webContents.send('rom_decryption_started', data);
+});
+
+NUSRipper.on('rom_decryption_completed', (data) => {
+	ApplicationWindow.webContents.send('rom_decryption_completed', data);
 });
 
 let ApplicationWindow;
@@ -284,7 +327,7 @@ ipcMain.on('change_theme', (event, data) => {
 		name: theme_name,
 		path: theme_path
 	});
-})
+});
 
 ipcMain.on('init', (event, data) => {
 	if (data && data.page == '_dlgames') {
@@ -293,7 +336,7 @@ ipcMain.on('init', (event, data) => {
 		NUSRipper.setTicketCacheLocation(settings_storage.get('ticket_cache_folder').value());
 		NUSRipper.setTicketVendor(settings_storage.get('ticket_vendor').value());
 		NUSRipper.setTicketCacheVendor(settings_storage.get('ticket_cache_vendor').value());
-		NUSRipper.setCDecryptLocation('./cdecrypt/CDecrypt_v2.0b.exe');
+		NUSRipper.setCDecryptLocation(settings_storage.get('cdecrypt_location').value());
 
 		NUSRipper.downloadTicketCache((data) => {
 			//ticket_cache_storage = low(new FileSync(settings_storage.get('ticket_cache_folder').value() + '/_cache.json'));
@@ -526,8 +569,9 @@ ipcMain.on('dl_game', (event, data) => {
 			})
 		},
 		function(gameFolder, image_buffer, callback) {
-			ApplicationWindow.webContents.send('game_dl_started', data);
 			let rom_dl_path = path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']');
+			data.location = rom_dl_path;
+			ApplicationWindow.webContents.send('game_dl_started', data);
 			NUSRipper.downloadTID(data.tid, rom_dl_path, null, () => {
 				if (NUSRipper.CANCEL_LIST.contains(NUSRipper.formatTID(data.tid))) {
 					console.log('ABORTED DL')
