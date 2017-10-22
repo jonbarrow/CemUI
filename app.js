@@ -155,6 +155,16 @@ updater.on('update-downloaded', (info) => {
   	console.log('Update downloaded');
 });
 
+
+NUSRipper.on('download_status', (data) => {
+	ApplicationWindow.webContents.send('download_status', data);
+});
+
+NUSRipper.on('download_total_size', (data) => {
+	ApplicationWindow.webContents.send('download_total_size', data);
+	console.log(data);
+});
+
 let ApplicationWindow;
 
 let dns_errors = 0;
@@ -516,8 +526,14 @@ ipcMain.on('dl_game', (event, data) => {
 			})
 		},
 		function(gameFolder, image_buffer, callback) {
+			ApplicationWindow.webContents.send('game_dl_started', data);
 			let rom_dl_path = path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']');
 			NUSRipper.downloadTID(data.tid, rom_dl_path, null, () => {
+				if (NUSRipper.CANCEL_LIST.contains(NUSRipper.formatTID(data.tid))) {
+					console.log('ABORTED DL')
+					return callback(true);
+				}
+				
 				console.log('Verifying encrypted download...');
 				NUSRipper.verifyEncryptedContents(rom_dl_path, data.tid, () => {
 					console.log('Decrypting files...');
@@ -617,6 +633,10 @@ ipcMain.on('dl_game', (event, data) => {
 		}
 	}
 	*/
+});
+
+ipcMain.on('cancel_game', (event, data) => {
+	NUSRipper.cancel(data);
 });
 
 ipcMain.on('smm_load_client_courses', async () => {

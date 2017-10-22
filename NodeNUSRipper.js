@@ -98,6 +98,12 @@ Main.prototype._config = {
     ticket_cache_folder: './ticketcache' 
 }
 
+Main.prototype.CANCEL_LIST = [];
+
+Main.prototype.cancel = function(tid) {
+    this.CANCEL_LIST.push(this.formatTID(tid));
+}
+
 Main.prototype.decrypt = function(location, cb) {
     let self = this;
 
@@ -324,14 +330,14 @@ Main.prototype._checkApplicationFiles = function(contents, location, tid, cb) {
         if (fs.pathExistsSync(path.join(location, file.id + '.app'))) {
             var size = fs.statSync(path.join(location, file.id + '.app')).size;
             if (size < file.size) {
-                this._ripFile(this.getTIDURL(tid) + '/' +  file.id, path.join(location, file.id + '.app'), () => {
+                this._ripFile(tid, this.getTIDURL(tid) + '/' +  file.id, path.join(location, file.id + '.app'), () => {
                     callback();
                 });
             } else {
                 callback();
             }
         } else {
-            this._ripFile(this.getTIDURL(tid) + '/' +  file.id, path.join(location, file.id + '.app'), () => {
+            this._ripFile(tid, this.getTIDURL(tid) + '/' +  file.id, path.join(location, file.id + '.app'), () => {
                 callback();
             });
         }
@@ -350,7 +356,7 @@ Main.prototype._checkHashFiles = function(contents, location, tid, cb) {
             var size = fs.statSync(path.join(location, file.id + '.h3')).size;
             this._getHeaders(this.getTIDURL(tid) + '/' +  file.id + '.h3', (headers) => {
                 if (size < headers['content-length']) {
-                    this._ripFile(this.getTIDURL(tid) + '/' +  file.id + '.h3', path.join(location, file.id + '.h3'), () => {
+                    this._ripFile(tid, this.getTIDURL(tid) + '/' +  file.id + '.h3', path.join(location, file.id + '.h3'), () => {
                         callback();
                     });
                 } else {
@@ -358,7 +364,7 @@ Main.prototype._checkHashFiles = function(contents, location, tid, cb) {
                 }
             });
         } else {
-            this._ripFile(this.getTIDURL(tid) + '/' +  file.id + '.h3', path.join(location, file.id + '.h3'), () => {
+            this._ripFile(tid, this.getTIDURL(tid) + '/' +  file.id + '.h3', path.join(location, file.id + '.h3'), () => {
                 callback();
             });
         }
@@ -372,9 +378,14 @@ Main.prototype._checkHashFiles = function(contents, location, tid, cb) {
 }
 
 Main.prototype.downloadTID = function(TID, location, update, cb) {
-    let self = this;
+    let self = this,
+        cache = fs.readJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'));
     TID = this.formatTID(TID);
     fs.ensureDirSync(location);
+
+    if (this.CANCEL_LIST.contains(TID)) {
+        this.CANCEL_LIST.splice(this.CANCEL_LIST.indexOf(TID), 1);
+    }
     
     fs.createReadStream('uni.cert').pipe(fs.createWriteStream(path.join(location, 'title.cert')));
 
@@ -388,11 +399,10 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
                 .pipe(fs.createWriteStream(path.join(location, 'title.tik')));
         } else if (this.getTIDType(TID) == '000E') {
             let URL_BASE = this.getTIDURL(TID);
-            this._ripFile(URL_BASE + '/cetk', path.join(location, 'title.tik'), (error) => {
+            this._ripFile(tid, URL_BASE + '/cetk', path.join(location, 'title.tik'), (error) => {
                 self.emit('downloaded_ticket', TID);
             });
         } else {
-            let cache = fs.readJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'));
             for (var i=0;i<cache.length;i++) {
                 var game = cache[i];
                 if (game.titleID == TID.toLowerCase()) {
@@ -412,13 +422,34 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
             this._patchDLC(path.join(location, 'title.tik'));
         }
 
+        let tmd_total_size = 0;
+        for (let tmd_file of tmd.contents) {
+            tmd_total_size += tmd_file.size;
+            if (tmd_file.type >= 8195) {
+                tmd_total_size += 20;
+            }
+        }
+
+        console.log(tmd_total_size)
+
+        self.emit('download_total_size', {
+            tid: TID,
+            size: tmd_total_size
+        });
+
         var queue = async.queue((file, callback) => {
+
+            if (this.CANCEL_LIST.contains(TID)) {
+                console.log('KILLED');
+                queue.kill();
+            }
+
             if (fs.pathExistsSync(path.join(location, file.id + '.app'))) {
                 var size = fs.statSync(path.join(location, file.id + '.app')).size;
                 if (size < file.size) {
-                    this._ripFile(URL_BASE + '/' +  file.id, path.join(location, file.id + '.app'), () => {
+                    this._ripFile(TID, URL_BASE + '/' +  file.id, path.join(location, file.id + '.app'), () => {
                         if (file.type >= 8195) {
-                            this._ripFile(URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
+                            this._ripFile(TID, URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
                                 return callback();
                             });
                         } else {
@@ -428,13 +459,15 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
                 } else {
                     self.emit('download_status', {
                         status: 'exists',
+                        tid: TID,
                         name: file.id + '.app',
                         path: path.join(location, file.id + '.app'),
                         received_bytes: size,
+                        received_bytes_raw: size,
                         total_bytes: size
                     });
                     if (file.type >= 8195) {
-                        this._ripFile(URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
+                        this._ripFile(TID, URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
                             return callback();
                         });
                     } else {
@@ -442,9 +475,9 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
                     }
                 }
             } else {
-                this._ripFile(URL_BASE + '/' +  file.id, path.join(location, file.id + '.app'), () => {
+                this._ripFile(TID, URL_BASE + '/' +  file.id, path.join(location, file.id + '.app'), () => {
                     if (file.type >= 8195) {
-                        this._ripFile(URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
+                        this._ripFile(TID, URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
                             return callback();
                         });
                     } else {
@@ -467,7 +500,7 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
 
 Main.prototype.downloadTMD = function(TID, file, cb) {
     TID = this.formatTID(TID);
-    this._ripFile(this.getTIDURL(TID) + '/tmd', file, () => {
+    this._ripFile(TID, this.getTIDURL(TID) + '/tmd', file, () => {
         return cb();
     });
 }
@@ -487,7 +520,7 @@ Main.prototype._downloadTicket = function(tid, cb) {
     });
 }
 
-Main.prototype._ripFile = function(url, file, cb) {
+Main.prototype._ripFile = function(TID, url, file, cb) {
     let self = this,
         files = file.split('\\');
 
@@ -497,9 +530,11 @@ Main.prototype._ripFile = function(url, file, cb) {
             if (size >= headers['content-length']) {
                 self.emit('download_status', {
                     status: 'exists',
+                    tid: TID,
                     name: files[files.length-1],
                     path: file,
                     received_bytes: size,
+                    received_bytes_raw: size,
                     total_bytes: size
                 });
                 return cb();
@@ -523,9 +558,11 @@ Main.prototype._ripFile = function(url, file, cb) {
             } else {
                 self.emit('download_status', {
                     status: 'started',
+                    tid: TID,
                     name: files[files.length-1],
                     path: file,
                     received_bytes: 0,
+                    received_bytes_raw: 0,
                     total_bytes: headers['content-length']
                 });
 
@@ -535,9 +572,11 @@ Main.prototype._ripFile = function(url, file, cb) {
                 out.on('finish', () => {
                     self.emit('download_status', {
                         status: 'finished',
+                        tid: TID,
                         name: files[files.length-1],
                         path: file,
                         received_bytes: received_bytes,
+                        received_bytes_raw: 0,
                         total_bytes: total_bytes
                     });
                     out.close(cb);
@@ -552,13 +591,22 @@ Main.prototype._ripFile = function(url, file, cb) {
                 });
 
                 req.on('data', (chunk) => {
+
+                    if (this.CANCEL_LIST.contains(TID)) {
+                        console.log('KILLED');
+                        req.abort();
+                        req.destroy();
+                    }
+
                     received_bytes += chunk.length;
                     self.emit('download_status', {
                         status: 'downloading',
+                        tid: TID,
                         name: files[files.length-1],
                         path: file,
                         chunk_length: chunk.length,
                         received_bytes: received_bytes,
+                        received_bytes_raw: chunk.length,
                         total_bytes: total_bytes
                     });
                 });
@@ -583,8 +631,6 @@ Main.prototype._stringToBin = function(string) {
     return return_string;
 }
 
-module.exports = Main;
-
 Main.prototype._getHeaders = function(uri, cb) {
     let url_tmp = new url.URL(uri);
     var options = {method: 'HEAD', host: url_tmp.host, port: 80, path: url_tmp.pathname};
@@ -592,4 +638,10 @@ Main.prototype._getHeaders = function(uri, cb) {
         return cb(res.headers);
     });
     req.end();
+}
+
+module.exports = Main;
+
+Array.prototype.contains = function(el) {
+    return this.indexOf(el) > -1;
 }

@@ -1,5 +1,6 @@
 var {ipcRenderer} = require('electron');
-var progress_balls_ind = 0;
+var progress_balls_ind = 0,
+    downloads_in_progress = {}
 
 function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
@@ -123,14 +124,6 @@ function setTheme(event,data) {
         new_view.contentWindow.ipcRenderer = ipcRenderer;
     },1000);
 }
-
-String.prototype.insert = function(index, string) {
-    if (index > 0) {
-        return this.substring(0, index) + string + this.substring(index, this.length);
-    } else {
-        return string + this;
-    }
-};
 
 function formatDate(input) {
     function pad(s) { return (s < 10) ? '0' + s : s; }
@@ -384,7 +377,7 @@ function setIPCevents() {
                     tid: tid,
                     title: title.name.replace(/[^\w\s]/gi, '').replace(/\n/g, ' ').replace(/\r/g, ' '),
                     region: title.region
-                })
+                });
             });
             bg_test.onerror = function () {
                 item.querySelector('img').src = "../../defaults/box.jpg";
@@ -405,8 +398,52 @@ function setIPCevents() {
     });
     
     ipcRenderer.on('theme_change',setTheme);
+
+    ipcRenderer.on('game_dl_started', (event, data) => {
+        let item = document.getElementById("TEMPLATE_DL_LIST").content.firstElementChild.cloneNode(true);
+        
+        addEvent(item.querySelector('p.cancel'), 'click', () => {
+            item.parentElement.removeChild(item);
+            ipcRenderer.send('cancel_game', data.tid);
+        });
+
+        item.querySelector('h2.title').innerHTML = data.title + ' (' + data.region + ')';
+        item.id = 'dl-list-entry-' + data.tid;
+
+        document.querySelector('#download_list').appendChild(item);
+        openNav();
+    });
+
+    ipcRenderer.on('download_total_size', (event, data) => {
+        downloads_in_progress[data.tid] = {
+            total_size: data.size,
+            current_size: 0
+        }
+    });
+
+    ipcRenderer.on('download_status', (event, data) => {
+        let item = document.querySelector('#dl-list-entry-' + data.tid.insert(8, '-'));
+        if (!item) return;
+
+        downloads_in_progress[data.tid].current_size += data.received_bytes_raw;
+
+        let total_size = downloads_in_progress[data.tid].total_size,
+            current_size = downloads_in_progress[data.tid].current_size;
+
+        //item.querySelector('.title').innerHTML = total_size + '/' + data.received_bytes_raw;
+        item.querySelector('.download_ind').style.width = ((current_size / total_size) * 100) + '%';
+        item.querySelector('.status').innerHTML = 'Downloading... ' + Math.round((current_size / total_size) * 100) + '%';
+    });
 }
 
 setIPCevents();
 ipcRenderer.send('init',{page: 'wrapper'});
 //ipcRenderer.send('smm_load_client_courses');
+
+String.prototype.insert = function(index, string) {
+    if (index > 0) {
+        return this.substring(0, index) + string + this.substring(index, this.length);
+    } else {
+        return string + this;
+    }
+};
