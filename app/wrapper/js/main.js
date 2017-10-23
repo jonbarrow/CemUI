@@ -1,4 +1,14 @@
-var {ipcRenderer} = require('electron');
+var {ipcRenderer} = require('electron'),
+    fs = require('fs-extra'),
+    path = require('path');
+
+let LOCAL_RESOURCES_ROOT;
+if (fs.pathExistsSync(path.join(__dirname, '../../defaults'))) {
+	LOCAL_RESOURCES_ROOT = path.join(__dirname, '../../defaults');
+} else {
+	LOCAL_RESOURCES_ROOT = path.join(__dirname, '../../../defaults');	
+}
+
 var progress_balls_ind = 0,
     downloads_in_progress = {}
 
@@ -385,7 +395,7 @@ function setIPCevents() {
                 });
             });
             bg_test.onerror = function () {
-                item.querySelector('img').src = "../../defaults/box.jpg";
+                item.querySelector('img').src = LOCAL_RESOURCES_ROOT + "/box.jpg";
             };
     
             bg_test.src = src;

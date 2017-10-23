@@ -2,7 +2,7 @@ const APP_VERSION = '2.1.1';
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
-	electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
+	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
@@ -13,7 +13,6 @@ let electron = require('electron'),
 	_7zip = require("7zip-standalone"),
 	ssl = require('ssl-root-cas').inject(),
     fs = require('fs-extra'),
-	fs_o = require('original-fs'),
 	fsmonitor = require('fsmonitor'),
 	async = require('async'),
 	XMLParser = require('pixl-xml'),
@@ -60,6 +59,13 @@ const SMM_VALID_SAVE_PATHS = [
 	'44fc5929',
 	'20660681'
 ];
+
+let LOCAL_RESOURCES_ROOT;
+if (fs.pathExistsSync('./resources')) {
+	LOCAL_RESOURCES_ROOT = './resources';
+} else {
+	LOCAL_RESOURCES_ROOT = './';	
+}
 
 winston.emitErrs = true;
 updater.autoDownload = false;
@@ -164,7 +170,7 @@ NUSRipper.on('rom_decryption_missing', () => {
 		title: 'CDecrypt Error',
 		message: 'CDecrypt Missing',
 		detail: 'CemUI does not ship with any means to decrypt rom files.\nWhile we would love to do so, we cannot for legal reasons.\nIn order to decrypt the files, CemUI makes use of CDecrypt, which is also not shipped with CemUI due to legal reasons.\nPlease obtain a copy of CDecrypt and tell CemUI where to look for it.',
-		icon: './defaults/error.png'
+		icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
 	}, () => {
 		var cdecrypt_location = dialog.showOpenDialog({
 			title: 'Select your CDecrypt executable',
@@ -181,13 +187,12 @@ NUSRipper.on('rom_decryption_missing', () => {
 				title: 'CDecrypt Error',
 				message: 'CDecrypt Not Set',
 				detail: 'CDecrypt was not set. Games will not auto-decrypt',
-				icon: './defaults/error.png'
-			}, () => {
-				return;
+				icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
 			});
+		} else {
+			settings_storage.set('cdecrypt_location', cdecrypt_location[0]).write();
+			NUSRipper.setCDecryptLocation(settings_storage.get('cdecrypt_location').value());
 		}
-		settings_storage.set('cdecrypt_location', cdecrypt_location[0]).write();
-		NUSRipper.setCDecryptLocation(settings_storage.get('cdecrypt_location').value());
 	});
 });
 
@@ -587,7 +592,7 @@ ipcMain.on('dl_game', (event, data) => {
 							var notification = new notifications({
 								title: 'Finished downloading ' + data.title + ' (' + data.region + ')',
 								body: 'Game downloaded successfully (IS NOT DECRYPTED)',
-								icon: electron.nativeImage.createFromBuffer(buffer)
+								icon: electron.nativeImage.createFromBuffer(image_buffer)
 							});
 							notification.show();
 							
@@ -599,7 +604,7 @@ ipcMain.on('dl_game', (event, data) => {
 								var notification = new notifications({
 									title: 'Finished downloading ' + data.title + ' (' + data.region + ')',
 									body: 'Game downloaded and decrypted successfully',
-									icon: electron.nativeImage.createFromBuffer(buffer)
+									icon: electron.nativeImage.createFromBuffer(image_buffer)
 								});
 								notification.show();
 								
@@ -611,7 +616,7 @@ ipcMain.on('dl_game', (event, data) => {
 							var notification = new notifications({
 								title: 'ERROR',
 								body: data.title + ' (' + data.region + ') DID NOT DOWNLOAD/EXTRACT CORRECTLY\nPLEASE TRY AGAIN',
-								icon: './defaults/error.png'
+								icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
 							});
 							notification.show();
 							
@@ -953,7 +958,7 @@ function loadGames(dir, master_callback) {
 									return cb(null, data, name, is_wud)
 								});
 						} else {
-							fs.createReadStream('./defaults/box.jpg')
+							fs.createReadStream(path.join(LOCAL_RESOURCES_ROOT, 'defaults/box.jpg'))
 								.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/box.jpg'));
 							
 							return cb(null, data, name, is_wud);
@@ -1014,7 +1019,7 @@ function loadGames(dir, master_callback) {
 								});
 							} else {
 								console.log('No icon found for ' + data.game_title + '. Defaulting to default icon')
-								fs.createReadStream('./defaults/icon.ico')
+								fs.createReadStream(path.join(LOCAL_RESOURCES_ROOT, 'defaults/icon.ico'))
 									.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico'));
 								
 								cb(null, data, name, is_wud);
@@ -1061,7 +1066,7 @@ function loadGames(dir, master_callback) {
 							});
 						} else {
 							console.log('No icon found for ' + data.game_title + '. Defaulting to default icon')
-							fs.createReadStream('./defaults/icon.ico')
+							fs.createReadStream(path.join(LOCAL_RESOURCES_ROOT, 'defaults/icon.ico'))
 								.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico'));
 							
 							cb(null, data, name, is_wud);
@@ -1081,7 +1086,7 @@ function loadGames(dir, master_callback) {
 								return cb(null, data, name, is_wud)
 							});
 						} else {
-							fs.createReadStream('./defaults/grid.jpg')
+							fs.createReadStream(path.join(LOCAL_RESOURCES_ROOT, 'defaults/grid.jpg'))
 								.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/grid.webp'));
 							
 							cb(null, data, name, is_wud);

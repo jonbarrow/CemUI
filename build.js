@@ -12,7 +12,24 @@ builder.build({
         "icon": "icon.ico",
         "directories": {
           "output": "builds"
-        }
+        },
+        extraResources: [
+            "defaults",
+            "uni.cert",
+        ],
+        files: [
+            "!builds",
+            "!.gitignore",
+            "!README.md",
+            "!CHANGELOG.md",
+            "!FAQ.md",
+            "!issue_template.md",
+            "!logo.psd",
+            "!logo.png",
+            "!build.js",
+            "!smm.js",
+            "!test.js",
+        ],
     }
 }).then(() => {
     console.log('Done');

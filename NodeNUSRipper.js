@@ -87,6 +87,13 @@ const TIK = new Buffer.from([
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 ]);
 
+let LOCAL_RESOURCES_ROOT;
+if (fs.pathExistsSync('./resources')) {
+	LOCAL_RESOURCES_ROOT = './resources';
+} else {
+	LOCAL_RESOURCES_ROOT = './';	
+}
+
 function Main() {}
 util.inherits(Main, EventEmitter);
 
@@ -392,7 +399,7 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
         this.CANCEL_LIST.splice(this.CANCEL_LIST.indexOf(TID), 1);
     }
     
-    fs.createReadStream('uni.cert').pipe(fs.createWriteStream(path.join(location, 'title.cert')));
+    fs.createReadStream(path.join(LOCAL_RESOURCES_ROOT, 'uni.cert')).pipe(fs.createWriteStream(path.join(location, 'title.cert')));
 
     this.downloadTMD(TID, path.join(location, 'title.tmd'), () => {
         self.emit('downloaded_tmd', TID);
