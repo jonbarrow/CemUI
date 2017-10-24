@@ -6,11 +6,9 @@ var ipcWrapper = {};
 
 ipcWrapper.ipc = ipcRenderer;
 ipcWrapper.listeners = [];
-ipcWrapper.on = function (channel, func) {
-
-	this.listeners.add(channel);
-	this.ipc.on(channel,func);
-
+ipcWrapper.on = function(channel, func) {
+	this.listeners.push(channel);
+	this.ipc.on(channel, func);
 }
 ipcWrapper.removeListeners = function () {
 
