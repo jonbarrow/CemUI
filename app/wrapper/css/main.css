@@ -361,7 +361,8 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
 }
 #smm #smm-wrapper-player-courses .course .img_container:hover div {
     visibility: visible;
@@ -404,6 +405,56 @@ body {
     display: inline-block;
 }
 
+
+.popup-overlay {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+          justify-content: center;
+    width: 100%;
+    height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  z-index: 99;
+}
+.popup-overlay .popup {
+  background: #fff;
+  border-radius: 5px;
+  width: 30%;
+  margin: 70px auto;
+  z-index: 10;
+    overflow: hidden;
+  transition: all 0.6s ease-in-out;
+}
+.popup-overlay .popup h2, .popup-overlay .popup .content {
+    padding: 0 25px 25px 25px;
+}
+.popup-overlay .popup .button {
+    width: 100%;
+    background-color: #ffffff;
+    padding: 25px 0;
+    border-top: 1px #f2f2f2 solid;
+    text-align: center;
+    cursor: pointer;
+}
+.popup-overlay .popup .button:hover {
+    background-color: #e8e8e8;
+}
+@media screen and (max-width: 768px){
+  .box{
+    width: 70%;
+  }
+  .popup-overlay .popup{
+    width: 70%;
+    left: 15%;
+  }
+}
 #dl .loading-overlay {
     position: absolute;
     z-index: 9999;
