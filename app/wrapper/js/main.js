@@ -2,6 +2,30 @@ var {ipcRenderer} = require('electron'),
     fs = require('fs-extra'),
     path = require('path');
 
+var ipcWrapper = {};
+
+ipcWrapper.ipc = ipcRenderer;
+ipcWrapper.listeners = [];
+ipcWrapper.on = function (channel, func) {
+
+	this.listeners.add(channel);
+	this.ipc.on(channel,func);
+
+}
+ipcWrapper.removeListeners = function () {
+
+	for (var i = 0; i < this.listeners.length; i++) {
+		ipcRenderer.removeAllListeners(this.listeners[i]);
+	}
+	this.listeners = [];
+
+}
+ipcWrapper.send = function (channel, data) {
+
+	this.ipc.send(channel,data);
+
+}
+
 let LOCAL_RESOURCES_ROOT;
 if (fs.pathExistsSync(path.join(__dirname, '../../defaults'))) {
 	LOCAL_RESOURCES_ROOT = path.join(__dirname, '../../defaults');
@@ -116,12 +140,10 @@ function setTheme(event,data) {
         let current_view = document.getElementById('webview');
         var new_view = document.createElement('iframe');
         
-        console.log('setting theme');
-        
         current_view.src = '';
         document.body.removeChild(current_view);
         
-        ipcRenderer.removeAllListeners('init_complete');
+        ipcWrapper.removeListeners();
         
         new_view.setAttribute('id','webview');
         new_view.setAttribute('src', data.path);
@@ -131,7 +153,7 @@ function setTheme(event,data) {
                 ipcRenderer.send('open_dev');
             }
         });
-        new_view.contentWindow.ipcRenderer = ipcRenderer;
+        new_view.contentWindow.ipcRenderer = ipcWrapper;
     },1000);
 }
 
