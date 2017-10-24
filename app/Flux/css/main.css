@@ -110,9 +110,11 @@ body, html {
 .square-cont {
     flex: 1;
     overflow-y: hidden;
-    overflow-x: auto;
     white-space: nowrap;
     margin-bottom: 100px;
+    width: auto;
+    position: relative;
+    right: 0;
 }
 .item {
     position: relative;
