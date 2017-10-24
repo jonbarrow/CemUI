@@ -603,6 +603,33 @@ body {
     transition: width .25s;
 }
 
+
+#menu {
+    position: fixed;
+    display: none;
+    top: 0;
+    left: 0;
+    /*display: block;*/
+    background: rgba(0, 0, 0, 0.6);
+    height: 100%;
+    width: 100%;
+}
+#menu .container {
+    width: 50%;
+    position: relative;
+    left: 0;
+    top: 0;
+    background-color: #efefef;
+    overflow: hidden;
+    height: 100%;
+}
+
+
+
+
+
+
+
 .txt-link {
     position: relative;
     cursor: pointer;
