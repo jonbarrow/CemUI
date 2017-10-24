@@ -405,6 +405,10 @@ function setIPCevents() {
         document.querySelectorAll('#dl .main')[0].classList.remove('hidden');
     });
 
+    ipcRenderer.on('ticket_downloaded', (event, data) => {
+        document.querySelector('#dl .loading-overlay .title .small small').innerHTML = 'This may take a while <b>' + data.id + '/' + data.total + '</b>'
+    });
+
     ipcRenderer.on('ticket_cache_search_results', (event, data) => {
         document.querySelectorAll('#dl .main')[0].innerHTML = '';
         for (let title of data) {

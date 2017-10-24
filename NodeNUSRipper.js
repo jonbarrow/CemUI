@@ -255,11 +255,17 @@ Main.prototype.downloadTicketCache = function(cb) {
             return cb(true);
         }
         let titles = JSON.parse(body),
-            cache = [];
+            cache = [],
+            i = 0;
 
         fs.writeJSONSync(path.join(this._config.ticket_cache_folder, '_cache.json'), titles);
 
         var queue = async.queue((title, callback) => {
+            i++;
+            self.emit('ticket_downloaded', {
+                id: i,
+                total: titles.length
+            });
             if (title.titleKey && title.titleKey.trim() != '') {
                 if (!fs.pathExistsSync(path.join(this._config.ticket_cache_folder, title.titleID + '.tik')) && title.ticket == 1) {
                     this._downloadTicket(title.titleID, () => {

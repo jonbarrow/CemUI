@@ -164,6 +164,10 @@ updater.on('update-downloaded', (info) => {
   	console.log('Update downloaded');
 });
 
+NUSRipper.on('ticket_downloaded', (data) => {
+	ApplicationWindow.webContents.send('ticket_downloaded', data);
+});
+
 NUSRipper.on('rom_decryption_missing', () => {
 	console.log('d')
 	dialog.showMessageBox(ApplicationWindow, {
