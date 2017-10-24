@@ -84,6 +84,18 @@ function toggleSMMDB() {
     }
 }
 
+function toggleSMMDBPlayerCourses() {
+    var el = document.getElementById('smm-wrapper-player-courses');
+    if (el.classList.contains('hidden')) {
+        ipcRenderer.send('smm_load_client_courses');
+        document.getElementById('smm-wrapper').classList.add('hidden');
+        el.classList.remove('hidden');
+    } else {
+        el.classList.add('hidden');
+        document.getElementById('smm-wrapper').classList.remove('hidden');
+    }
+}
+
 function toggleGAMES() {
     var el = document.getElementById('dl');
     if (el.style.display == "flex") {
@@ -466,11 +478,56 @@ function setIPCevents() {
         let item = document.querySelector('div[data-dl-location="' + data.replace(/\\/g, '\\\\') + '"]');
         item.querySelector('.status').innerHTML = 'Finished';
     });
+
+    ipcRenderer.on('smm_player_courses', (event, data) => {
+        let i = 0,
+            course_cols = document.querySelectorAll('.colm');
+
+        course_cols[2].innerHTML = course_cols[3].innerHTML = '';
+        for (let smm_save_dir of data) {
+            for (let course_data of smm_save_dir.courses) {
+                i++;
+                let course = document.getElementById("TEMPLATE_SMMDB_COURSE").content.firstElementChild.cloneNode(true);
+                course.querySelector('.details').removeChild(course.querySelector('.stars'));
+
+                addEvent(course.querySelector('h1.download'), 'click', () => {
+                    ipcRenderer.send('smm_upload_level', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id));
+                });
+                addEvent(course.querySelector('.img_thumbnail'), 'click', () => {
+                    ipcRenderer.send('smm_change_thumbnail_image', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id));
+                });
+                addEvent(course.querySelector('.img_preview'), 'click', () => {
+                    ipcRenderer.send('smm_change_preview_image', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id));
+                });
+
+                let imgs = course.querySelectorAll('.img_container');
+                for (let img of imgs) {
+                    let div = document.createElement('div');
+                    div.classList = 'txt-s-16 txt-c-white'
+                    div.innerHTML = '<p>Change Image</p>';
+                    img.appendChild(div);
+                }
+                
+                course.querySelector('h1.download').innerHTML = 'Upload';
+                course.querySelector('h1.download').classList.add('upload');
+                course.querySelector('h1.download').classList.remove('download');
+                course.querySelector('.course-name').innerHTML = course_data.title;
+                course.querySelector('.owner').innerHTML = course_data.maker;
+                course.querySelector('.img_preview img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id, 'thumbnail0.jpg?' + new Date());
+                course.querySelector('.img_thumbnail img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id, 'thumbnail1.jpg?' + new Date());
+
+                if (i % 2 != 0) {
+                    course_cols[2].appendChild(course)
+                } else {
+                    course_cols[3].appendChild(course)
+                }
+            }
+        }
+    });
 }
 
 setIPCevents();
 ipcRenderer.send('init',{page: 'wrapper'});
-//ipcRenderer.send('smm_load_client_courses');
 
 String.prototype.insert = function(index, string) {
     if (index > 0) {

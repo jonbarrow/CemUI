@@ -2,7 +2,7 @@ const APP_VERSION = '2.1.1';
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
-	//electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
+	electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
@@ -27,6 +27,7 @@ let electron = require('electron'),
 	request = require('request'),
 	ws = require('windows-shortcuts'),
 	winston = require('winston'),
+	unpad = require('unpad'),
 	notifications = electron.Notification,
 	dialog = electron.dialog,
 	shell = electron.shell,
@@ -704,36 +705,84 @@ ipcMain.on('smm_load_client_courses', async () => {
 					let course = await smm_editor.loadCourse(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, smm_save_dir));
 					course.exportThumbnailSync();
 					courses.courses.push({
+						id: smm_save_dir,
+						save_id: smm_save_path,
+						cemu: cemu_path.cemu_folder_path,
 						title: course.title,
 						maker: course.maker
 					});
 				}
 				smm_courses.push(courses);
-				console.log(smm_courses)
 			}
 		}
-		/*
-		if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave/44fc5929'))) {
-			console.log('yes 1')
-			let save = await smm.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave/44fc5929'));
-			//await save.reorder();
-			//await save.exportThumbnail();
-			smm_save_folders.push(save);
-			console.log('yes 3')
-		}
-		if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave/fe31b7f2'))) {
-			console.log('yes 2')
-			let save = await smm.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave/fe31b7f2'));
-			//await save.reorder();
-			//await save.exportThumbnail();
-			smm_save_folders.push(save);
-		}
-		//20660681
-		*/
 	}
 
-	//console.log(smm_courses);
+	ApplicationWindow.webContents.send('smm_player_courses', smm_courses);
 	
+});
+
+ipcMain.on('smm_upload_level', (event, data) => {
+
+});
+
+ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
+	let image_location = dialog.showOpenDialog({
+		title: 'Select new thumbnail',
+		message: 'Select new thumbnail',
+		properties: ['openFile'],
+		filters: [
+			{name: 'thumbnail1.jpg', extensions: ['jpg', 'jpeg', 'png']}
+		]
+	});
+
+	if (!image_location) {
+		return;
+	}
+	image_location = image_location[0];
+	
+	let course_id = data.split('\\').pop(),
+		course_index = course_id.substr(course_id.length - 3);
+
+		console.log(unpad)
+	let course = await smm_editor.loadCourse(data);
+	await course.setThumbnail(image_location);
+	course.writeToSave(course_index, data);
+
+	console.log(course_index, unpad(course_index), unpad('010'));
+
+	let smm_courses = [];
+		
+	for (let cemu_path of settings_storage.get('cemu_paths').value()) {
+		for (let smm_save_path of SMM_VALID_SAVE_PATHS) {
+			if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
+				console.log(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))
+				let courses = {
+					save_dir: smm_save_path,
+					cemu_path: cemu_path.cemu_folder_path,
+					courses: []
+				}
+				for (let smm_save_dir of getDirectories(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
+					let course = await smm_editor.loadCourse(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, smm_save_dir));
+					course.exportThumbnailSync();
+					courses.courses.push({
+						id: smm_save_dir,
+						save_id: smm_save_path,
+						cemu: cemu_path.cemu_folder_path,
+						title: course.title,
+						maker: course.maker
+					});
+				}
+				smm_courses.push(courses);
+			}
+		}
+	}
+
+	ApplicationWindow.webContents.send('smm_player_courses', smm_courses);
+
+});
+
+ipcMain.on('smm_change_preview_image', (event, data) => {
+
 });
 
 function sendScreens() {

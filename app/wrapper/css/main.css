@@ -83,6 +83,9 @@ body,html {
     user-select: none;
     font-family: 'OpenSans';
 }
+body {
+    overflow: hidden;
+}
 .hidden {
     display: none !important;
 }
@@ -94,8 +97,6 @@ body,html {
     margin: 0;
     padding: 0;
 }
-
-
 
 .screens .screen-overlay {
     position: absolute;
@@ -226,7 +227,7 @@ body,html {
 }
 #smm .course .content .img_container.img_thumbnail {
     max-width: 50%;
-    padding-bottom: 5px;
+    margin-bottom: 5px;
     height: 240px;
     width: 320px;
 }
@@ -264,11 +265,11 @@ body,html {
 }
 #smm .main .wrapper {
     -webkit-box-flex: 1;
-            flex: 1;
+    flex: 1;
     font-size: 0;
     width: 100%;
     position: relative;
-        overflow-y: auto;
+    overflow-y: auto;
 }
 #smm .main .header {
     background-color: #283138;
@@ -280,11 +281,10 @@ body,html {
     margin-right: 25px;
 }
 #smm .main .header h1:first-child {
-    margin-left: 25px;
     float: left;
 }
-#smm .main .header .close {
-    float: right;
+#smm .main .header div.close {
+    display: inline-block;
     height: 100%;
 }
 #smm .overlay {
@@ -334,6 +334,44 @@ body,html {
     bottom: 0%;
     transition: left .5s,bottom .5s;
 }
+#smm #smm-wrapper-player-courses .course {
+    height: 530px;
+}
+#smm #smm-wrapper-player-courses .course:hover {
+    cursor: default;
+}
+#smm #smm-wrapper-player-courses .course .img_container div {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    background: rgba(0, 0, 0, 0.72);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .2s, visibility .2s;
+}
+#smm #smm-wrapper-player-courses .course .img_container div p {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+#smm #smm-wrapper-player-courses .course .img_container:hover div {
+    visibility: visible;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.course .img_container {
+    position: relative;
+}
 
 #dl {
     display: none;
@@ -363,7 +401,6 @@ body,html {
     margin: 0;
 }
 .header .close {
-    float: right;
     display: inline-block;
 }
 

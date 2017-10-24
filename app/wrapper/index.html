@@ -70,10 +70,15 @@
                     <h1 class="txt-s-32 txt-c-yellow txt-font-smm">Super Mario Maker Database</h1>
                     <div class="close">
                         <input type="text" placeholder="Search..." class="input-text-smm txt-s-24 txt-c-yellow">
+                        <h1 class="txt-button txt-s-24 txt-c-yellow txt-font-smm" onclick="toggleSMMDBPlayerCourses();">My Courses</h1>
                         <h1 class="txt-button close txt-s-24 txt-c-yellow txt-font-smm" onclick="toggleSMMDB();">Back</h1>
                     </div>
                 </div>
                 <div id="smm-wrapper" class="wrapper">
+                    <div class="colm"></div>
+                    <div class="colm"></div>
+                </div>
+                <div id="smm-wrapper-player-courses" class="wrapper hidden">
                     <div class="colm"></div>
                     <div class="colm"></div>
                 </div>
@@ -110,10 +115,10 @@
                 <h2 class="txt-s-32 txt-pad-lr txt-c-black txt-up txt-extrabold">CEM<span class="txt-c-blue">UI</span> <span class="txt-c-purple txt-up txt-extrabold">Downloads center</span></h2>
                 <div class="close txt-s-24 txt-pad-lr txt-c-black">
                     <div class="close">
-                        <p class="txt-s-24 txt-c-blue txt-button txt-button-white" onclick="toggleGAMES();">back</p>
+                        <p style="margin-right: 25px;" class="txt-s-24 txt-c-blue download txt-button txt-button-white" onclick="openNav()">downloads</p>
                     </div>
                     <div class="close">
-                        <p style="margin-right: 25px;" class="txt-s-24 txt-c-blue download txt-button txt-button-white" onclick="openNav()">downloads</p>
+                        <p class="txt-s-24 txt-c-blue txt-button txt-button-white" onclick="toggleGAMES();">back</p>
                     </div>
                 </div>
             </div>
