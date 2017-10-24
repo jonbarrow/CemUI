@@ -3,6 +3,11 @@ var {ipcRenderer} = require('electron'),
     path = require('path');
 
 var ipcWrapper = {};
+window.alert = function(message, title) {
+    console.log(message, title);
+}
+
+alert('test', 'title test')
 
 ipcWrapper.ipc = ipcRenderer;
 ipcWrapper.listeners = [];
@@ -424,11 +429,21 @@ function setIPCevents() {
                 if (item.querySelectorAll('p.download')[0].classList.contains('disabled')) {
                     return;
                 }
-                ipcRenderer.send('dl_game', {
+                let options = {
                     tid: tid,
                     title: title.name.replace(/[^\w\s]/gi, '').replace(/\n/g, ' ').replace(/\r/g, ' '),
                     region: title.region
-                });
+                }
+
+                if (item.querySelector('input[name="dlc-boolean"]').checked) {
+                    options.dl_dlc = true;
+                }
+
+                if (item.querySelector('.update-selector').value.trim() != '') {
+                    options.dl_update = item.querySelector('.update-selector').value.trim();
+                }
+
+                ipcRenderer.send('dl_game', options);
             });
             bg_test.onerror = function () {
                 item.querySelector('img').src = LOCAL_RESOURCES_ROOT + "/box.jpg";
@@ -442,6 +457,17 @@ function setIPCevents() {
 
             if (!title.dlc || title.dlc.length < 1) {
                 item.querySelector('.overlayR').classList.add('hidden');
+            } else {
+                item.querySelector('.dlc-boolean').classList.remove('hidden');
+            }
+
+            if (title.updates && title.updates.length >= 1) {
+                item.querySelector('.update-selector').classList.remove('hidden');
+                for (let update of title.updates) {
+                    let option = document.createElement('option');
+                    option.value = option.innerHTML = update;
+                    item.querySelector('.update-selector').appendChild(option);
+                }
             }
 
             document.querySelectorAll('#dl .main')[0].appendChild(item)
@@ -451,8 +477,6 @@ function setIPCevents() {
     ipcRenderer.on('theme_change',setTheme);
 
     ipcRenderer.on('game_dl_started', (event, data) => {
-
-        document.querySelector('div[data-dl-grid="' + data.tid + '"]').querySelector('p.download').classList.add('disabled');
 
         let item = document.getElementById("TEMPLATE_DL_LIST").content.firstElementChild.cloneNode(true);
         
@@ -465,7 +489,7 @@ function setIPCevents() {
         item.setAttribute('data-dl-location', data.location);
 
         item.querySelector('h2.title').innerHTML = data.title + ' (' + data.region + ')';
-        item.id = 'dl-list-entry-' + data.tid;
+        item.id = 'dl-list-entry-' + data.tid.toLowerCase();
 
         document.querySelector('#download_list').appendChild(item);
         openNav();
@@ -479,7 +503,8 @@ function setIPCevents() {
     });
 
     ipcRenderer.on('download_status', (event, data) => {
-        let item = document.querySelector('#dl-list-entry-' + data.tid.insert(8, '-'));
+        console.log(data)
+        let item = document.querySelector('#dl-list-entry-' + data.tid.toLowerCase().insert(8, '-'));
         if (!item) return;
 
         downloads_in_progress[data.tid].current_size += data.received_bytes_raw;

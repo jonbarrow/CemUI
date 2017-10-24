@@ -158,7 +158,7 @@ Main.prototype.decrypt = function(location, cb) {
         files.push('msvcr120d.dll');
 
         for (let file of files) {
-            fs.unlinkSync(path.join(location, file));
+            //fs.unlinkSync(path.join(location, file));
         }
 
         self.emit('rom_decryption_completed', location);
@@ -407,7 +407,7 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
     
     fs.createReadStream(path.join(LOCAL_RESOURCES_ROOT, 'uni.cert')).pipe(fs.createWriteStream(path.join(location, 'title.cert')));
 
-    this.downloadTMD(TID, path.join(location, 'title.tmd'), () => {
+    this.downloadTMD(TID, path.join(location, 'title.tmd'), update, () => {
         self.emit('downloaded_tmd', TID);
         let tmd = this.parseTMD(path.join(location, 'title.tmd')),
             URL_BASE = this.getTIDURL(TID);
@@ -516,9 +516,12 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
     });
 }
 
-Main.prototype.downloadTMD = function(TID, file, cb) {
+Main.prototype.downloadTMD = function(TID, file, update, cb) {
     TID = this.formatTID(TID);
-    this._ripFile(TID, this.getTIDURL(TID) + '/tmd', file, () => {
+    let tmd_url = this.getTIDURL(TID) + '/tmd';
+    if (update) tmd_url = tmd_url.concat('.', update);
+    console.log(tmd_url)
+    this._ripFile(TID, tmd_url, file, () => {
         return cb();
     });
 }

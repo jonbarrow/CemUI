@@ -549,7 +549,6 @@ body {
     padding: 0;
     margin: 0;
     background-color: #738ed6;
-    transition: width .25s;
 }
 
 .txt-link {

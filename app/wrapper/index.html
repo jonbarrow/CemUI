@@ -140,9 +140,13 @@
                 <img>
                 <h2 class="title content txt-s-24 txt-c-purple"></h2>
                 <p class="txt-s-24 txt-c-blue download txt-button txt-button-large txt-button-white">download</p>
-                <div class="download_container">
-                    <p class="txt-s-18 txt-center txt-c-black">Downloading...</p>
-                    <div class="download_bar"><div style="width: 25%;" class="download_ind"></div></div>
+                <div class="download_options">
+                    <label class="hidden dlc-boolean" for="dlc-boolean">
+                        DLC <input type="checkbox" name="dlc-boolean" id="">
+                    </label>
+                    <select class="hidden update-selector" name="update-selector" id="">
+                        <option value="">No Update</option>
+                    </select>
                 </div>
             </div>
         </template>

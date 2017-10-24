@@ -593,6 +593,7 @@ ipcMain.on('dl_game', (event, data) => {
 					console.log('Decrypting files...');
 					NUSRipper.decrypt(rom_dl_path, (cdecrypt_missing) => {
 						console.log('GAME DOWNLOADED');
+						callback(null, gameFolder, image_buffer);
 						if (cdecrypt_missing) {
 							var notification = new notifications({
 								title: 'Finished downloading ' + data.title + ' (' + data.region + ')',
@@ -602,7 +603,7 @@ ipcMain.on('dl_game', (event, data) => {
 							notification.show();
 							
 							notification.on('click', (event) => {
-								shell.openItem(path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']'));
+								shell.openItem(rom_dl_path);
 							});
 						} else if (fs.pathExistsSync(path.join(rom_dl_path, 'meta', 'iconTex.tga'))) {
 							tga2png(path.join(rom_dl_path, 'meta', 'iconTex.tga')).then(buffer => {
@@ -614,7 +615,7 @@ ipcMain.on('dl_game', (event, data) => {
 								notification.show();
 								
 								notification.on('click', (event) => {
-									shell.openItem(path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']'));
+									shell.openItem(rom_dl_path);
 								});
 							});
 						} else {
@@ -626,37 +627,142 @@ ipcMain.on('dl_game', (event, data) => {
 							notification.show();
 							
 							notification.on('click', (event) => {
-								shell.openItem(path.join(gameFolder, data.title + ' [' + data.region + '] [' + data.tid + ']'));
+								shell.openItem(rom_dl_path);
 							});
 						}
 					});
 				});
 			});
 		},
-		function(callback) {
-			if (data.dl_update_version) {
-				var gameUpdateFolder = dialog.showOpenDialog({
-					title: 'Select where you want to download title update',
-					message: 'Select where you want to download title update',
-					properties: ['openDirectory']
+		function(gameFolder, image_buffer, callback) {
+			if (data.dl_update) {
+				let new_data = data;
+				new_data.tid = data.tid = data.tid.replace('00050000', '0005000e')
+				let rom_dl_path = path.join(gameFolder, new_data.title + ' [Update v' + new_data.dl_update + '] [' + new_data.region + '] [' + new_data.tid + ']');
+				new_data.location = rom_dl_path;
+				new_data.title = data.title.concat(' Update v' + new_data.dl_update);
+				
+				ApplicationWindow.webContents.send('game_dl_started', new_data);
+				NUSRipper.downloadTID(new_data.tid, rom_dl_path, new_data.dl_update, () => {
+					if (NUSRipper.CANCEL_LIST.contains(NUSRipper.formatTID(new_data.tid))) {
+						console.log('ABORTED DL')
+						return callback(true);
+					}
+					
+					console.log('Verifying encrypted download...');
+					NUSRipper.verifyEncryptedContents(rom_dl_path, new_data.tid, () => {
+						console.log('Decrypting files...');
+						NUSRipper.decrypt(rom_dl_path, (cdecrypt_missing) => {
+							console.log('UPDATE DOWNLOADED');
+							callback(null, gameFolder, image_buffer);
+							if (cdecrypt_missing) {
+								var notification = new notifications({
+									title: 'Finished downloading ' + new_data.title + ' (' + new_data.dl_update + ') (' + new_data.region + ')',
+									body: 'Update downloaded successfully (IS NOT DECRYPTED)',
+									icon: electron.nativeImage.createFromBuffer(image_buffer)
+								});
+								notification.show();
+								
+								notification.on('click', (event) => {
+									shell.openItem(rom_dl_path);
+								});
+							} else if (fs.pathExistsSync(path.join(rom_dl_path, 'meta', 'iconTex.tga'))) {
+								tga2png(path.join(rom_dl_path, 'meta', 'iconTex.tga')).then(buffer => {
+									var notification = new notifications({
+										title: 'Finished downloading ' + new_data.title + ' (' + new_data.dl_update + ') (' + data.region + ')',
+										body: 'Update downloaded and decrypted successfully',
+										icon: electron.nativeImage.createFromBuffer(image_buffer)
+									});
+									notification.show();
+									
+									notification.on('click', (event) => {
+										shell.openItem(rom_dl_path);
+									});
+								});
+							} else {
+								var notification = new notifications({
+									title: 'ERROR',
+									body: data.title + ' (' + data.dl_update + ') (' + data.region + ') DID NOT DOWNLOAD/EXTRACT CORRECTLY\nPLEASE TRY AGAIN',
+									icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
+								});
+								notification.show();
+								
+								notification.on('click', (event) => {
+									shell.openItem(rom_dl_path);
+								});
+							}
+						});
+					});
 				});
-				if (gameUpdateFolder) {
-					gameUpdateFolder = gameUpdateFolder[0];
-					callback(null, gameUpdateFolder);
-				} else {
-					callback();
-				}
 			} else {
-				callback();
+				callback(null, gameFolder, image_buffer);
 			}
 		},
-		function(gameUpdateFolder, callback) {
-			if (gameUpdateFolder) {
-				console.log('dl update')
-				callback();
+		function(gameFolder, image_buffer, callback) {
+			if (data.dl_dlc) {
+				let new_data = data;
+				new_data.tid = data.tid = data.tid.replace('00050000', '0005000c').replace('0005000e', '0005000c')
+				let rom_dl_path = path.join(gameFolder, new_data.title + ' [DLC] [' + new_data.region + '] [' + new_data.tid + ']');
+				new_data.location = rom_dl_path;
+				new_data.title = data.title.concat(' DLC');
+
+				console.log(new_data.title)
+				console.log(new_data.tid)
+				
+				ApplicationWindow.webContents.send('game_dl_started', new_data);
+				NUSRipper.downloadTID(new_data.tid, rom_dl_path, null, () => {
+					if (NUSRipper.CANCEL_LIST.contains(NUSRipper.formatTID(new_data.tid))) {
+						console.log('ABORTED DL')
+						return callback(true);
+					}
+					
+					console.log('Verifying encrypted download...');
+					NUSRipper.verifyEncryptedContents(rom_dl_path, new_data.tid, () => {
+						console.log('Decrypting files...');
+						NUSRipper.decrypt(rom_dl_path, (cdecrypt_missing) => {
+							console.log('UPDATE DOWNLOADED');
+							callback(null, gameFolder, image_buffer);
+							if (cdecrypt_missing) {
+								var notification = new notifications({
+									title: 'Finished downloading ' + new_data.title + ' (DLC) (' + new_data.region + ')',
+									body: 'Update downloaded successfully (IS NOT DECRYPTED)',
+									icon: electron.nativeImage.createFromBuffer(image_buffer)
+								});
+								notification.show();
+								
+								notification.on('click', (event) => {
+									shell.openItem(rom_dl_path);
+								});
+							} else if (fs.pathExistsSync(path.join(rom_dl_path, 'meta', 'iconTex.tga'))) {
+								tga2png(path.join(rom_dl_path, 'meta', 'iconTex.tga')).then(buffer => {
+									var notification = new notifications({
+										title: 'Finished downloading ' + new_data.title + ' (DLC) (' + new_data.region + ')',
+										body: 'Update downloaded and decrypted successfully',
+										icon: electron.nativeImage.createFromBuffer(image_buffer)
+									});
+									notification.show();
+									
+									notification.on('click', (event) => {
+										shell.openItem(rom_dl_path);
+									});
+								});
+							} else {
+								var notification = new notifications({
+									title: 'ERROR',
+									body: new_data.title + ' (' + new_data.dl_update + ') (' + new_data.region + ') DID NOT DOWNLOAD/EXTRACT CORRECTLY\nPLEASE TRY AGAIN',
+									icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
+								});
+								notification.show();
+								
+								notification.on('click', (event) => {
+									shell.openItem(rom_dl_path);
+								});
+							}
+						});
+					});
+				});
 			} else {
-				console.log('no dl update')
-				callback();
+				callback(null, gameFolder, image_buffer);
 			}
 		}
 	], (cancel) => {
