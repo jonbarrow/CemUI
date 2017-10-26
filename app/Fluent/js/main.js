@@ -16,6 +16,10 @@ ipcRenderer.on('emulator_list', function(event, data) {
     emulators_list = data;
 })
 
+addEvent(document.getElementById('menu_button'),'click',function() {
+    ipcRenderer.send('open_menu');
+});
+
 ipcRenderer.on('init_complete', function(event, data) {
     console.log('init main.js fluent')
     setTimeout(function () {

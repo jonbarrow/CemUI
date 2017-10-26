@@ -8,7 +8,12 @@ var games_lib = document.getElementById('games'),
 function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
 }
-$( "#draggable" ).draggable({ axis: "x",containment: "parent" });
+
+addEvent(document.getElementById('menu_button'),'click',function() {
+    ipcRenderer.send('open_menu');
+});
+
+
 /*
 addEvent(document.getElementById('select_cemu').getElementsByClassName('button')[0], 'click', function() {
     if (this.classList.contains('disabled')) {

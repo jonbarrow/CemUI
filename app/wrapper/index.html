@@ -65,7 +65,44 @@
         
         <div id="menu">
             <div class="container">
-                <h2 class="txt-s-32 txt-c-black txt-bold txt-up">cem<span class="txt-c-blue">UI</span> <span class="txt-c-blue">Settings</span></h2>
+                <div class="slide-container">
+                    <div class="header">
+                        <h2 class="txt-s-32 txt-c-black padding txt-bold txt-up" style="float: left;">cem<span class="txt-c-blue">UI</span> <span class="txt-c-blue">menu</span></h2>
+                        <h2 class="txt-button padding txt-c-blue txt-button-white" onclick="closeMenu();" style="float: right;">Back</h2>
+                    </div>
+                    <hr>
+                    <div class="menu-item bigpadding txt-hover-blacktoblue" id="settings_button">
+                        <h2 class="text-s-32 txt-up txt-c-blue">Settings</h2>
+                        <p class="txt-s-18">Configure special settings here.</p>
+                    </div>
+                    <div class="menu-item bigpadding txt-hover-blacktoblue" id="themes_button">
+                        <h2 class="text-s-32 txt-up txt-c-blue">Themes</h2>
+                        <p class="txt-s-18">Want a new look and feel? configure it here.</p>
+                    </div>
+                    <div class="menu-item bigpadding txt-hover-blacktoblue" id="dlgames_button">
+                        <h2 class="text-s-32 txt-up txt-c-blue">Download games</h2>
+                        <p class="txt-s-18">Ran out of games to play? We got you covered.</p>
+                    </div>
+                    <div class="menu-item bigpadding txt-hover-blacktoblue" id="smmdb_button">
+                        <h2 class="text-s-32 txt-up txt-c-blue">Super Mario Maker levels</h2>
+                        <p class="txt-s-18">The place to be to play some more of those really nice mario levels.</p>
+                    </div>
+                </div>
+                <div class="slide-container slide-hidden" id="theme_selection">
+                    <div class="header">
+                        <h2 class="txt-s-32 txt-link txt-link-black txt-c-black padding txt-up" onclick="closeMenuSection('theme_selection');">BACK</h2>
+                    </div>
+                    <hr>
+                    <button class="flux">Flux</button><br>
+                    <button class="fluent">Fluent</button>
+                </div>
+                <div class="slide-container slide-hidden" id="settings_section">
+                    <div class="header">
+                        <h2 class="txt-s-32 txt-link txt-link-black txt-c-black padding txt-up" onclick="closeMenuSection('settings_section');">BACK</h2>
+                    </div>
+                    <hr>
+                    <p>Itsa empty, check back in the update.</p>
+                </div>
             </div>
         </div>
         
@@ -206,13 +243,6 @@
                 </div>
             </div>
         </template>
-        
-        <div class="theme-buttons">
-            <button class="flux">Flux</button>
-            <button class="fluent">Fluent</button>
-            <button class="smmdb">smmdb</button>
-            <button class="dlgames">games</button>
-        </div>
         
         <script src="js/main.js"></script>
     </body>

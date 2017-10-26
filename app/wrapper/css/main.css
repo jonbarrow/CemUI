@@ -420,7 +420,7 @@ body {
     width: 100%;
     height: 100%;
   background: rgba(0, 0, 0, 0.6);
-  position: fixed;
+  position: absolute;
   z-index: 99;
 }
 .popup-overlay .popup {
@@ -602,25 +602,68 @@ body {
     background-color: #738ed6;
 }
 
-
 #menu {
     position: fixed;
     display: none;
     top: 0;
     left: 0;
-    /*display: block;*/
+    display: none;
+    opacity: 1;
     background: rgba(0, 0, 0, 0.6);
     height: 100%;
     width: 100%;
+    transition: opacity .25s;
+}
+#menu .header {
+    overflow: hidden;
 }
 #menu .container {
     width: 50%;
+    min-width: 500px;
     position: relative;
     left: 0;
     top: 0;
     background-color: #efefef;
     overflow: hidden;
     height: 100%;
+    transition: left .25s;
+}
+#menu .slide-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #efefef;
+    width: 100%;
+    overflow-x: hidden;
+    transition: left .25s;
+}
+#menu .slide-hidden {
+    left: -100%;
+}
+#menu hr {
+    width: 100%;
+    height: 1px;
+    opacity: 0.4;
+}
+#menu .padding {
+    margin: 5px 25px;
+}
+#menu .bigpadding {
+    padding: 10px 50px;
+}
+#menu .txt-hover-blacktoblue {
+    color: black;
+    background-color: rgba(0,0,0,0);
+    cursor: pointer;
+    transition: all .15s;
+}
+#menu .txt-hover-blacktoblue:hover {
+    color: white;
+    background-color: #0099FF;
+}
+#menu .txt-hover-blacktoblue:hover .txt-c-blue {
+    color: white;
 }
 
 

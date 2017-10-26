@@ -5,13 +5,16 @@
         <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="css/main.css" rel="stylesheet" type="text/css" />
-        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.8.0/slick.css"/>
+        <!--<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.8.0/slick.css"/>-->
     </head>
     <body>
         <div id="main">
             <div id="header">
                 <h2 class="txt-s-32 txt-pad-lr txt-c-black txt-up txt-extrabold">CEM<span class="txt-c-blue">UI</span></h2>
-                <h2 class="txt-s-24 txt-pad-lr txt-up txt-c-black" id="clock">12:00 AM</h2>
+                <div>
+                    <h2 class="txt-s-24 txt-pad-lr txt-up txt-c-black" style="display: inline-block;" id="clock">12:00 AM</h2>
+                    <h2 class="txt-s-24 txt-pad-lr txt-up txt-c-black" style="display: inline-block; cursor: pointer" id="menu_button">menu</h2>
+                </div>
             </div>
             <h2 class="txt-up txt-c-purple txt-s-24 txt-pad-lr">Recently played</h2>
             <div class="square-cont" id="recent">
@@ -41,7 +44,7 @@
         </div>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         
-<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery.slick/1.8.0/slick.min.js"></script>
+<!--<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery.slick/1.8.0/slick.min.js"></script>-->
         <script src="js/main.js"></script>
         <script src="js/Controller.js"></script>
         <script src="js/Controller.layouts.js"></script>
