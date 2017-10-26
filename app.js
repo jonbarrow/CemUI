@@ -169,36 +169,31 @@ NUSRipper.on('ticket_downloaded', (data) => {
 });
 
 NUSRipper.on('rom_decryption_missing', () => {
-	console.log('d')
-	dialog.showMessageBox(ApplicationWindow, {
-		type: 'error',
-		title: 'CDecrypt Error',
-		message: 'CDecrypt Missing',
-		detail: 'CemUI does not ship with any means to decrypt rom files.\nWhile we would love to do so, we cannot for legal reasons.\nIn order to decrypt the files, CemUI makes use of CDecrypt, which is also not shipped with CemUI due to legal reasons.\nPlease obtain a copy of CDecrypt and tell CemUI where to look for it.',
-		icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
-	}, () => {
-		var cdecrypt_location = dialog.showOpenDialog({
-			title: 'Select your CDecrypt executable',
-			message: 'Select your CDecrypt executable',
-			properties: ['openFile'],
-			filters: [
-				{name: 'CDecrypt.exe', extensions: ['exe']}
-			]
-		});
-	
-		if (!cdecrypt_location) {
-			dialog.showMessageBox(ApplicationWindow, {
-				type: 'error',
-				title: 'CDecrypt Error',
-				message: 'CDecrypt Not Set',
-				detail: 'CDecrypt was not set. Games will not auto-decrypt',
-				icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
-			});
-		} else {
-			settings_storage.set('cdecrypt_location', cdecrypt_location[0]).write();
-			NUSRipper.setCDecryptLocation(settings_storage.get('cdecrypt_location').value());
-		}
+	ApplicationWindow.webContents.send('rom_decryption_missing');
+});
+
+ipcMain.on('rom_decryption_missing', () => {
+	var cdecrypt_location = dialog.showOpenDialog({
+		title: 'Select your CDecrypt executable',
+		message: 'Select your CDecrypt executable',
+		properties: ['openFile'],
+		filters: [
+			{name: 'CDecrypt.exe', extensions: ['exe']}
+		]
 	});
+
+	if (!cdecrypt_location) {
+		dialog.showMessageBox(ApplicationWindow, {
+			type: 'error',
+			title: 'CDecrypt Error',
+			message: 'CDecrypt Not Set',
+			detail: 'CDecrypt was not set. Games will not auto-decrypt',
+			icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
+		});
+	} else {
+		settings_storage.set('cdecrypt_location', cdecrypt_location[0]).write();
+		NUSRipper.setCDecryptLocation(settings_storage.get('cdecrypt_location').value());
+	}
 });
 
 NUSRipper.on('download_status', (data) => {
@@ -768,31 +763,7 @@ ipcMain.on('dl_game', (event, data) => {
 	], (cancel) => {
 		if (cancel) return;
 		console.log('Done')
-	})
-	
-	
-	/*
-	if (data.dl_update_version) {
-		var gameUpdateFolder = dialog.showOpenDialog({
-			title: 'Select where you want to download title update',
-			message: 'Select where you want to download title update',
-			properties: ['openDirectory']
-		});
-		if (gameUpdateFolder) {
-			gameUpdateFolder = gameUpdateFolder[0];
-		}
-	}
-	if (data.dl_dlc) {
-		var gameDLCFolder = dialog.showOpenDialog({
-			title: 'Select where you want to download title DLC',
-			message: 'Select where you want to download title DLC',
-			properties: ['openDirectory']
-		});
-		if (gameDLCFolder) {
-			gameDLCFolder = gameDLCFolder[0];
-		}
-	}
-	*/
+	});
 });
 
 ipcMain.on('cancel_game', (event, data) => {

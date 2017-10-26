@@ -60,19 +60,13 @@ addEvent(document.querySelectorAll('.input-text-smm')[0], 'keyup', () => {
     ipcRenderer.send('smm_search_courses', {title: document.querySelectorAll('.input-text-smm')[0].value});
 });
 
-/*
-addEvent(document.querySelectorAll('.input-button-game-dl')[0], 'click', () => {
+addEvent(document.querySelectorAll('.input-text-game-dl')[0], 'keyup', (event) => {
     ipcRenderer.send('games_search_cache', document.querySelectorAll('.input-text-game-dl')[0].value.trim());
 });
 
-addEvent(document.querySelectorAll('.input-text-game-dl')[0], 'keyup', (event) => {
-    if (event.code == 'Enter' || event.code == 'Return') {
-        ipcRenderer.send('games_search_cache', document.querySelectorAll('.input-text-game-dl')[0].value.trim());
-    }
-});
-*/
-addEvent(document.querySelectorAll('.input-text-game-dl')[0], 'keyup', (event) => {
-    ipcRenderer.send('games_search_cache', document.querySelectorAll('.input-text-game-dl')[0].value.trim());
+addEvent(document.querySelector('#popup1 .button'), 'click', (event) => {
+    ipcRenderer.send('rom_decryption_missing');
+    document.querySelector('#popup1').classList.add('hidden');
 });
 
 function toggleSMMDB() {
@@ -572,6 +566,10 @@ function setIPCevents() {
                 }
             }
         }
+    });
+
+    ipcRenderer.on('rom_decryption_missing', () => {
+        document.querySelector('#popup1').classList.remove('hidden');
     });
 }
 
