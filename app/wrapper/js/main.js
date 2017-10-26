@@ -53,8 +53,6 @@ addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
         name: 'Fluent'
     });
 });
-addEvent(document.getElementsByClassName('dlgames')[0], 'click', toggleGAMES );
-addEvent(document.getElementsByClassName('smmdb')[0], 'click', toggleSMMDB );
 
 addEvent(document.querySelectorAll('.input-text-smm')[0], 'keyup', () => {
     ipcRenderer.send('smm_search_courses', {title: document.querySelectorAll('.input-text-smm')[0].value});
@@ -146,6 +144,7 @@ addEvent(window, 'keypress', function(event) {
 function setTheme(event,data) {
     openLoadingScreen();
     setTimeout(function () {
+        closeMenu();
         let current_view = document.getElementById('webview');
         var new_view = document.createElement('iframe');
         
@@ -189,6 +188,51 @@ function openNav() {
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 } 
+//menu animations
+
+function openMenu() {
+    document.getElementById('menu').style.opacity = '0';
+    document.querySelector('#menu .container').style.left = '-100%';
+    document.getElementById('menu').style.display = 'block';
+    setTimeout(function () {
+        document.getElementById('menu').style.opacity = '1';
+        setTimeout(function () {
+            document.querySelector('#menu .container').style.left = '0%';
+        },250);
+    },10);
+}
+function closeMenu() {
+    document.querySelector('#menu .container').style.left = '-100%';
+    setTimeout(function () {
+        document.getElementById('menu').style.opacity = '0';
+        setTimeout(function () {
+            document.getElementById('menu').style.display = 'none';
+            closeMenuSection('theme_selection');
+            closeMenuSection('settings_section');
+        },250);
+    },250);
+}
+function openMenuSection(id) {
+    document.getElementById(id).style.left = '0%';
+}
+function closeMenuSection(id) {
+    document.getElementById(id).style.left = '-100%';
+}
+//menu onclicks
+document.getElementById('dlgames_button').onclick = function () {
+    toggleGAMES();
+    closeMenu();
+}
+document.getElementById('smmdb_button').onclick = function () {
+    toggleSMMDB();
+    closeMenu();
+}
+document.getElementById('themes_button').onclick = function () {
+    openMenuSection('theme_selection');
+}
+document.getElementById('settings_button').onclick = function () {
+    openMenuSection('settings_section');
+}
 
 //update functionality
 
@@ -291,6 +335,10 @@ function setIPCevents() {
             }
             balls.children[progress_balls_ind].classList.add('selected');
         }   
+    });
+    
+    ipcRenderer.on('open_menu_wrapper', function(event, data) {
+        openMenu();
     });
 
     ipcRenderer.on('cemu_folder_loaded', function(event, data) {

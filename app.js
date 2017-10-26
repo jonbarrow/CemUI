@@ -284,6 +284,10 @@ ipcMain.on('theme_finished_loading', (event, data) => {
 	ApplicationWindow.webContents.send('wrapper_close_loading');
 });
 
+ipcMain.on('open_menu', (event, data) => {
+	ApplicationWindow.webContents.send('open_menu_wrapper');
+});
+
 ipcMain.on('check_for_update', checkForUpdate);
 ipcMain.on('download_update', downloadUpdate);
 ipcMain.on('apply_update', applyUpdate);
