@@ -1,5 +1,6 @@
 ![CemUI Logo](https://i.imgur.com/FyFr81X.png)
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Latest](https://img.shields.io/github/release/RedDuckss/CemUI/all.svg)
 ![Total Downloads](https://img.shields.io/github/downloads/RedDuckss/CemUI/total.svg)
 ![Star](https://img.shields.io/github/stars/RedDuckss/CemUI.svg?style=social&label=Star)
