@@ -775,17 +775,23 @@ ipcMain.on('smm_load_client_courses', async () => {
 	for (let cemu_path of settings_storage.get('cemu_paths').value()) {
 		for (let smm_save_path of SMM_VALID_SAVE_PATHS) {
 			if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
-				console.log(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))
-				let courses = {
+				let save = await smm_editor.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path));
+				await save.exportThumbnail();
+
+				let saved_courses = await save.loadCourses(),
+					courses = {
 					save_dir: smm_save_path,
 					cemu_path: cemu_path.cemu_folder_path,
 					courses: []
 				}
-				for (let smm_save_dir of getDirectories(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
-					let course = await smm_editor.loadCourse(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, smm_save_dir));
-					course.exportThumbnailSync();
+				
+				for (let course in saved_courses) {
+					var course_id = course.replace(/course/, '');
+					course = saved_courses[course];
+
 					courses.courses.push({
-						id: smm_save_dir,
+						id: course_id,
+						course_id: 'course' + course_id,
 						save_id: smm_save_path,
 						cemu: cemu_path.cemu_folder_path,
 						title: course.title,
@@ -811,7 +817,7 @@ ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
 		message: 'Select new thumbnail',
 		properties: ['openFile'],
 		filters: [
-			{name: 'thumbnail1.jpg', extensions: ['jpg', 'jpeg', 'png']}
+			{name: 'thumbnail1.jpg', extensions: ['jpg', 'jpeg']}
 		]
 	});
 
@@ -820,32 +826,34 @@ ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
 	}
 	image_location = image_location[0];
 	
-	let course_id = data.split('\\').pop(),
-		course_index = course_id.substr(course_id.length - 3);
+	let save_url = path.join(data, '../'),
+		save = await smm_editor.loadSave(save_url),
+		courses = await save.loadCourses();
 
-		console.log(unpad)
-	let course = await smm_editor.loadCourse(data);
-	await course.setThumbnail(image_location);
-	course.writeToSave(course_index, data);
-
-	console.log(course_index, unpad(course_index), unpad('010'));
-
+	console.log(courses)
+	/*
 	let smm_courses = [];
 		
 	for (let cemu_path of settings_storage.get('cemu_paths').value()) {
 		for (let smm_save_path of SMM_VALID_SAVE_PATHS) {
 			if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
-				console.log(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))
-				let courses = {
+				let save = await smm_editor.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path));
+				await save.exportThumbnail();
+
+				let saved_courses = await save.loadCourses(),
+					courses = {
 					save_dir: smm_save_path,
 					cemu_path: cemu_path.cemu_folder_path,
 					courses: []
 				}
-				for (let smm_save_dir of getDirectories(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
-					let course = await smm_editor.loadCourse(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, smm_save_dir));
-					course.exportThumbnailSync();
+				
+				for (let course in saved_courses) {
+					course_id = course.replace(/course/, '');
+					course = saved_courses[course];
+
 					courses.courses.push({
-						id: smm_save_dir,
+						id: course_id,
+						course_id: 'course' + course_id,
 						save_id: smm_save_path,
 						cemu: cemu_path.cemu_folder_path,
 						title: course.title,
@@ -858,6 +866,7 @@ ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
 	}
 
 	ApplicationWindow.webContents.send('smm_player_courses', smm_courses);
+	*/
 
 });
 

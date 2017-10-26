@@ -534,13 +534,13 @@ function setIPCevents() {
                 course.querySelector('.details').removeChild(course.querySelector('.stars'));
 
                 addEvent(course.querySelector('h1.download'), 'click', () => {
-                    ipcRenderer.send('smm_upload_level', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id));
+                    ipcRenderer.send('smm_upload_level', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.course_id));
                 });
                 addEvent(course.querySelector('.img_thumbnail'), 'click', () => {
-                    ipcRenderer.send('smm_change_thumbnail_image', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id));
+                    ipcRenderer.send('smm_change_thumbnail_image', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.course_id));
                 });
                 addEvent(course.querySelector('.img_preview'), 'click', () => {
-                    ipcRenderer.send('smm_change_preview_image', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id));
+                    ipcRenderer.send('smm_change_preview_image', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.course_id));
                 });
 
                 let imgs = course.querySelectorAll('.img_container');
@@ -556,8 +556,8 @@ function setIPCevents() {
                 course.querySelector('h1.download').classList.remove('download');
                 course.querySelector('.course-name').innerHTML = course_data.title;
                 course.querySelector('.owner').innerHTML = course_data.maker;
-                course.querySelector('.img_preview img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id, 'thumbnail0.jpg?' + new Date());
-                course.querySelector('.img_thumbnail img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.id, 'thumbnail1.jpg?' + new Date());
+                course.querySelector('.img_preview img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, 'course' + course_data.id, 'thumbnail0.jpg?' + new Date());
+                course.querySelector('.img_thumbnail img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, 'course' + course_data.id, 'thumbnail1.jpg?' + new Date());
 
                 if (i % 2 != 0) {
                     course_cols[2].appendChild(course)
