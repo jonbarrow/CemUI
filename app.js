@@ -1613,19 +1613,13 @@ function getThemes() {
 	let themes = [{
 		name: 'Flux',
 		is_built_in: true,
-		config: {
-			title: 'Flux',
-			description: 'System default'
-		},
+		config: fs.readJsonSync(path.join(__dirname, 'app', 'Flux', 'config.json')),
 		screenshot: path.join(__dirname, 'app', 'Flux', 'thumbnail.jpg')
 	},
 	{
 		name: 'Fluent',
 		is_built_in: true,
-		config: {
-			title: 'Fluent',
-			description: 'The original CemUI 2.0 theme'
-		},
+		config: fs.readJsonSync(path.join(__dirname, 'app', 'Fluent', 'config.json')),
 		screenshot: path.join(__dirname, 'app', 'Fluent', 'thumbnail.jpg')
 	}];
 

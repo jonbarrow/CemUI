@@ -47,8 +47,10 @@ function insertThemeList(event, data) {
     console.log(data);
     document.getElementById('theme_list').innerHTML = '';
     for (let theme of data) {
-        let item = document.getElementById("TEMPLATE_THEME_LIST").content.firstElementChild.cloneNode(true);
+        let item = document.getElementById("TEMPLATE_THEME_LIST").content.firstElementChild.cloneNode(true),
+            rgb = hex2RGB(theme.config.theme_color);
         item.querySelector('.bg').style.backgroundImage = 'url("' + theme.screenshot + '")';
+        item.querySelector('.bg .desc').style.backgroundColor = 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.81)';
         addEvent(item.querySelector('.bg'), 'click', () => {
             console.log(theme)
             console.log(theme.name)
@@ -649,6 +651,16 @@ function setIPCevents() {
 
 setIPCevents();
 ipcRenderer.send('init',{page: 'wrapper'});
+
+function hex2RGB(hex) {
+    if (!hex) {
+        return {r:89, g:137, b:229};
+    }
+    let r = parseInt(hex.slice(1, 3), 16),
+        g = parseInt(hex.slice(3, 5), 16),
+        b = parseInt(hex.slice(5, 7), 16);
+    return {r:r,g:g,b:b};
+}
 
 String.prototype.insert = function(index, string) {
     if (index > 0) {
