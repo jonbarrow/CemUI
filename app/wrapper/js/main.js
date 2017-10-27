@@ -268,6 +268,9 @@ addEvent(document.getElementById('select_cemu').getElementsByClassName('txt-butt
     ipcRenderer.send('load_cemu_folder');
     this.classList.add('disabled');
 });
+addEvent(document.querySelector('.cemu_skip'), 'click', function() {
+    ipcRenderer.send('skip_cemu_folder');
+});
 
 addEvent(document.getElementById('select_games').getElementsByClassName('txt-button')[0], 'click', function() {
     if (this.classList.contains('disabled')) {
@@ -275,6 +278,9 @@ addEvent(document.getElementById('select_games').getElementsByClassName('txt-but
     }
     ipcRenderer.send('load_games_folder');
     this.classList.add('disabled');
+});
+addEvent(document.querySelector('.games_skip'), 'click', function() {
+    ipcRenderer.send('skip_games_folder');
 });
 
 function openScreen(id) {

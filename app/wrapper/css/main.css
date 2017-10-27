@@ -137,6 +137,10 @@ body {
 .screens .progress .selected {
     background-color: #4696f4;
 }
+.cemu_skip, .games_skip {
+    cursor: pointer;
+}
+
 #smm {
     position: absolute;
     top: 0;
