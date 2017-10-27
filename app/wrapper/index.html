@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/main.css" type="text/css">
         <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="css/super-mario-font.css" rel="stylesheet" type="text/css">
     </head>
     <body>
         
@@ -72,19 +73,31 @@
                     </div>
                     <hr>
                     <div class="menu-item bigpadding txt-hover-blacktoblue" id="settings_button">
-                        <h2 class="text-s-32 txt-up txt-c-blue">Settings</h2>
+                        <h2 class="text-s-32 txt-up txt-c-blue">
+                            <i class="txt-s-32 fa fa-cogs" aria-hidden="true"></i>
+                            Settings
+                        </h2>
                         <p class="txt-s-18">Configure special settings here.</p>
                     </div>
                     <div class="menu-item bigpadding txt-hover-blacktoblue" id="themes_button">
-                        <h2 class="text-s-32 txt-up txt-c-blue">Themes</h2>
+                        <h2 class="text-s-32 txt-up txt-c-blue">
+                            <i class="txt-s-32 fa fa-paint-brush" aria-hidden="true"></i>
+                            Themes
+                        </h2>
                         <p class="txt-s-18">Want a new look and feel? configure it here.</p>
                     </div>
                     <div class="menu-item bigpadding txt-hover-blacktoblue" id="dlgames_button">
-                        <h2 class="text-s-32 txt-up txt-c-blue">Download games</h2>
+                        <h2 class="text-s-32 txt-up txt-c-blue">
+                            <i class="txt-s-32 fa fa-cloud-download" aria-hidden="true"></i>
+                            Download games
+                        </h2>
                         <p class="txt-s-18">Ran out of games to play? We got you covered.</p>
                     </div>
                     <div class="menu-item bigpadding txt-hover-blacktoblue" id="smmdb_button">
-                        <h2 class="text-s-32 txt-up txt-c-blue">Super Mario Maker levels</h2>
+                        <h2 class="text-s-32 txt-up txt-c-blue">
+                            <i class="txt-s-32 icon-super-mario-mario"></i>
+                            Super Mario Maker levels
+                        </h2>
                         <p class="txt-s-18">The place to be to play some more of those really nice mario levels.</p>
                     </div>
                 </div>
@@ -93,15 +106,45 @@
                         <h2 class="txt-s-32 txt-link txt-link-black txt-c-black padding txt-up" onclick="closeMenuSection('theme_selection');">BACK</h2>
                     </div>
                     <hr>
-                    <button class="flux">Flux</button><br>
-                    <button class="fluent">Fluent</button>
+                    <div class="menu-item bigpadding txt-hover-blacktoblue flux">
+                        <h2 class="text-s-32 txt-up txt-c-blue">
+                            Flux
+                        </h2>
+                        <p class="txt-s-18">System default</p>
+                    </div>
+                    <div class="menu-item bigpadding txt-hover-blacktoblue fluent">
+                        <h2 class="text-s-32 txt-up txt-c-blue">
+                            Fluent
+                        </h2>
+                        <p class="txt-s-18">The original CemUI 2.0 theme</p>
+                    </div>
                 </div>
                 <div class="slide-container slide-hidden" id="settings_section">
                     <div class="header">
                         <h2 class="txt-s-32 txt-link txt-link-black txt-c-black padding txt-up" onclick="closeMenuSection('settings_section');">BACK</h2>
                     </div>
                     <hr>
-                    <p>Itsa empty, check back in the update.</p>
+                    <div class="menu-item bigpadding txt-hover-blacktoblue" id="setting_smmdb_api_key_button">
+                        <h2 class="text-s-32 txt-up txt-c-blue">
+                            <i class="fa fa-key" aria-hidden="true"></i>
+                            SMMDB API Key
+                        </h2>
+                        <p class="txt-s-18">Enter your SMMDB API key (used for course uploading)</p>
+                    </div>
+                    <div class="menu-item bigpadding txt-hover-blacktoblue" id="setting_cemu_paths_button">
+                        <h2 class="text-s-32 txt-up txt-c-blue">
+                            <i class="fa fa-gamepad" aria-hidden="true"></i>
+                            Cemu paths
+                        </h2>
+                        <p class="txt-s-18">Add and remove different Cemu instances</p>
+                    </div>
+                    <div class="menu-item bigpadding txt-hover-blacktoblue" id="setting_game_paths_button">
+                        <h2 class="text-s-32 txt-up txt-c-blue">
+                            <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                            Game folder paths
+                        </h2>
+                        <p class="txt-s-18">Add and remove different game/rom folders</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -122,6 +165,7 @@
                     <div class="colm"></div>
                 </div>
                 <div id="smm-wrapper-player-courses" class="wrapper hidden">
+                    <div class="situp-loading hidden"></div>
                     <div class="colm"></div>
                     <div class="colm"></div>
                 </div>

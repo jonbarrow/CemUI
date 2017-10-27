@@ -2,7 +2,7 @@ const APP_VERSION = '2.1.1';
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
-	electron_reload = require('electron-reload')(__dirname), // lmao super broke idek why this is here
+	electron_reload = require('electron-reload')(__dirname),
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
@@ -774,41 +774,7 @@ ipcMain.on('cancel_game', (event, data) => {
 });
 
 ipcMain.on('smm_load_client_courses', async () => {
-	let smm_courses = [];
-		
-	for (let cemu_path of settings_storage.get('cemu_paths').value()) {
-		for (let smm_save_path of SMM_VALID_SAVE_PATHS) {
-			if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
-				let save = await smm_editor.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path));
-				await save.exportThumbnail();
-
-				let saved_courses = await save.loadCourses(),
-					courses = {
-					save_dir: smm_save_path,
-					cemu_path: cemu_path.cemu_folder_path,
-					courses: []
-				}
-				
-				for (let course in saved_courses) {
-					var course_id = course.replace(/course/, '');
-					course = saved_courses[course];
-
-					courses.courses.push({
-						id: course_id,
-						course_id: 'course' + course_id,
-						save_id: smm_save_path,
-						cemu: cemu_path.cemu_folder_path,
-						title: course.title,
-						maker: course.maker
-					});
-				}
-				smm_courses.push(courses);
-			}
-		}
-	}
-
-	ApplicationWindow.webContents.send('smm_player_courses', smm_courses);
-	
+	sendSMMCourses();	
 });
 
 ipcMain.on('smm_upload_level', (event, data) => {
@@ -830,52 +796,29 @@ ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
 	}
 	image_location = image_location[0];
 	
-	let save_url = path.join(data, '../'),
-		save = await smm_editor.loadSave(save_url),
-		courses = await save.loadCourses();
-
-	console.log(courses)
-	/*
-	let smm_courses = [];
-		
-	for (let cemu_path of settings_storage.get('cemu_paths').value()) {
-		for (let smm_save_path of SMM_VALID_SAVE_PATHS) {
-			if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
-				let save = await smm_editor.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path));
-				await save.exportThumbnail();
-
-				let saved_courses = await save.loadCourses(),
-					courses = {
-					save_dir: smm_save_path,
-					cemu_path: cemu_path.cemu_folder_path,
-					courses: []
-				}
-				
-				for (let course in saved_courses) {
-					course_id = course.replace(/course/, '');
-					course = saved_courses[course];
-
-					courses.courses.push({
-						id: course_id,
-						course_id: 'course' + course_id,
-						save_id: smm_save_path,
-						cemu: cemu_path.cemu_folder_path,
-						title: course.title,
-						maker: course.maker
-					});
-				}
-				smm_courses.push(courses);
-			}
-		}
-	}
-
-	ApplicationWindow.webContents.send('smm_player_courses', smm_courses);
-	*/
-
+	fs.copySync(image_location, path.join(data, 'thumbnail1.jpg'));
+	
+	sendSMMCourses();
 });
 
 ipcMain.on('smm_change_preview_image', (event, data) => {
+	let image_location = dialog.showOpenDialog({
+		title: 'Select new preview',
+		message: 'Select new preview',
+		properties: ['openFile'],
+		filters: [
+			{name: 'thumbnail0.jpg', extensions: ['jpg', 'jpeg']}
+		]
+	});
 
+	if (!image_location) {
+		return;
+	}
+	image_location = image_location[0];
+	
+	fs.copySync(image_location, path.join(data, 'thumbnail0.jpg'));
+	
+	sendSMMCourses();
 });
 
 function sendScreens() {
@@ -1468,6 +1411,50 @@ function createShortcut(emulator, id) {
 
 function getDirectories(src) {  // Gets dirs
 	return fs.readdirSync(src).filter(file => fs.statSync(path.join(src, file)).isDirectory());
+}
+
+async function sendSMMCourses() {
+		let smm_courses = [];
+		
+	for (let cemu_path of settings_storage.get('cemu_paths').value()) {
+		for (let smm_save_path of SMM_VALID_SAVE_PATHS) {
+			if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
+				let save = await smm_editor.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path));
+
+				let saved_courses = await save.loadCourses(),
+					courses = {
+					save_dir: smm_save_path,
+					cemu_path: cemu_path.cemu_folder_path,
+					courses: []
+				}
+				
+				for (let course in saved_courses) {
+					var course_id = course.replace(/course/, '');
+					course = saved_courses[course];
+
+					await course.setThumbnail(
+						path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, 'course'.concat(course_id), 'thumbnail0.jpg'),
+						path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, 'course'.concat(course_id), 'thumbnail1.jpg')
+					);
+
+					await course.writeThumbnail();
+					await course.exportThumbnail();
+
+					courses.courses.push({
+						id: course_id,
+						course_id: 'course' + course_id,
+						save_id: smm_save_path,
+						cemu: cemu_path.cemu_folder_path,
+						title: course.title,
+						maker: course.maker
+					});
+				}
+				smm_courses.push(courses);
+			}
+		}
+	}
+
+	ApplicationWindow.webContents.send('smm_player_courses', smm_courses);
 }
 
 Array.prototype.contains = function(el) {

@@ -148,6 +148,16 @@ body {
     display: none;
     transition: top .5s;
 }
+.situp-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 128px;
+    height: 52px;
+    transform: translate(-50%);
+    background-image: url(../images/situps.png);
+    animation: situps 1.6s steps(8) infinite
+}
 #smm .main {
     background-color: #086a9a;
     display: none;
@@ -361,8 +371,8 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    -webkit-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%);
+            transform: translate(-50%);
 }
 #smm #smm-wrapper-player-courses .course .img_container:hover div {
     visibility: visible;
@@ -870,4 +880,13 @@ body {
 .txt-s-12 {
     font-size: 12px;
     line-height: 12px;
+}
+
+@keyframes situps {
+    0% {
+        background-position: 0 0
+    }
+    100% {
+        background-position:0 -416px
+    }
 }
