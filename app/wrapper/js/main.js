@@ -54,6 +54,11 @@ addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
     });
 });
 
+function insertThemeList(event, data) {
+    console.log(data);
+    //nothing yet
+}
+
 addEvent(document.querySelectorAll('.input-text-smm')[0], 'keyup', () => {
     ipcRenderer.send('smm_search_courses', {title: document.querySelectorAll('.input-text-smm')[0].value});
 });
@@ -628,6 +633,8 @@ function setIPCevents() {
     ipcRenderer.on('rom_decryption_missing', () => {
         document.querySelector('#popup1').classList.remove('hidden');
     });
+    
+    ipcRenderer.on('themes_list',insertThemeList);
 }
 
 setIPCevents();

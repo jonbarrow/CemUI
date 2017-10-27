@@ -171,8 +171,6 @@ FUCK IT, WE'RE ALREADY RIPPING THEIR GAMES WHY NOT CSS
     height:160px;
     margin-top:-80px;
     margin-left:-80px;
-    -moz-border-radius:10px;
-    -webkit-border-radius:10px;
     border-radius:10px;
     background-color:#fff;
 }
@@ -185,7 +183,8 @@ FUCK IT, WE'RE ALREADY RIPPING THEIR GAMES WHY NOT CSS
     margin-top:-26px;
     margin-left:-64px;
     background-image: url(../images/situps.png);
-    animation: situps 1.6s steps(8) infinite
+    -webkit-animation: situps 1.6s steps(8) infinite;
+            animation: situps 1.6s steps(8) infinite
 }
 /**
 
@@ -710,6 +709,48 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     color: white;
 }
 
+#menu .theme {
+    padding: 25px;
+    display: block;
+}
+#menu .theme .bg {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;
+    box-shadow: 0px 0px 36px -13px rgba(0,0,0,0.75);
+    cursor: pointer;
+}
+#menu .theme .bg .desc {
+    background-color: rgba(89, 137, 229, 0.81);
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-align: center;
+            -webkit-box-pack: center;
+                    justify-content: center;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+                    flex-direction: column;
+    text-align: left;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    padding: 10px 25px;
+    transition: height .25s;
+}
+#menu .theme .bg .desc p:first-child {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+#menu .theme .bg:hover .desc {
+    height: 100%;
+}
 
 
 
@@ -914,6 +955,15 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
 .txt-s-12 {
     font-size: 12px;
     line-height: 12px;
+}
+
+@-webkit-keyframes situps {
+    0% {
+        background-position: 0 0
+    }
+    100% {
+        background-position:0 -416px
+    }
 }
 
 @keyframes situps {
