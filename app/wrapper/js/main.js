@@ -43,18 +43,8 @@ function addEvent(object, event, func) {
     object.addEventListener(event, func, true);
 }
 
-addEvent(document.getElementsByClassName('flux')[0], 'click', function() {
-    ipcRenderer.send('change_theme', {
-        name: 'Flux'
-    });
-});
-addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
-    ipcRenderer.send('change_theme', {
-        name: 'Fluent'
-    });
-});
-
 function insertThemeList(event, data) {
+    console.log(data);
     document.getElementById('theme_list').innerHTML = '';
     for (var ind = 0; ind < data.length; ind++) {
         let item = document.getElementById("TEMPLATE_THEME_LIST").content.firstElementChild.cloneNode(true);
