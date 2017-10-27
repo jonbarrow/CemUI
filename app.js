@@ -117,7 +117,7 @@ settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
 settings_storage.defaults({
 	cemu_paths: [],
 	game_paths: [],
-	theme: 'Fluent',
+	theme: 'Flux',
 	smmdb_api_key: '',
 	ticket_cache_folder: path.join(DATA_ROOT, 'ticketcache'),
 	ticket_cache_vendor: 'http://cemui.com/api/v2/ticketcache',
@@ -441,6 +441,9 @@ ipcMain.on('load_cemu_folder', () => {
 	settings_storage.get('cemu_paths').push(cemu_object).write();
 	ApplicationWindow.webContents.send('cemu_folder_loaded');
 });
+ipcMain.on('skip_cemu_folder', () => {
+	ApplicationWindow.webContents.send('cemu_folder_loaded');
+});
 
 ipcMain.on('load_games_folder', () => {
 	var game_path = pickGameFolder();
@@ -452,17 +455,25 @@ ipcMain.on('load_games_folder', () => {
 		ApplicationWindow.webContents.send('games_folder_loaded');
 	});
 });
+ipcMain.on('skip_games_folder', () => {
+	ApplicationWindow.webContents.send('games_folder_loaded');
+});
 
 ipcMain.on('play_rom', (event, data) => {
 	var game = game_storage.get('games').find({title_id: data.rom}).value(),
+		instance = settings_storage.get('cemu_paths').find({name: data.emu}).value(),
 		game_path;
+
+	if (!instance || !game) {
+		return;
+	}
 	if (game.is_wud) {
 		game_path = game.path;
 	} else {
 		game_path = game.path + '/code/' + game.rom;
 	}
 
-	exec('"' + settings_storage.get('cemu_paths').find({name: data.emu}).value().cemu_path + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
+	exec('"' + instance.cemu_path + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
 		if (error) {
 			console.error(error);
 			return;
@@ -509,14 +520,19 @@ ipcMain.on('games_search_cache', (event, data) => {
 ipcMain.on('update_game_settings', (event, data) => {
 	var id = data.rom.toLowerCase().replace('-', ''),
 		settings = data.settings,
-		valid_games = game_storage.get('games').filter({title_id: data.rom}).value();
+		valid_games = game_storage.get('games').filter({title_id: data.rom}).value(),
+		instance = settings_storage.get('cemu_paths').find({name: data.emu}).value();
+
+	if (!valid_games || !instance) {
+		return;
+	}
 	
 	for (var i=0;i<valid_games.length;i++) {
 		var game = valid_games[i];
 		game_storage.get('games').find({path: game.path}).set('settings', settings).write();
 	}
 	
-	fs.writeFileSync(settings_storage.get('cemu_paths').find({name: data.emu}).value().cemu_folder_path + '/gameProfiles/' + id + '.ini', ini.encode(settings));
+	fs.writeFileSync(instance.cemu_folder_path + '/gameProfiles/' + id + '.ini', ini.encode(settings));
 });
 
 ipcMain.on('smm_dl_level', function(event, data) {
@@ -936,14 +952,19 @@ function init() {
 				callback();
 			});
 		}, (error) => {
-			var games = game_storage.get('games').value(),
-				most_played = getMostPlayed(games);
-			
-			getSuggested(most_played, (error, suggested) => {
-				if (error) throw error;
+			var games = game_storage.get('games').value();
+			if (!games || games.length <= 0) {
+				console.log('info', 'test')
 				ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
-				ApplicationWindow.webContents.send('init_complete', {library: games, most_played: most_played, suggested: suggested});
-			});
+				ApplicationWindow.webContents.send('init_complete', {library: [], most_played: [], suggested: []});
+			} else {
+				let most_played = getMostPlayed(games);
+				getSuggested(most_played, (error, suggested) => {
+					if (error) throw error;
+					ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
+					ApplicationWindow.webContents.send('init_complete', {library: games, most_played: most_played, suggested: suggested});
+				});
+			}
 		})
 	});
 }
@@ -1390,7 +1411,10 @@ function loadGames(dir, master_callback) {
 }
 
 function pickSMMLevelFolder() {
-	let smm_base_folder = path.join(settings_storage.get('cemu_paths').find({name: 'Default'}).value().cemu_folder_path, 'mlc01', 'emulatorSave'),
+	let instance = settings_storage.get('cemu_paths').find({name: 'Default'}).value();
+	if (!instance) return;
+
+	let smm_base_folder = path.join(instance.cemu_folder_path, 'mlc01', 'emulatorSave'),
 		smm_save_dir = smm_base_folder;
 	
 	for (let smm_save_path of SMM_VALID_SAVE_PATHS) {
@@ -1514,9 +1538,9 @@ function createShortcut(emulator, id) {
 	God I fucking hate Node support for lnk files, and lnk files in general. 00050000-10143500
 	*/
 	var game = game_storage.get('games').find({ title_id: id }).value(),
-		cemu = settings_storage.get('cemu_paths').find({name: emulator}).value().cemu_path,
+		cemu = settings_storage.get('cemu_paths').find({name: emulator}).value(),
 		rom;
-	if (!game) return;
+	if (!game || !cemu) return;
 
 	if (game.is_wud) {
 		rom = game.path;
@@ -1525,7 +1549,7 @@ function createShortcut(emulator, id) {
 	}
 
 	ws.create(require('os').homedir() + '/Desktop/' + game.name_clean + ' (' + emulator + ').lnk', {
-		target : cemu,
+		target : cemu.cemu_path,
 		args: '-g "' + rom + '"',
 		icon: DATA_ROOT + 'cache/images/' + id + '/icon.ico',
 		iconIndex: '0',
