@@ -1612,6 +1612,7 @@ async function sendSMMCourses() {
 function getThemes() {
 	let themes = [{
 		name: 'Flux',
+		is_built_in: true,
 		config: {
 			// idk what you want here
 		},
@@ -1619,6 +1620,7 @@ function getThemes() {
 	},
 	{
 		name: 'Fluent',
+		is_built_in: true,
 		config: {
 			// idk what you want here
 		},
@@ -1632,7 +1634,7 @@ function getThemes() {
 		}
 		let theme_config = fs.readJsonSync(path.join(DATA_ROOT, 'themes', custom_theme, 'config.json')),
 			theme = {
-				name: theme_config.name,
+				name: custom_theme,
 				config: theme_config,
 				screenshot: path.join(DATA_ROOT, 'themes', custom_theme, 'thumbnail.jpg')
 			}
