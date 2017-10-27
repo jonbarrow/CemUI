@@ -55,8 +55,20 @@ addEvent(document.getElementsByClassName('fluent')[0], 'click', function() {
 });
 
 function insertThemeList(event, data) {
-    console.log(data);
-    //nothing yet
+    document.getElementById('theme_list').innerHTML = '';
+    for (var ind = 0; ind < data.length; ind++) {
+        let item = document.getElementById("TEMPLATE_THEME_LIST").content.firstElementChild.cloneNode(true);
+        item.querySelector('.bg').style.backgroundImage = 'url("' + data[ind].screenshot + '")';
+        item.querySelector('.bg').onclick = function () {
+            ipcRenderer.send('change_theme', {
+                name: data[ind].name
+            });
+        }
+        //item.querySelector('.desc').style.backgroundColor = data[ind].config.theme_color;
+        item.querySelector('.title').innerHTML = /*data[ind].config.title*/ 'placeholder';
+        item.querySelector('.description').innerHTML = /*data[ind].config.description*/ 'placeholder';
+        document.getElementById('theme_list').appendChild(item);
+    }
 }
 
 addEvent(document.querySelectorAll('.input-text-smm')[0], 'keyup', () => {
