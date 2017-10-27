@@ -67,6 +67,10 @@ addEvent(document.querySelector('#popup1 .button'), 'click', (event) => {
     document.querySelector('#popup1').classList.add('hidden');
 });
 
+addEvent(document.querySelector('#setting_cdecrypt_location_button'), 'click', () => {
+    ipcRenderer.send('rom_decryption_missing');
+});
+
 function toggleSMMDB() {
     var el = document.getElementById('smm');
     if (el.style.display == "block") {
