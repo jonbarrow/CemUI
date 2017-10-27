@@ -774,14 +774,17 @@ ipcMain.on('cancel_game', (event, data) => {
 });
 
 ipcMain.on('smm_load_client_courses', async () => {
+	ApplicationWindow.webContents.send('smm_show_loader');
 	sendSMMCourses();	
 });
 
 ipcMain.on('smm_upload_level', (event, data) => {
+	ApplicationWindow.webContents.send('smm_show_loader');
 
 });
 
 ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
+	ApplicationWindow.webContents.send('smm_show_loader');
 	let image_location = dialog.showOpenDialog({
 		title: 'Select new thumbnail',
 		message: 'Select new thumbnail',
@@ -802,6 +805,7 @@ ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
 });
 
 ipcMain.on('smm_change_preview_image', (event, data) => {
+	ApplicationWindow.webContents.send('smm_show_loader');
 	let image_location = dialog.showOpenDialog({
 		title: 'Select new preview',
 		message: 'Select new preview',
@@ -1414,7 +1418,7 @@ function getDirectories(src) {  // Gets dirs
 }
 
 async function sendSMMCourses() {
-		let smm_courses = [];
+	let smm_courses = [];
 		
 	for (let cemu_path of settings_storage.get('cemu_paths').value()) {
 		for (let smm_save_path of SMM_VALID_SAVE_PATHS) {

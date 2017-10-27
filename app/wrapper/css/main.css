@@ -160,9 +160,10 @@ FUCK IT, WE'RE ALREADY RIPPING THEIR GAMES WHY NOT CSS
     top:0;
     left:0;
     position:fixed;
-    z-index:200
+    z-index:200;
+    background: rgba(0, 0, 0, 0.7);
 }
-#situp-loading-overlay #situp-loading-overlay-pedestal{
+#situp-loading-overlay #situp-loading-overlay-pedestal {
     position:fixed;
     top:50%;
     left:50%;
@@ -173,7 +174,7 @@ FUCK IT, WE'RE ALREADY RIPPING THEIR GAMES WHY NOT CSS
     -moz-border-radius:10px;
     -webkit-border-radius:10px;
     border-radius:10px;
-    background-color:#fff
+    background-color:#fff;
 }
 .situp-loading {
     position: fixed;

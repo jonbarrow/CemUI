@@ -570,7 +570,12 @@ function setIPCevents() {
         item.querySelector('.status').innerHTML = 'Finished';
     });
 
+    ipcRenderer.on('smm_show_loader', () => {
+        document.querySelector('#situp-loading-overlay').classList.remove('hidden');
+    });
+
     ipcRenderer.on('smm_player_courses', (event, data) => {
+        document.querySelector('#situp-loading-overlay').classList.add('hidden');
         let i = 0,
             course_cols = document.querySelectorAll('.colm');
 
