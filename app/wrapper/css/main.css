@@ -148,16 +148,49 @@ body {
     display: none;
     transition: top .5s;
 }
+/**
+
+RIPPED FROM NINTENDO BOOKMARK SITE
+FUCK IT, WE'RE ALREADY RIPPING THEIR GAMES WHY NOT CSS
+
+**/
+#situp-loading-overlay {
+    height:120%;
+    width:100%;
+    top:0;
+    left:0;
+    position:fixed;
+    z-index:200
+}
+#situp-loading-overlay #situp-loading-overlay-pedestal{
+    position:fixed;
+    top:50%;
+    left:50%;
+    width:160px;
+    height:160px;
+    margin-top:-80px;
+    margin-left:-80px;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px;
+    background-color:#fff
+}
 .situp-loading {
     position: fixed;
     top: 50%;
     left: 50%;
     width: 128px;
     height: 52px;
-    transform: translate(-50%);
+    margin-top:-26px;
+    margin-left:-64px;
     background-image: url(../images/situps.png);
     animation: situps 1.6s steps(8) infinite
 }
+/**
+
+END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
+
+**/
 #smm .main {
     background-color: #086a9a;
     display: none;
