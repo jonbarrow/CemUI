@@ -1614,7 +1614,8 @@ function getThemes() {
 		name: 'Flux',
 		is_built_in: true,
 		config: {
-			// idk what you want here
+			title: 'Flux',
+			description: 'System default'
 		},
 		screenshot: path.join(__dirname, 'app', 'Flux', 'thumbnail.jpg')
 	},
@@ -1622,7 +1623,8 @@ function getThemes() {
 		name: 'Fluent',
 		is_built_in: true,
 		config: {
-			// idk what you want here
+			title: 'Fluent',
+			description: 'The original CemUI 2.0 theme'
 		},
 		screenshot: path.join(__dirname, 'app', 'Fluent', 'thumbnail.jpg')
 	}];

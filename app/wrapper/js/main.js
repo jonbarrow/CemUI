@@ -46,18 +46,20 @@ function addEvent(object, event, func) {
 function insertThemeList(event, data) {
     console.log(data);
     document.getElementById('theme_list').innerHTML = '';
-    for (var ind = 0; ind < data.length; ind++) {
+    for (let theme of data) {
         let item = document.getElementById("TEMPLATE_THEME_LIST").content.firstElementChild.cloneNode(true);
-        item.querySelector('.bg').style.backgroundImage = 'url("' + data[ind].screenshot + '")';
-        item.querySelector('.bg').onclick = function () {
+        item.querySelector('.bg').style.backgroundImage = 'url("' + theme.screenshot + '")';
+        addEvent(item.querySelector('.bg'), 'click', () => {
+            console.log(theme)
+            console.log(theme.name)
             ipcRenderer.send('change_theme', {
-                name: data[ind].name
+                name: theme.name
             });
-        }
-        //item.querySelector('.desc').style.backgroundColor = data[ind].config.theme_color;
-        item.querySelector('.title').innerHTML = /*data[ind].config.title*/ 'placeholder';
-        item.querySelector('.description').innerHTML = /*data[ind].config.description*/ 'placeholder';
-        document.getElementById('theme_list').appendChild(item);
+        });
+        item.querySelector('.desc').style.backgroundColor = theme.config.theme_color;
+        item.querySelector('.title').innerHTML = theme.config.title;
+        item.querySelector('.description').innerHTML = theme.config.description;
+        document.getElementById('theme_list').appendChild(item);   
     }
 }
 
