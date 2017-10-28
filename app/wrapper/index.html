@@ -240,12 +240,21 @@
                 <div class="overlayR">DLC</div>
                 <img>
                 <h2 class="title content txt-s-24 txt-c-purple"></h2>
+                
                 <p class="txt-s-24 txt-c-blue download txt-button txt-button-large txt-button-white">download</p>
+                <!--
+                <select class="txt-s-24 txt-c-blue txt-button txt-button-large txt-button-white">
+                    <option value="all">Download</option>
+                    <option value="update">Update Only</option>
+                    <option value="dlc">DLC Only</option>
+                </select>
+                -->
                 <div class="download_options">
-                    <label class="hidden dlc-boolean" for="dlc-boolean">
-                        DLC <input type="checkbox" name="dlc-boolean" id="">
+                    <label class="hidden dlc-boolean checkbox-wrapper">
+                        DLC <input type="checkbox" checked="checked" name="dlc-boolean">
+                        <div class="checkbox_checker"></div>
                     </label>
-                    <select class="hidden update-selector" name="update-selector" id="">
+                    <select class="hidden dl-option update-selector txt-c-blue" name="update-selector" id="">
                         <option value="">No Update</option>
                     </select>
                 </div>

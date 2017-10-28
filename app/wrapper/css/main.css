@@ -876,6 +876,31 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
 .input-text-game-dl:focus, .input-text-game-dl:active {
     outline: none;
 }
+.download_options, .download_options .dl-option {
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+.update-selector {
+    background-color: #FFFFFF;
+    box-shadow: 0px 6px 0px 0px rgba(1,1,1,0.1);
+    margin: auto;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    outline: none;
+}
+.dlc-selector input {
+    background-color: #FFFFFF;
+    box-shadow: 0px 6px 0px 0px rgba(1,1,1,0.1);
+    margin: auto;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    outline: none;
+}
 .txt-button {
     background-color: #303C44;
     border-radius: 5px;
@@ -885,6 +910,7 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     margin-bottom: 4px !important;
     cursor: pointer;
     display:inline-block;
+    outline: none;
 }
 .txt-button-white {
     background-color: #FFFFFF;
@@ -977,4 +1003,61 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     100% {
         background-position:0 -416px
     }
+}
+
+.checkbox-wrapper {
+    font-family: arial;
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 5px;
+    padding-top: 3px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.checkbox-wrapper input {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+}
+.checkbox_checker {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background: #e6e6e6;
+    border: 0px solid #000000;
+}
+
+.checkbox-wrapper:hover input ~ .checkbox_checker,
+.checkbox-wrapper input:focus ~ .checkbox_checker {
+    background: #cccccc;
+}
+
+.checkbox-wrapper input:checked ~ .checkbox_checker {
+    background: #2aa1c0;
+}
+.checkbox-wrapper input:disabled ~ .checkbox_checker {
+    background: #e6e6e6;
+    opacity: 0.6;
+    pointer-events: none;
+}
+.checkbox_checker:after {
+    box-sizing: unset;
+    content: '';
+    position: absolute;
+    display: none;
+}
+.checkbox-wrapper input:checked ~ .checkbox_checker:after {
+    display: block;
+}
+.checkbox-wrapper .checkbox_checker:after {
+    left: 8px;
+    top: 4px;
+    width: 3px;
+    height: 8px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
 }
