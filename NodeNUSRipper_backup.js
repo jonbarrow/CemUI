@@ -564,7 +564,7 @@ Main.prototype._ripFile = function(TID, url, file, cb) {
 
         let received_bytes = 0,
             total_bytes = headers['content-length'],
-            req = http.get(url);
+            req = request.get(url);
 
         req.on('response', (response) => {
             if (response.statusCode !== 200) {
@@ -588,7 +588,7 @@ Main.prototype._ripFile = function(TID, url, file, cb) {
                 });
 
                 var out = fs.createWriteStream(file);
-                response.pipe(out);
+                req.pipe(out);
 
                 out.on('finish', () => {
                     self.emit('download_status', {
@@ -611,7 +611,7 @@ Main.prototype._ripFile = function(TID, url, file, cb) {
                     throw error
                 });
 
-                response.on('data', (chunk) => {
+                req.on('data', (chunk) => {
 
                     if (this.CANCEL_LIST.contains(TID)) {
                         console.log('KILLED');
@@ -632,7 +632,7 @@ Main.prototype._ripFile = function(TID, url, file, cb) {
                     });
                 });
         
-                response.on('error', (error) => {
+                req.on('error', (error) => {
                     console.log(error);
                     console.log(error.message);
                     console.log(url);
