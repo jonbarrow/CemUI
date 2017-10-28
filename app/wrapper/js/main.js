@@ -488,7 +488,7 @@ function setIPCevents() {
     
             item.setAttribute('data-dl-grid', tid);
 
-            /*addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
+            addEvent(item.querySelectorAll('p.download')[0], 'click', () => {
                 if (item.querySelectorAll('p.download')[0].classList.contains('disabled')) {
                     return;
                 }
@@ -507,7 +507,7 @@ function setIPCevents() {
                 }
 
                 ipcRenderer.send('dl_game', options);
-            });*/
+            });
             bg_test.onerror = function () {
                 item.querySelector('img').src = LOCAL_RESOURCES_ROOT + "/box.jpg";
             };

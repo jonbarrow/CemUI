@@ -130,6 +130,7 @@ body, html {
     cursor: pointer;
     transition: width .25s;
     overflow: hidden;
+    background-image: url('http://cemui.com/api/v2/image/grid/00050000-1010ED00');
 }
 .item:hover {
     width: 400px;
