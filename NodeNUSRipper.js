@@ -12,6 +12,7 @@ var EventEmitter = require('events').EventEmitter,
     readline = require('readline'),
     fs = require('fs-extra'),
     url = require('url'),
+    _url = url.URL,
     util = require('util'),
     path = require('path'),
     http = require('http'),
@@ -564,9 +565,18 @@ Main.prototype._ripFile = function(TID, url, file, cb) {
 
         let received_bytes = 0,
             total_bytes = headers['content-length'],
-            req = http.get(url);
+            parsed_url = new _url(url),
+            req = http.get({
+                hostname: parsed_url.hostname,
+                path: parsed_url.pathname,
+                headers: {
+                    'User-Agent': 'wii libnup/1.1',
+                    'Cache-Control': 'max-age=0, no-cache, no-store'
+                }
+            });
 
         req.on('response', (response) => {
+            console.log(response.headersSent);
             if (response.statusCode !== 200) {
                 if (response.statusCode == 404) {
                     console.log(file);
