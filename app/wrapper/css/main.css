@@ -528,6 +528,44 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     left: 15%;
   }
 }
+
+.instance_container {
+    display: -webkit-box;
+    display: flex;
+    width: calc(100% - 20px);
+    height: auto;
+    padding: 10px;
+    transition: background-color .1s;
+}
+.instance_container:hover {
+    background-color: #e5e5e5;
+}
+.instance_container .instance_path {
+    -webkit-box-flex: 1;
+            flex: 1;
+    border-radius: 10px 0 0 10px;
+    padding: 10px 15px;
+    background-color: #fff;
+    color: #939393;
+}
+.instance_action {
+    padding: 10px 15px;
+    color: #fff;
+    border-radius: 0 10px 10px 0;
+    background-color: #6594ff;
+    cursor: pointer;
+}
+.instance_action:hover {
+    background-color: #296aff;
+}
+.instance_add {
+    min-width: 50%;
+    margin: 10px 10%;
+    border-radius: 10px;
+    text-align: center;
+}
+
+
 #dl .loading-overlay {
     position: absolute;
     z-index: 9999;
@@ -689,6 +727,10 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
 }
 #menu .header {
     overflow: hidden;
+}
+#menu .passive {
+    -webkit-box-pack: start;
+            justify-content: flex-start;
 }
 #menu .container {
     width: 50%;
@@ -933,8 +975,6 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     border-radius: 5px;
     box-shadow: 0px 6px 0px 0px rgba(1,1,1,0.1);
     padding: 20px 40px;
-    margin-top: 0 !important;
-    margin-bottom: 4px !important;
     cursor: pointer;
     display:inline-block;
     outline: none;
@@ -964,13 +1004,13 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     background-color: #0071bc;
 }
 .txt-button:active, .txt-button:focus {
-    margin-top: 4px !important;
-    margin-bottom: 0 !important;
+    -webkit-transform: translateY(4px);
+            transform: translateY(4px);
     box-shadow: 0px 2px 0px 0px rgba(1,1,1,0.1);
 }
 .txt-button-blue:active, .txt-button-blue:focus {
-    margin-top: 4px !important;
-    margin-bottom: 0 !important;
+    -webkit-transform: translateY(4px);
+            transform: translateY(4px);
     box-shadow: 0px 2px 0px 0px #0068ad;
 }
 .txt-button.disabled {

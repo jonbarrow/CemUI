@@ -282,6 +282,12 @@ document.getElementById('themes_button').onclick = function () {
 document.getElementById('settings_button').onclick = function () {
     openMenuSection('settings_section');
 }
+document.getElementById('setting_cemu_paths_button').onclick = function () {
+    openMenuSection('cemu_selection');
+}
+document.getElementById('setting_game_paths_button').onclick = function () {
+    openMenuSection('game_selection');
+}
 
 //update functionality
 
