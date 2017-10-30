@@ -104,8 +104,9 @@
                     </div>
                 </div>
                 <div class="slide-container slide-hidden" id="theme_selection">
-                    <div class="header">
-                        <h2 class="txt-s-32 txt-link txt-link-black txt-c-black padding txt-up" onclick="closeMenuSection('theme_selection');">BACK</h2>
+                    <div class="header passive">
+                        <h2 class="txt-button padding txt-c-blue txt-button-white" onclick="closeMenuSection('theme_selection');">BACK</h2>
+                        <h2 class="txt-s-24 txt-c-blue txt-bold txt-up">Themes</h2>
                     </div>
                     <hr>
                     <div id="theme_list">
@@ -113,8 +114,9 @@
                     </div>
                 </div>
                 <div class="slide-container slide-hidden" id="settings_section">
-                    <div class="header">
-                        <h2 class="txt-s-32 txt-link txt-link-black txt-c-black padding txt-up" onclick="closeMenuSection('settings_section');">BACK</h2>
+                    <div class="header passive">
+                        <h2 class="txt-button padding txt-c-blue txt-button-white" onclick="closeMenuSection('settings_section');">BACK</h2>
+                        <h2 class="txt-s-24 txt-c-blue txt-bold txt-up">settings</h2>
                     </div>
                     <hr>
                     <div class="menu-item bigpadding txt-hover-blacktoblue" id="setting_smmdb_api_key_button">
@@ -144,6 +146,78 @@
                             Game folder paths
                         </h2>
                         <p class="txt-s-18">Add and remove different game/rom folders</p>
+                    </div>
+                </div>
+                <div class="slide-container slide-hidden" id="cemu_selection">
+                    <div class="header passive">
+                        <h2 class="txt-button padding txt-c-blue txt-button-white" onclick="closeMenuSection('cemu_selection');">BACK</h2>
+                        <h2 class="txt-s-24 txt-c-blue txt-bold txt-up">cemu instances</h2>
+                    </div>
+                    <hr>
+                    <div class="txt-s-18 instance_action instance_add">
+                        Add new instance
+                    </div>
+                    <div id="cemu_instance_list">
+                        <div class="instance_container">
+                            <div class="txt-c-grey txt-s-18 instance_path">
+                                E://test/test/test/test/test/test/test/test/test/test/
+                            </div>
+                            <div class="txt-s-18 instance_action">
+                                Remove
+                            </div>
+                        </div>
+                        <div class="instance_container">
+                            <div class="txt-c-grey txt-s-18 instance_path">
+                                E://test/test/test/test/test/test/test/test/test/test/
+                            </div>
+                            <div class="txt-s-18 instance_action">
+                                Remove
+                            </div>
+                        </div>
+                        <div class="instance_container">
+                            <div class="txt-c-grey txt-s-18 instance_path">
+                                E://test/test/test/test/test/test/test/test/test/test/
+                            </div>
+                            <div class="txt-s-18 instance_action">
+                                Remove
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-container slide-hidden" id="game_selection">
+                    <div class="header passive">
+                        <h2 class="txt-button txt-c-blue padding txt-button-white" onclick="closeMenuSection('game_selection');">BACK</h2>
+                        <h2 class="txt-s-24 txt-c-blue txt-bold txt-up">game folder selection</h2>
+                    </div>
+                    <hr>
+                    <div class="txt-s-18 instance_action instance_add">
+                        Add new instance
+                    </div>
+                    <div id="game_folder_list">
+                        <div class="instance_container">
+                            <div class="txt-c-grey txt-s-18 instance_path">
+                                E://test/test/test/test/test/test/test/test/test/test/
+                            </div>
+                            <div class="txt-s-18 instance_action">
+                                Remove
+                            </div>
+                        </div>
+                        <div class="instance_container">
+                            <div class="txt-c-grey txt-s-18 instance_path">
+                                E://test/test/test/test/test/test/test/test/test/test/
+                            </div>
+                            <div class="txt-s-18 instance_action">
+                                Remove
+                            </div>
+                        </div>
+                        <div class="instance_container">
+                            <div class="txt-c-grey txt-s-18 instance_path">
+                                E://test/test/test/test/test/test/test/test/test/test/
+                            </div>
+                            <div class="txt-s-18 instance_action">
+                                Remove
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -187,17 +261,17 @@
                 </div>
             </div>
         </div>
+        <div id="popup1" class="popup-overlay hidden">
+            <div class="popup">
+                <h2 class="title">Missing CDecrypt</h2>
+                <div class="content">
+                    It seems like CDecrypt is missing, You need to install CDecrypt for the games to be decrypted. After you have done that you have to specify where you installed it.
+                </div>
+                <div class="button">Select CDecrypt</div>
+            </div>
+        </div>
         
         <div id="dl">
-            <div id="popup1" class="popup-overlay hidden">
-                <div class="popup">
-                    <h2 class="title">Missing CDecrypt</h2>
-                    <div class="content">
-                        It seems like CDecrypt is missing, You need to install CDecrypt for the games to be decrypted. After you have done that you have to specify where you installed it.
-                    </div>
-                    <div class="button">Select CDecrypt</div>
-                </div>
-            </div>
             
             <div class="loading-overlay">
                 <div class="title">
@@ -307,6 +381,17 @@
                 </div>
                 <div class="footer txt-center">
                     <h1 class="download txt-button txt-button-large txt-button-white txt-s-24 txt-c-black txt-font-smm">Download</h1>
+                </div>
+            </div>
+        </template>
+        <template id="TEMPLATE_POPUP">
+            <div id="popup1" class="popup-overlay popup-hidden">
+                <div class="popup hidden-card">
+                    <h2 class="title">title</h2>
+                    <div class="content">
+                        content
+                    </div>
+                    <div class="button">button</div>
                 </div>
             </div>
         </template>

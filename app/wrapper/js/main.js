@@ -204,6 +204,40 @@ function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 } 
 //menu animations
+function createPopup(title,content,inputs,button_text,button_event,id) {
+    let btn = document.getElementById("TEMPLATE_POPUP").content.firstElementChild.cloneNode(true);
+    btn.id = id;
+    btn.querySelector('.title').innerHTML = title;
+    btn.querySelector('.content').innerHTML = content;
+    if (inputs != null) {
+        let content = btn.querySelector('.content');
+        for (let ind = 0; ind < inputs.length;ind++) {
+            content.innerHTML += '<p>' + inputs[ind].caption + '</p>';
+            if (inputs[ind].type == 'text') {
+                content.innerHTML += '<input type="text" id="' + inputs[ind].id + '" class="input-text" />';
+            }
+        }
+    }
+    btn.querySelector('.button').innerHTML = button_text;
+    btn.querySelector('.button').onclick = function () { button_event(this); }
+    document.body.appendChild(btn);
+    setTimeout(function () {
+        btn.classList.remove("popup-hidden");
+        setTimeout(function () {
+            btn.querySelector('.popup').classList.remove("hidden-card");
+        },250);
+    },0);
+}
+
+function closePopup(el) {
+    el.querySelector('.popup').classList.add("hidden-card");
+    setTimeout(function () {
+        el.classList.add("popup-hidden");
+        setTimeout(function () {
+            document.body.removeChild(el);
+        },250);
+    },600);
+}
 
 function openMenu() {
     document.getElementById('menu').style.opacity = '0';
@@ -247,6 +281,12 @@ document.getElementById('themes_button').onclick = function () {
 }
 document.getElementById('settings_button').onclick = function () {
     openMenuSection('settings_section');
+}
+document.getElementById('setting_cemu_paths_button').onclick = function () {
+    openMenuSection('cemu_selection');
+}
+document.getElementById('setting_game_paths_button').onclick = function () {
+    openMenuSection('game_selection');
 }
 
 //update functionality
