@@ -25,6 +25,7 @@
     "pixl-xml": "^1.0.13",
     "png-to-ico": "^1.0.3",
     "python-struct": "^1.0.6",
+    "req-fast": "git+https://github.com/RedDuckss/req-fast.git",
     "request": "^2.81.0",
     "smm-api": "^2.0.1",
     "ssl-root-cas": "^1.2.3",

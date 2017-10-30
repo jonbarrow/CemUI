@@ -18,6 +18,7 @@ var EventEmitter = require('events').EventEmitter,
     http = require('http'),
     async = require('async'),
     request = require('request'),
+    req_fast = require('req-fast'),
     struct = require('python-struct');
 
 const NINTENDO_CCS_URL = 'http://ccs.cdn.c.shop.nintendowifi.net/ccs/download/';
@@ -441,7 +442,8 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
             this._patchDLC(path.join(location, 'title.tik'));
         }
 
-        let tmd_total_size = 0;
+        let tmd_total_size = 0,
+            tmd_hashes = [];
         for (let tmd_file of tmd.contents) {
             tmd_total_size += tmd_file.size;
             if (tmd_file.type >= 8195) {
@@ -463,17 +465,15 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
                 queue.kill();
             }
 
+            if (file.type & 0x2) {
+                tmd_hashes.push(file.id);
+            }
+
             if (fs.pathExistsSync(path.join(location, file.id + '.app'))) {
                 var size = fs.statSync(path.join(location, file.id + '.app')).size;
                 if (size < file.size) {
                     this._ripFile(TID, URL_BASE + '/' +  file.id, path.join(location, file.id + '.app'), () => {
-                        if (file.type >= 8195) {
-                            this._ripFile(TID, URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
-                                return callback();
-                            });
-                        } else {
-                            return callback();
-                        }
+                        callback();
                     });
                 } else {
                     self.emit('download_status', {
@@ -485,34 +485,31 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
                         received_bytes_raw: size,
                         total_bytes: size
                     });
-                    if (file.type >= 8195) {
-                        this._ripFile(TID, URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
-                            return callback();
-                        });
-                    } else {
-                        return callback();
-                    }
+                    callback();
                 }
             } else {
                 this._ripFile(TID, URL_BASE + '/' +  file.id, path.join(location, file.id + '.app'), () => {
-                    if (file.type >= 8195) {
-                        this._ripFile(TID, URL_BASE + '/' + file.id + '.h3', path.join(location, file.id + '.h3'), (error) => {
-                            return callback();
-                        });
-                    } else {
-                        return callback();
-                    }
+                    callback();
                 });
             }
         });
 
         queue.drain = () => {
-            self.emit('rom_rip_completed', location);
-            if (cb) {
-                return cb(location);
-            }
+            console.log(tmd_hashes)
+            async.each(tmd_hashes, (hash, callback) => {
+                this._ripFile(TID, URL_BASE + '/' + hash + '.h3', path.join(location, hash + '.h3'), (error) => {
+                    return callback();
+                });
+            }, () => {
+                console.timeEnd('dlstart');
+                self.emit('rom_rip_completed', location);
+                if (cb) {
+                    return cb(location);
+                }
+            });
         }
 
+        console.time('dlstart');
         queue.push(tmd.contents);
     });
 }
@@ -563,93 +560,89 @@ Main.prototype._ripFile = function(TID, url, file, cb) {
             }
         }
 
+        self.emit('download_status', {
+            status: 'started',
+            tid: TID,
+            name: files[files.length-1],
+            path: file,
+            received_bytes: 0,
+            received_bytes_raw: 0,
+            total_bytes: headers['content-length']
+        });
+
         let received_bytes = 0,
             total_bytes = headers['content-length'],
             parsed_url = new _url(url),
-            req = http.get({
-                hostname: parsed_url.hostname,
-                path: parsed_url.pathname,
+            req = req_fast({
+                uri: url,
+                method: 'GET',
                 headers: {
                     'User-Agent': 'wii libnup/1.1',
                     'Cache-Control': 'max-age=0, no-cache, no-store'
                 }
-            });
-
-        req.on('response', (response) => {
-            console.log(response.headersSent);
-            if (response.statusCode !== 200) {
-                if (response.statusCode == 404) {
-                    console.log(file);
-                    return cb();
-                }
-                console.log(url);
-                console.log(file);
-                console.log(response.statusCode)
-                throw new Error('Invalid response code', response.statusCode);
-            } else {
-                self.emit('download_status', {
-                    status: 'started',
-                    tid: TID,
-                    name: files[files.length-1],
-                    path: file,
-                    received_bytes: 0,
-                    received_bytes_raw: 0,
-                    total_bytes: headers['content-length']
-                });
-
-                var out = fs.createWriteStream(file);
-                response.pipe(out);
-
-                out.on('finish', () => {
-                    self.emit('download_status', {
-                        status: 'finished',
-                        tid: TID,
-                        name: files[files.length-1],
-                        path: file,
-                        received_bytes: received_bytes,
-                        received_bytes_raw: 0,
-                        total_bytes: total_bytes
-                    });
-                    out.close(cb);
-                });
-        
-                out.on('error', (error) => {
-                    console.log(error);
-                    console.log(error.message);
-                    console.log(url);
-                    console.log(file);
-                    throw error
-                });
-
-                response.on('data', (chunk) => {
-
-                    if (this.CANCEL_LIST.contains(TID)) {
-                        console.log('KILLED');
-                        req.abort();
-                        req.destroy();
+            }, (error, response) => {
+                if (response.statusCode !== 200) {
+                    if (response.statusCode == 404) {
+                        console.log(file);
+                        return cb();
                     }
-
-                    received_bytes += chunk.length;
-                    self.emit('download_status', {
-                        status: 'downloading',
-                        tid: TID,
-                        name: files[files.length-1],
-                        path: file,
-                        chunk_length: chunk.length,
-                        received_bytes: received_bytes,
-                        received_bytes_raw: chunk.length,
-                        total_bytes: total_bytes
-                    });
-                });
-        
-                response.on('error', (error) => {
-                    console.log(error);
-                    console.log(error.message);
                     console.log(url);
                     console.log(file);
-                    throw error;
-                });
+                    console.log(response.statusCode)
+                    throw new Error('Invalid response code', response.statusCode);
+                } else {
+            
+                    req.on('error', (error) => {
+                        console.log(error);
+                        console.log(error.message);
+                        console.log(url);
+                        console.log(file);
+                        throw error;
+                    });
+                }
+            });
+        var out = fs.createWriteStream(file);
+        req.pipe(out);
+
+        req.on('data', (chunk) => {
+            if (this.CANCEL_LIST.contains(TID)) {
+                console.log('KILLED');
+                req.abort();
+                req.destroy();
             }
+
+            received_bytes += chunk.length;
+            self.emit('download_status', {
+                status: 'downloading',
+                tid: TID,
+                name: files[files.length-1],
+                path: file,
+                chunk_length: chunk.length,
+                received_bytes: received_bytes,
+                received_bytes_raw: chunk.length,
+                total_bytes: total_bytes
+            });
+        });
+        
+        out.on('finish', () => {
+            self.emit('download_status', {
+                status: 'finished',
+                tid: TID,
+                name: files[files.length-1],
+                path: file,
+                received_bytes: received_bytes,
+                received_bytes_raw: 0,
+                total_bytes: total_bytes
+            });
+            out.close(cb);
+        });
+
+        out.on('error', (error) => {
+            console.log(error);
+            console.log(error.message);
+            console.log(url);
+            console.log(file);
+            throw error
         });
     });
 }
