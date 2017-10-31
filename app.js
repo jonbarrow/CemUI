@@ -407,25 +407,6 @@ ipcMain.on('init', (event, data) => {
 	}	
 });
 
-ipcMain.on('create_emulator_instance', (name, cemu_path) => {
-	var cemu_object = {};
-	if (!name) return ApplicationWindow.webContents.send('add_cemu_error', {type: 'missing', value: 'name'});
-	if (!path) return ApplicationWindow.webContents.send('add_cemu_error', {type: 'missing', value: 'path'});
-	if (settings_storage.get('cemu_paths').find({ name: name }).value()) return ApplicationWindow.webContents.send('add_cemu_error', {type: 'taken', value: 'name'});
-	if (settings_storage.get('cemu_paths').find({ cemu_path: cemu_path }).value()) return ApplicationWindow.webContents.send('add_cemu_error', {type: 'taken', value: 'path'});
-
-	cemu_object.name = name;
-
-	cemu_path = cemu_path.replace(/\\/g, '/');
-	cemu_object.cemu_path = cemu_path;
-
-	cemu_path = cemu_path.split('/');
-	cemu_path.pop();
-	cemu_object.cemu_folder_path = cemu_path.join('/');
-
-	settings_storage.get('cemu_paths').push(cemu_object).write();
-	ApplicationWindow.webContents.send('cemu_folder_added');
-})
 
 ipcMain.on('load_cemu_folder', () => {
 	var cemu_path = pickEmuFolder(),
@@ -450,14 +431,133 @@ ipcMain.on('load_games_folder', () => {
 
 	ApplicationWindow.webContents.send('game_folder_loading');
 
-	loadGames(game_path, () => {
-		settings_storage.get('game_paths').push(game_path).write();
+	if (!settings_storage.get('game_paths').value().contains(game_path)) {
+		loadGames(game_path, () => {
+			settings_storage.get('game_paths').push(game_path).write();
+			ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
+			ApplicationWindow.webContents.send('games_folder_loaded');
+		});
+	} else {
+		ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
 		ApplicationWindow.webContents.send('games_folder_loaded');
+	}
+});
+ipcMain.on('add_new_game_folder', () => {
+	var gameFolder = dialog.showOpenDialog({
+		title: 'Select a games folder',
+		message: 'Select a games folder',
+		properties: ['openDirectory']
 	});
+
+	if (!gameFolder) {
+		return;
+	}
+	let game_path = gameFolder[0];
+	if (!settings_storage.get('game_paths').value().contains(game_path)) {
+		loadGames(game_path, () => {
+			settings_storage.get('game_paths').push(game_path).write();
+			ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
+		});
+	} else {
+		ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
+	}
 });
 ipcMain.on('skip_games_folder', () => {
 	ApplicationWindow.webContents.send('games_folder_loaded');
 });
+
+ipcMain.on('ask_for_emulator_list', () => {
+	ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
+});
+ipcMain.on('cemu_name_check', (event, data) => {
+	for (let cemu_instance of settings_storage.get('cemu_paths').value()) {
+		if (cemu_instance.name.toUpperCase() == data.toUpperCase()) {
+			dialog.showMessageBox(ApplicationWindow, {
+				type: 'error',
+				title: 'CemUI Error',
+				message: 'Name Taken',
+				detail: 'A Cemu instance with that name already exists. Please pick a different name',
+				icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
+			});
+			return;
+		}
+	}
+	let cemu_path = dialog.showOpenDialog({
+		title: 'Select a Cemu executable',
+		message: 'Select a Cemu executable',
+		properties: ['openFile'],
+		filters: [
+			{name: 'All Executables', extensions: ['exe']}
+		]
+	});
+
+	if (!cemu_path) {
+		return;
+	}
+	cemu_path = cemu_path[0];
+
+	let cemu_object = {};
+	cemu_object.name = data;
+
+	cemu_path = cemu_path.replace(/\\/g, '/');
+	cemu_object.cemu_path = cemu_path;
+
+	cemu_path = cemu_path.split('/');
+	cemu_path.pop();
+	cemu_object.cemu_folder_path = cemu_path.join('/');
+
+	settings_storage.get('cemu_paths').push(cemu_object).write();
+	ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
+	ApplicationWindow.webContents.send('cemu_folder_added');
+});
+ipcMain.on('remove_cemu_instance', (event, data) => {
+	settings_storage.get('cemu_paths').remove({name: data}).write();
+	ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
+	ApplicationWindow.webContents.send('cemu_folder_removed');
+});
+
+ipcMain.on('ask_for_games_folder_list', () => {
+	ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
+});
+ipcMain.on('games_folder_path_check', () => {
+	let games_folder_path = dialog.showOpenDialog({
+		title: 'Select a games folder',
+		message: 'Select a games folder',
+		properties: ['openDirectory']
+	});
+
+	if (!games_folder_path) {
+		return;
+	}
+	games_folder_path = games_folder_path[0];
+
+	for (let game_folder of settings_storage.get('game_paths').value()) {
+		if (game_folder == games_folder_path) {
+			dialog.showMessageBox(ApplicationWindow, {
+				type: 'error',
+				title: 'CemUI Error',
+				message: 'Path Taken',
+				detail: 'A game folder already exists in that path',
+				icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
+			});
+			return;
+		}
+	}
+
+
+	settings_storage.get('game_paths').push(games_folder_path).write();
+	ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
+	ApplicationWindow.webContents.send('games_folder_added');
+});
+ipcMain.on('remove_games_folder', (event, data) => {
+	let paths = settings_storage.get('game_paths').value(),
+		new_paths = paths.splice(paths.indexOf(data), 1);
+
+	settings_storage.get('game_paths', new_paths).write();
+	ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
+	ApplicationWindow.webContents.send('games_folder_removed');
+});
+
 
 ipcMain.on('play_rom', (event, data) => {
 	var game = game_storage.get('games').find({title_id: data.rom}).value(),
@@ -953,6 +1053,7 @@ function init() {
 			});
 		}, (error) => {
 			var games = game_storage.get('games').value();
+			ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
 			if (!games || games.length <= 0) {
 				console.log('info', 'test')
 				ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
@@ -994,7 +1095,8 @@ function getSuggested(most_played, cb) {
 }
 
 function verifyGames(cb) {
-	var games = game_storage.get('games').value();
+	var games = game_storage.get('games').value(),
+		paths = settings_storage.get('game_paths').value();
 	for (var i=games.length-1;i>=0;i--) {
 		var game = games[i],
 			pathToCheck;
@@ -1005,6 +1107,10 @@ function verifyGames(cb) {
 		}
 
 		if (!fs.existsSync(pathToCheck)) {
+			game_storage.get('games').remove(game).write();
+		}
+
+		if (!paths.contains(game.path_root)) {
 			game_storage.get('games').remove(game).write();
 		}
 	}
@@ -1347,6 +1453,7 @@ function loadGames(dir, master_callback) {
 						is_wud: is_wud,
 						title_id: data.game_title_id,
 						product_code: data.game_product_code,
+						path_root: dir,
 						path: dir + '/' + name,
 						rom: rom,
 						name: data.game_title,

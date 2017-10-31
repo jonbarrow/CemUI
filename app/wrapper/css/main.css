@@ -529,21 +529,33 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
   }
 }
 
-.instance_container {
+.instance_container .content {
     display: -webkit-box;
     display: flex;
     width: calc(100% - 20px);
     height: auto;
     padding: 10px;
+    padding-top: 0;
     transition: background-color .1s;
+}
+.instance_name {
+    margin: 0 10px;
+    padding: 5px 0;
+    width: calc(100% - 20px);
+    background-color: #e5e5e5;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+.instance_name > * {
+    margin-left: 5px;
 }
 .instance_container:hover {
     background-color: #e5e5e5;
 }
-.instance_container .instance_path {
+.instance_container .content .instance_path {
     -webkit-box-flex: 1;
             flex: 1;
-    border-radius: 10px 0 0 10px;
+    border-bottom-left-radius: 10px;
     padding: 10px 15px;
     background-color: #fff;
     color: #939393;
@@ -551,7 +563,7 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
 .instance_action {
     padding: 10px 15px;
     color: #fff;
-    border-radius: 0 10px 10px 0;
+    border-bottom-right-radius: 10px;
     background-color: #6594ff;
     cursor: pointer;
 }
@@ -563,6 +575,13 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     margin: 10px 10%;
     border-radius: 10px;
     text-align: center;
+}
+
+#game_folder_list .instance_container .instance_path {
+    border-radius: 10px 0 0 10px;
+}
+#game_folder_list .instance_action {
+    border-radius: 0 10px 10px 0;
 }
 
 

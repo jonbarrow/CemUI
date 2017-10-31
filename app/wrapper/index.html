@@ -154,34 +154,10 @@
                         <h2 class="txt-s-24 txt-c-blue txt-bold txt-up">cemu instances</h2>
                     </div>
                     <hr>
-                    <div class="txt-s-18 instance_action instance_add">
+                    <div class="txt-s-18 emulator_instances instance_action instance_add">
                         Add new instance
                     </div>
                     <div id="cemu_instance_list">
-                        <div class="instance_container">
-                            <div class="txt-c-grey txt-s-18 instance_path">
-                                E://test/test/test/test/test/test/test/test/test/test/
-                            </div>
-                            <div class="txt-s-18 instance_action">
-                                Remove
-                            </div>
-                        </div>
-                        <div class="instance_container">
-                            <div class="txt-c-grey txt-s-18 instance_path">
-                                E://test/test/test/test/test/test/test/test/test/test/
-                            </div>
-                            <div class="txt-s-18 instance_action">
-                                Remove
-                            </div>
-                        </div>
-                        <div class="instance_container">
-                            <div class="txt-c-grey txt-s-18 instance_path">
-                                E://test/test/test/test/test/test/test/test/test/test/
-                            </div>
-                            <div class="txt-s-18 instance_action">
-                                Remove
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="slide-container slide-hidden" id="game_selection">
@@ -190,34 +166,10 @@
                         <h2 class="txt-s-24 txt-c-blue txt-bold txt-up">game folder selection</h2>
                     </div>
                     <hr>
-                    <div class="txt-s-18 instance_action instance_add">
-                        Add new instance
+                    <div class="txt-s-18 game_instances instance_action instance_add">
+                        Add new folder
                     </div>
                     <div id="game_folder_list">
-                        <div class="instance_container">
-                            <div class="txt-c-grey txt-s-18 instance_path">
-                                E://test/test/test/test/test/test/test/test/test/test/
-                            </div>
-                            <div class="txt-s-18 instance_action">
-                                Remove
-                            </div>
-                        </div>
-                        <div class="instance_container">
-                            <div class="txt-c-grey txt-s-18 instance_path">
-                                E://test/test/test/test/test/test/test/test/test/test/
-                            </div>
-                            <div class="txt-s-18 instance_action">
-                                Remove
-                            </div>
-                        </div>
-                        <div class="instance_container">
-                            <div class="txt-c-grey txt-s-18 instance_path">
-                                E://test/test/test/test/test/test/test/test/test/test/
-                            </div>
-                            <div class="txt-s-18 instance_action">
-                                Remove
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -392,6 +344,33 @@
                         content
                     </div>
                     <div class="button">button</div>
+                </div>
+            </div>
+        </template>
+        <template id="TEMPLATE_EMULATOR_LIST">
+            <div class="instance_container">
+                <div class="instance_name">
+                    <small class="txt-c-grey txt-s-14">Default</small>
+                </div>
+                <div class="content">
+                    <div class="txt-c-grey txt-s-18 instance_path">
+                        E://test/test/test/test/test/test/test/test/test/test/
+                    </div>
+                    <div class="txt-s-18 instance_action">
+                        Remove
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="TEMPLATE_GAME_FOLDER_LIST">
+            <div class="instance_container">
+                <div class="content">
+                    <div class="txt-c-grey txt-s-18 instance_path">
+                        E://test/test/test/test/test/test/test/test/test/test/
+                    </div>
+                    <div class="txt-s-18 instance_action">
+                        Remove
+                    </div>
                 </div>
             </div>
         </template>

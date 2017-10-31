@@ -2,12 +2,15 @@ var {ipcRenderer} = require('electron'),
     fs = require('fs-extra'),
     path = require('path');
 
-var ipcWrapper = {};
+var ipcWrapper = {},
+    emulators_list = [], games_folder_list = [];
+/*
 window.alert = function(message, title) {
     console.log(message, title);
 }
 
 alert('test', 'title test')
+*/
 
 ipcWrapper.ipc = ipcRenderer;
 ipcWrapper.listeners = [];
@@ -80,6 +83,83 @@ addEvent(document.querySelector('#popup1 .button'), 'click', (event) => {
 
 addEvent(document.querySelector('#setting_cdecrypt_location_button'), 'click', () => {
     ipcRenderer.send('rom_decryption_missing');
+});
+
+ipcRenderer.on('emulator_list', function(event, data) {
+    emulators_list = data;
+    document.querySelector('#cemu_instance_list').innerHTML = '';
+    for (let instance of data) {
+        let item = document.getElementById("TEMPLATE_EMULATOR_LIST").content.firstElementChild.cloneNode(true);
+        item.querySelector('.instance_name small').innerHTML = instance.name;
+        item.querySelector('.instance_path').innerHTML = instance.cemu_path;
+        addEvent(item.querySelector('.instance_action'), 'click', () => {
+            if (instance.name.toUpperCase() == 'DEFAULT') {
+                return;
+            }
+            ipcRenderer.send('remove_cemu_instance', instance.name);
+        });
+        document.querySelector('#cemu_instance_list').appendChild(item);
+    }
+});
+ipcRenderer.on('cemu_folder_added', () => {
+    closePopup(document.querySelector('#new_cemu_instance_modal'));
+});
+ipcRenderer.on('games_folder_list', function(event, data) {
+    games_folder_list = data;
+    document.querySelector('#game_folder_list').innerHTML = '';
+    for (let folder of data) {
+        let item = document.getElementById("TEMPLATE_GAME_FOLDER_LIST").content.firstElementChild.cloneNode(true);
+        item.querySelector('.instance_path').innerHTML = folder;
+        addEvent(item.querySelector('.instance_action'), 'click', () => {
+            if (games_folder_list.length == 1) {
+                return;
+            }
+            ipcRenderer.send('remove_games_folder', folder);
+        });
+        document.querySelector('#game_folder_list').appendChild(item);
+    }
+});
+ipcRenderer.on('games_folder_added', () => {
+    openLoadingScreen();
+    setTimeout(function () {
+        closeMenu();
+        let current_view = document.getElementById('webview');
+        
+        current_view.src = current_view.src + '?' + new Date().toString();
+        
+        ipcWrapper.removeListeners();
+        
+        current_view.setAttribute('id','webview');
+        current_view.setAttribute('src', current_view.src);
+        document.body.appendChild(current_view);
+        addEvent(current_view.contentWindow, 'keypress', function(event) {
+            if (event.charCode == 112) {
+                ipcRenderer.send('open_dev');
+            }
+        });
+        current_view.contentWindow.ipcRenderer = ipcWrapper;
+    },1000);
+});
+ipcRenderer.on('games_folder_removed', () => {
+    openLoadingScreen();
+    setTimeout(function () {
+        closeMenu();
+        let current_view = document.getElementById('webview');
+        
+        current_view.src = current_view.src + '?' + new Date().toString();
+        
+        ipcWrapper.removeListeners();
+        
+        current_view.setAttribute('id','webview');
+        current_view.setAttribute('src', current_view.src);
+        document.body.appendChild(current_view);
+        addEvent(current_view.contentWindow, 'keypress', function(event) {
+            if (event.charCode == 112) {
+                ipcRenderer.send('open_dev');
+            }
+        });
+        current_view.contentWindow.ipcRenderer = ipcWrapper;
+    },1000);
 });
 
 function toggleSMMDB() {
@@ -283,9 +363,11 @@ document.getElementById('settings_button').onclick = function () {
     openMenuSection('settings_section');
 }
 document.getElementById('setting_cemu_paths_button').onclick = function () {
+    ipcRenderer.send('ask_for_emulator_list');
     openMenuSection('cemu_selection');
 }
 document.getElementById('setting_game_paths_button').onclick = function () {
+    ipcRenderer.send('ask_for_games_folder_list');
     openMenuSection('game_selection');
 }
 
@@ -332,6 +414,23 @@ addEvent(document.getElementById('select_games').getElementsByClassName('txt-but
 });
 addEvent(document.querySelector('.games_skip'), 'click', function() {
     ipcRenderer.send('skip_games_folder');
+});
+addEvent(document.querySelector('.instance_add.game_instances'), 'click', () => {
+    ipcRenderer.send('games_folder_path_check');
+});
+addEvent(document.querySelector('.instance_add.emulator_instances'), 'click', () => {
+    createPopup(
+        'New Cemu instance',
+        null,
+        [
+            {type: "text", id: "new-cemu-instance-name", caption: "Enter a name for this instance"}
+        ],
+        'Select',
+        function (el) {
+            ipcRenderer.send('cemu_name_check', el.parentElement.querySelector('input[type="text"]').value);
+        },
+        'new_cemu_instance_modal'
+    );
 });
 
 function openScreen(id) {
