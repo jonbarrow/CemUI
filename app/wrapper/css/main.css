@@ -495,15 +495,29 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
   border-radius: 5px;
   width: 30%;
   margin: 70px auto;
+    position: relative;
   z-index: 10;
     overflow: hidden;
     -webkit-transform: translateY(0);
             transform: translateY(0);
   transition: all 0.6s ease-in-out;
+    opacity: 1;
 }
 .popup-overlay .hidden-card {
     -webkit-transform: translateY(-200%);
             transform: translateY(-200%);
+    opacity: 0;
+}
+.popup-overlay .popup .close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #767676;
+    padding: 15px;
+    cursor: pointer;
+}
+.popup-overlay .popup .close:hover {
+    color: #b2b2b2;
 }
 .popup-overlay .popup h2, .popup-overlay .popup .content {
     padding: 0 25px 25px 25px;

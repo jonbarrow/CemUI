@@ -284,7 +284,7 @@ function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 } 
 //menu animations
-function createPopup(title,content,inputs,button_text,button_event,id) {
+function createPopup(title,content,inputs,button_text,button_event,id,close_event) {
     let btn = document.getElementById("TEMPLATE_POPUP").content.firstElementChild.cloneNode(true);
     btn.id = id;
     btn.querySelector('.title').innerHTML = title;
@@ -300,6 +300,11 @@ function createPopup(title,content,inputs,button_text,button_event,id) {
     }
     btn.querySelector('.button').innerHTML = button_text;
     btn.querySelector('.button').onclick = function () { button_event(this); }
+    if (typeof close_event != 'undefined') {
+        btn.querySelector('.close').onclick = function () { close_event(this); }
+    } else {
+        btn.querySelector('.close').onclick = function () { closePopup(this.parentElement.parentElement); }
+    }
     document.body.appendChild(btn);
     setTimeout(function () {
         btn.classList.remove("popup-hidden");
