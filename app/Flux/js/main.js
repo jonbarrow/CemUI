@@ -1,5 +1,5 @@
 ipcRenderer = window.ipcRenderer; // Gets ipcRenderer
-var games_lib = document.getElementById('games'),
+var games_lib = document.getElementById('library'),
     modal_list  = document.getElementById('modal-content-list'),
     modal_open = false,
     clicks = 0,
@@ -173,7 +173,7 @@ ipcRenderer.on('init_complete', function(event, data) {
     },0);
 });
 
-    ipcRenderer.send('init');
+ipcRenderer.send('init');
 
 /*
 function addToGrid(arr,id) {
@@ -740,3 +740,7 @@ function clock() {
 }
 clock();
 setInterval(clock, 1000);
+
+addEvent(games_lib, 'scroll', (event) => {
+    console.log(event);
+});

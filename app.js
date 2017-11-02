@@ -2,17 +2,17 @@ const APP_VERSION = '2.1.1';
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
-	electron_reload = require('electron-reload')(__dirname, {
+	/*electron_reload = require('electron-reload')(__dirname, {
 		ignored: /node_modules|[\/\\]\.|cemui.log|cemui.error.log|cemui.info.log/
-	}),
+	}),*/
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
 	smm = require('smm-api'),
 	smm_editor = require('cemu-smm'),
 	fusejs = require('fuse.js'),
+	unzip = require('unzip'),
 	zipFolder = require('zip-folder'),
-	_7zip = require("7zip-standalone"),
 	archiver = require('archiver'),
 	bl = require('bl'),
 	ssl = require('ssl-root-cas').inject(),
@@ -688,6 +688,7 @@ ipcMain.on('smm_dl_level', function(event, data) {
 		return;
 	}
 	SMMLevelFolder = SMMLevelFolder[0];
+	event.sender.send("smm_show_loader");
 
 	console.log({
 		level: 'info',
@@ -754,7 +755,15 @@ ipcMain.on('smm_dl_level', function(event, data) {
 				level: 'info',
 				message: 'unpacking SMMDB course: ' + data
 			});
-			_7zip.extract(path.join(SMMLevelFolder, 'new_level.zip'), SMMLevelFolder).then(function() {
+			fs.createReadStream(path.join(SMMLevelFolder, 'new_level.zip'))
+			.pipe(unzip.Extract({ path: SMMLevelFolder }))
+			.on('entry', (entry) => {
+				console.log({
+					level: 'info',
+					message: 'Found zip file ' + entry.path
+				})
+			})
+			.on('close', () => {
 				console.log({
 					level: 'info',
 					message: 'unpacked SMMDB course: ' + data
@@ -795,6 +804,7 @@ ipcMain.on('smm_dl_level', function(event, data) {
 			});
 		}
 	], function() {
+		event.sender.send("smm_hide_loader");
 		event.sender.send("smm_level_dl_end");
 	});
 });
@@ -1796,6 +1806,7 @@ async function sendSMMCourses() {
 		}
 	}
 
+	ApplicationWindow.webContents.send('smm_hide_loader');
 	ApplicationWindow.webContents.send('smm_player_courses', smm_courses);
 }
 
