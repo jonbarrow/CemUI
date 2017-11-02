@@ -689,9 +689,18 @@ ipcMain.on('smm_dl_level', function(event, data) {
 	}
 	SMMLevelFolder = SMMLevelFolder[0];
 
+	console.log({
+		level: 'info',
+		message: 'starting download of SMMDB course: ' + data
+	});
+
 	async.waterfall([
 		function(callback) {
 			event.sender.send("smm_level_dl_start");
+			console.log({
+				level: 'info',
+				message: 'starting backup zip of local course'
+			});
 			zipFolder(SMMLevelFolder, path.join(SMMLevelFolder, 'backup.zip'), function(err) {
 			    if(err) {
 			        console.log({
@@ -701,7 +710,11 @@ ipcMain.on('smm_dl_level', function(event, data) {
 			        callback(null);
 			    } else {
 			        callback(null);
-			    }
+				}
+				console.log({
+					level: 'info',
+					message: 'local course backed up'
+				});
 			});
 		},
 		function(callback) {
@@ -723,7 +736,11 @@ ipcMain.on('smm_dl_level', function(event, data) {
 
 		    req.on('data', function(chunk) {
 		        received_bytes += chunk.length;
-		        var percent = (received_bytes * 100) / total_bytes;
+				var percent = (received_bytes * 100) / total_bytes;
+				console.log({
+					level: 'info',
+					message: 'downloaded ' + percent + '% of SMMDB course: ' + data
+				});
 		        event.sender.send("smm_level_progress", {progress: percent});
 		    });
 
@@ -733,13 +750,29 @@ ipcMain.on('smm_dl_level', function(event, data) {
 		},
 		function(callback) {
 			event.sender.send("smm_level_extract");
+			console.log({
+				level: 'info',
+				message: 'unpacking SMMDB course: ' + data
+			});
 			_7zip.extract(path.join(SMMLevelFolder, 'new_level.zip'), SMMLevelFolder).then(function() {
+				console.log({
+					level: 'info',
+					message: 'unpacked SMMDB course: ' + data
+				});
 				callback(null);
 			});
 		},
 		function(callback) {
+			console.log({
+				level: 'info',
+				message: 'removing zip of SMMDB course: ' + data
+			});
 			fs.unlink(path.join(SMMLevelFolder, 'new_level.zip'), function() {
-	    		callback(null);
+				console.log({
+					level: 'info',
+					message: 'removed zip of SMMDB course: ' + data
+				});
+				callback(null);
 	    	});
 		},
 		function(callback) {

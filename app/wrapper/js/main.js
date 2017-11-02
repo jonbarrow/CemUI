@@ -52,7 +52,7 @@ function insertThemeList(event, data) {
     for (let theme of data) {
         let item = document.getElementById("TEMPLATE_THEME_LIST").content.firstElementChild.cloneNode(true),
             rgb = hex2RGB(theme.config.theme_color);
-        item.querySelector('.bg').style.backgroundImage = 'url("' + theme.screenshot + '")';
+        item.querySelector('.bg').style.backgroundImage = 'url(' + theme.screenshot.replace(/\\/g, '\\\\') + ')';
         item.querySelector('.bg .desc').style.backgroundColor = 'rgba(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ', 0.81)';
         addEvent(item.querySelector('.bg'), 'click', () => {
             console.log(theme)
