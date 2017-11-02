@@ -85,6 +85,22 @@ addEvent(document.querySelector('#setting_cdecrypt_location_button'), 'click', (
     ipcRenderer.send('rom_decryption_missing');
 });
 
+addEvent(document.querySelector('#setting_smmdb_api_key_button'), 'click', () => {
+    createPopup(
+        'SMMDB API Key',
+        'Please enter your SMMDB API key. To obtain your API key visit <a target="_blank" href="https://smmdb.ddns.net/profile">the SMMDB website</a>',
+        [
+            { type: "text", id: "input-apikey", caption: "Insert API key"}
+        ],
+        'Save', 
+        function (el) {
+            ipcRenderer.send('smm_save_api_key', document.querySelector('#input-apikey').value);
+            closePopup(el.parentElement.parentElement);
+        },
+        'smmdb_api_key_modal'
+    );
+});
+
 ipcRenderer.on('emulator_list', function(event, data) {
     emulators_list = data;
     document.querySelector('#cemu_instance_list').innerHTML = '';
@@ -202,9 +218,11 @@ function toggleSMMDBPlayerCourses() {
     var el = document.getElementById('smm-wrapper-player-courses');
     if (el.classList.contains('hidden')) {
         ipcRenderer.send('smm_load_client_courses');
+        document.querySelector('#smm-toggle-player-courses').innerHTML = 'Community';
         document.getElementById('smm-wrapper').classList.add('hidden');
         el.classList.remove('hidden');
     } else {
+        document.querySelector('#smm-toggle-player-courses').innerHTML = 'My Courses';
         el.classList.add('hidden');
         document.getElementById('smm-wrapper').classList.remove('hidden');
     }
@@ -292,9 +310,22 @@ function createPopup(title,content,inputs,button_text,button_event,id,close_even
     if (inputs != null) {
         let content = btn.querySelector('.content');
         for (let ind = 0; ind < inputs.length;ind++) {
-            content.innerHTML += '<p>' + inputs[ind].caption + '</p>';
-            if (inputs[ind].type == 'text') {
-                content.innerHTML += '<input type="text" id="' + inputs[ind].id + '" class="input-text" />';
+            switch (inputs[ind].type) {
+                case 'button':
+                    let cap = 'Submit';
+                    if (inputs[ind].caption) {
+                        cap = inputs[ind].caption;
+                    }
+                    content.innerHTML += '<h2 class="txt-button txt-button-blue txt-s-16 txt-c-white" onclick="closeUpdate();" style="float: left;">Cancel</h2>';
+                    break;
+            
+                case 'text':
+                default:
+                    if (inputs[ind].caption) {
+                        content.innerHTML += '<p>' + inputs[ind].caption + '</p>';
+                    }
+                    content.innerHTML += '<input type="text" id="' + inputs[ind].id + '" class="input-text" />';
+                    break;
             }
         }
     }
@@ -432,7 +463,10 @@ addEvent(document.querySelector('.instance_add.emulator_instances'), 'click', ()
         ],
         'Select',
         function (el) {
-            ipcRenderer.send('cemu_name_check', el.parentElement.querySelector('input[type="text"]').value);
+            if (el.parentElement.querySelector('input[type="text"]').value.trim() == '') {
+                return;
+            }
+            ipcRenderer.send('cemu_name_check', el.parentElement.querySelector('input[type="text"]').value.trim());
         },
         'new_cemu_instance_modal'
     );
@@ -750,9 +784,11 @@ function setIPCevents() {
                 i++;
                 let course = document.getElementById("TEMPLATE_SMMDB_COURSE").content.firstElementChild.cloneNode(true);
                 course.querySelector('.details').removeChild(course.querySelector('.stars'));
+                course.querySelector('.details').removeChild(course.querySelector('.owner'));
+                //cemu
 
                 addEvent(course.querySelector('h1.download'), 'click', () => {
-                    ipcRenderer.send('smm_upload_level', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.course_id));
+                    ipcRenderer.send('smm_upload_course', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.course_id));
                 });
                 addEvent(course.querySelector('.img_thumbnail'), 'click', () => {
                     ipcRenderer.send('smm_change_thumbnail_image', path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.course_id));
@@ -769,11 +805,11 @@ function setIPCevents() {
                     img.appendChild(div);
                 }
                 
+                //course.querySelector('.title p').innerHTML = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, course_data.course_id);
                 course.querySelector('h1.download').innerHTML = 'Upload';
                 course.querySelector('h1.download').classList.add('upload');
                 course.querySelector('h1.download').classList.remove('download');
                 course.querySelector('.course-name').innerHTML = course_data.title;
-                course.querySelector('.owner').innerHTML = course_data.maker;
                 course.querySelector('.img_preview img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, 'course' + course_data.id, 'thumbnail0.jpg?' + new Date());
                 course.querySelector('.img_thumbnail img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, 'course' + course_data.id, 'thumbnail1.jpg?' + new Date());
 

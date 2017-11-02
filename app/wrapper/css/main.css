@@ -519,7 +519,7 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
 .popup-overlay .popup .close:hover {
     color: #b2b2b2;
 }
-.popup-overlay .popup h2, .popup-overlay .popup .content {
+.popup-overlay .popup h2.title, .popup-overlay .popup .content {
     padding: 0 25px 25px 25px;
 }
 .popup-overlay .popup .button {
@@ -949,6 +949,9 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
 }
 .txt-light {
     font-family: 'OpenSansLight';
+}
+.input-text-sm {
+    width: 150px !important;
 }
 .input-text-smm {
     height: 100%;

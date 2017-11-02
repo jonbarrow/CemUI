@@ -13,6 +13,8 @@ let electron = require('electron'),
 	fusejs = require('fuse.js'),
 	zipFolder = require('zip-folder'),
 	_7zip = require("7zip-standalone"),
+	archiver = require('archiver'),
+	bl = require('bl'),
 	ssl = require('ssl-root-cas').inject(),
     fs = require('fs-extra'),
 	fsmonitor = require('fsmonitor'),
@@ -471,7 +473,7 @@ ipcMain.on('ask_for_emulator_list', () => {
 });
 ipcMain.on('cemu_name_check', (event, data) => {
 	for (let cemu_instance of settings_storage.get('cemu_paths').value()) {
-		if (cemu_instance.name.toUpperCase() == data.toUpperCase()) {
+		if (cemu_instance.name.toUpperCase().trim() == data.toUpperCase().trim()) {
 			dialog.showMessageBox(ApplicationWindow, {
 				type: 'error',
 				title: 'CemUI Error',
@@ -610,6 +612,51 @@ ipcMain.on('smm_search_courses', (event, data) => {
 	smm.searchCourses(data, (error, courses) => {
 		if (error) throw error;
 		ApplicationWindow.webContents.send('smm_courses_list', courses)
+	});
+});
+
+ipcMain.on('smm_save_api_key', (event, data) => {
+	settings_storage.set('smmdb_api_key', data).write();
+});
+
+ipcMain.on('smm_upload_course', async (event, data) => {
+	smm.apiKey(settings_storage.get('smmdb_api_key').value());
+
+	console.log({
+		level: 'info',
+		message: 'Uploading SMM level from ' + data
+	});
+
+	let zip = archiver('zip'),
+		buffer;
+		
+	zip.pipe(
+		bl((error, chunk) => {
+			buffer = chunk;
+		})
+	);
+	zip.directory(data, 'course000');
+	await zip.finalize();
+	
+	smm.uploadCourse(buffer, (error, course_data) => {
+		if (error) {
+			console.log({
+				level: 'error',
+				message: error
+			});
+			throw new Error(error);
+		}
+		dialog.showMessageBox(ApplicationWindow, {
+			type: 'info',
+			title: 'CemUI SMMDB',
+			message: 'Course uploaded to SMMDB',
+			detail: 'Course uploaded successfully. Course ID: ' + course_data[0].id
+		});
+		console.log({
+			level: 'info',
+			message: 'upload course to SMMDB: ' + JSON.stringify(course_data)
+		});
+		ApplicationWindow.webContents.send('smm_course_uploaded', course_data[0]);		
 	});
 });
 
@@ -990,6 +1037,7 @@ ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
 	});
 
 	if (!image_location) {
+		sendSMMCourses();
 		return;
 	}
 	image_location = image_location[0];
@@ -1011,6 +1059,7 @@ ipcMain.on('smm_change_preview_image', (event, data) => {
 	});
 
 	if (!image_location) {
+		sendSMMCourses();
 		return;
 	}
 	image_location = image_location[0];
@@ -1691,6 +1740,7 @@ async function sendSMMCourses() {
 					var course_id = course.replace(/course/, '');
 					course = saved_courses[course];
 
+					await course.exportThumbnail();
 					await course.setThumbnail(
 						path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, 'course'.concat(course_id), 'thumbnail0.jpg'),
 						path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, 'course'.concat(course_id), 'thumbnail1.jpg')
