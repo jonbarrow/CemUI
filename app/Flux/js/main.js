@@ -113,7 +113,7 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
 ipcRenderer.on('init_complete', function(event, data) {
     console.log('init main.js flux');
     ipcRenderer.send('theme_finished_loading'); 
-    $('#library').slick();
+    //$('#library').slick();
     setTimeout(function () {
         var games = data.library;
         for (var i=0,length = games.length ;i<length;i++) {
