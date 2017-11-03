@@ -13,8 +13,10 @@ window.addEventListener('gc.controller.found', function(event) {
 }, false);
 
 window.addEventListener('gc.button.press', function(event) {
-    ipcRenderer.send('controller_event', {
-        name: 'button_press',
-        event: event.detail
-    });
+    if (document.hasFocus()) {
+        ipcRenderer.send('controller_event', {
+            name: 'button_press',
+            event: event.detail
+        });
+    }
 }, false);
