@@ -60,7 +60,7 @@ CemUI supports loading 3rd party themes. Themes can be loaded from `%appdata%/Ce
 # Events
 To fully utilize themes you will need to hook into the many events emitted (not all possible events are documented. All missing events were deemed useless to themes and thus have not been documented).
 | Event | Sent From | Description | Takes in/sends |
-|-------|-----------|-------------|-------------| |
+|-------|-----------|-------------|----------------|
 | `init` | ipcRenderer | Start wrapper and theme loading | |
 | `open_dev` | ipcRenderer | Opens the developer console | |
 | `theme_finished_loading` | ipcRenderer | Tells backend the theme is finished loading | |
