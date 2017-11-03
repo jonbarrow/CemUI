@@ -20,28 +20,29 @@
             <h2 class="txt-up txt-c-purple txt-s-24 txt-pad-lr">Library</h2>
             <div class="square-cont highlighted" id="library"></div>
         </div>
+
+        <div class="modal_list hidden"></div>
         
-        <div class="game_modal hidden">
-            <div class="content">
-                <h2 class="txt-s-24 txt-c-white">Nes Remix</h2>
-                <div class="main_content" style='background-image: url("C:/Users/jelle/AppData/Roaming/CemUI/app_data/cache/images/00050000-10146000/grid.webp");'>
-                    <div class="about txt-c-white">
-                        <h2 class="txt-s-18">About</h2>
-                        <p>Super mario maker is a sidescrolling platform video game and game creation system developed and published by nintendo for the wii u game console, which released worldwide in September 2015.</p>
+    
+        <template id="TEMPLATE_GAME_MODAL">
+            <div class="game_modal">
+                <div class="content">
+                    <h2 class="txt-s-24 txt-c-white">Nes Remix</h2>
+                    <div class="main_content" style='background-image: url("C:/Users/jelle/AppData/Roaming/CemUI/app_data/cache/images/00050000-10146000/grid.webp");'>
+                        <div class="about txt-c-white">
+                            <h2 class="txt-s-18">About</h2>
+                            <p>Super mario maker is a sidescrolling platform video game and game creation system developed and published by nintendo for the wii u game console, which released worldwide in September 2015.</p>
+                        </div>
+                    </div>
+                    <div class="screenshots">
+                        <img class="screenshot" src="https://s.candybanana.com/images/f017/nes_remix_2_4.jpg" >
+                        <img class="screenshot" src="https://s.candybanana.com/images/f017/nes_remix_2_4.jpg" >
+                        <img class="screenshot" src="https://s.candybanana.com/images/f017/nes_remix_2_4.jpg" >
+                        <img class="screenshot" src="https://s.candybanana.com/images/f017/nes_remix_2_4.jpg" >
                     </div>
                 </div>
-                <div class="screenshots">
-                    <img class="screenshot" src="https://s.candybanana.com/images/f017/nes_remix_2_4.jpg" >
-                    <img class="screenshot" src="https://s.candybanana.com/images/f017/nes_remix_2_4.jpg" >
-                    <img class="screenshot" src="https://s.candybanana.com/images/f017/nes_remix_2_4.jpg" >
-                    <img class="screenshot" src="https://s.candybanana.com/images/f017/nes_remix_2_4.jpg" >
-                </div>
             </div>
-        </div>
-        
-        
-        
-        
+        </template>
         <template id="TEMPLATE_GAME_ITEM">
             <div class="item img-cap-white">
                 <div>
