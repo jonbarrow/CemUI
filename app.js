@@ -600,9 +600,14 @@ ipcMain.on('play_rom', (event, data) => {
 	}
 
 	game_storage.get('games').find(game).set('last_started', Date.now()).write();
-	exec('"' + instance.cemu_path + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
+	exec('"' + instance.cemu_path + '" -g ' + '"' + game_path + '"', {
+		cwd: instance.cemu_folder_path
+	}, (error, stdout, stderr) => {
 		if (error) {
-			console.error(error);
+			console.log({
+				level: 'error',
+				message: error
+			});
 			return;
 		}
 
@@ -821,9 +826,12 @@ ipcMain.on('smm_dl_level', function(event, data) {
 			callback(null, dir);
 		},
 		function(dir, callback) {
-			fs.remove(path.join(SMMLevelFolder, dir), err => {
-			  	if (err) {
-			  		console.error(err);
+			fs.remove(path.join(SMMLevelFolder, dir), error => {
+			  	if (error) {
+			  		console.log({
+						level: 'error',
+						message: error
+					});
 			  		callback(null);
 			  	}
 			  	callback(null);
