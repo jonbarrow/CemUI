@@ -96,6 +96,7 @@ body, html {
     display: flex;
     flex-direction: column;
     background-color: #EFEFEF;
+    /*filter: blur(4px);*/
 }
 #header {
     width: 100%;
@@ -181,8 +182,47 @@ body, html {
     bottom: 0;
 }
 
-
-
+.game_modal {
+    background-color: rgba(0, 0, 0, 0.35);
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+.hidden {
+    display: none;
+}
+.game_modal .content {
+    margin: 0 auto;
+    width: 50%;
+    padding: 25px;
+}
+.game_modal .content .main_content {
+    background-position: center;
+    background-size: cover;
+    width: 100%;
+    min-height: 10em;
+    padding-top: 8em;
+    border-radius: 15px;
+}
+.game_modal .content .main_content .about {
+    display: block;
+    padding: 5px 20px;
+    backdrop-filter: blur(30px);
+}
+.game_modal .content .screenshots {
+    font-size: 0;
+    width: 100%;
+}
+.game_modal .content .screenshot {
+    width: calc(50% - 20px);
+    margin: 10px 10px 0 10px;
+    height: calc((25vw - 20px) / 16 * 9);
+    height: auto;
+    border-radius: 15px;
+    display: inline-block;
+}
 /* typography styles */
 
 .img-cap-white {
