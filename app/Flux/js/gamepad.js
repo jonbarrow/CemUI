@@ -64,6 +64,7 @@ ipcRenderer.on('controller_found', function(event, data) {
 ipcRenderer.on('controller_button_press', function(event, data) {
     switch (data.name) {
         case 'DPAD_UP':
+            if (document.querySelector('.active')) return;
             var current_highlighted = document.querySelector('.highlighted');
             if (current_highlighted.id == 'library') {
                 if (document.querySelector('.selected')) {
@@ -74,6 +75,7 @@ ipcRenderer.on('controller_button_press', function(event, data) {
             document.querySelector('#recent').classList.add('highlighted');
             break;
         case 'DPAD_DOWN':
+            if (document.querySelector('.active')) return;
             var current_highlighted = document.querySelector('.highlighted');
             if (current_highlighted.id == 'recent') {
                 if (document.querySelector('.selected')) {
@@ -84,6 +86,7 @@ ipcRenderer.on('controller_button_press', function(event, data) {
             document.querySelector('#library').classList.add('highlighted');
             break;
         case 'DPAD_RIGHT':
+            if (document.querySelector('.active')) return;
             var current_highlighted = document.querySelector('.highlighted'),
                 current_selected = current_highlighted.querySelector('.selected');
             if (!current_selected) {
@@ -105,6 +108,7 @@ ipcRenderer.on('controller_button_press', function(event, data) {
             current_highlighted.scrollLeft += 25;
             break;
         case 'DPAD_LEFT':
+            if (document.querySelector('.active')) return;
             var current_highlighted = document.querySelector('.highlighted'),
                 current_selected = current_highlighted.querySelector('.selected');
             if (!current_selected) {
@@ -134,6 +138,13 @@ ipcRenderer.on('controller_button_press', function(event, data) {
             }
             break;
         case 'FACE_1': //A button XBox
+            if (document.querySelector('.active')) {
+                ipcRenderer.send('play_rom', {
+                    emu: 'Default',
+                    rom: document.querySelector('.active').id
+                });
+                return;
+            }
             if (document.querySelector('.selected')) {
                 document.querySelector('.selected').click();
             }
