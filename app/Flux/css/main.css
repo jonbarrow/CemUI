@@ -208,8 +208,10 @@ body, html {
 }
 .game_modal .content .main_content .about {
     display: block;
+    max-height: 10em;
     padding: 5px 20px;
     backdrop-filter: blur(30px);
+    overflow: scroll;
 }
 .game_modal .content .screenshots {
     font-size: 0;

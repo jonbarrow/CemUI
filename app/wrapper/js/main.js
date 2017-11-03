@@ -546,6 +546,10 @@ function setIPCevents() {
         },0);
     });
 
+    ipcRenderer.on('game_folder_loading', () => {
+        document.getElementById('select_games').querySelector('.head').querySelector('h1').innerHTML = 'Downloading game data... <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i>'
+    });
+
     ipcRenderer.on('games_folder_loaded', function(event, data) {
         closeScreen('select_games');
     });

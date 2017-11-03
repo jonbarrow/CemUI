@@ -1166,10 +1166,6 @@ function sendScreens() {
 function init() {
 	verifyGames(() => {
 		let load_games_queue = async.queue((game_path, callback) => {
-			console.log({
-				level: 'info',
-				message: game_path
-			})
 			loadGames(game_path, () => {
 				callback();
 			});
@@ -1179,7 +1175,6 @@ function init() {
 			var games = game_storage.get('games').value();
 			ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
 			if (!games || games.length <= 0) {
-				console.log('info', 'test')
 				ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
 				ApplicationWindow.webContents.send('init_complete', {library: [], most_played: [], suggested: []});
 			} else {
