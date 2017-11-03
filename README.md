@@ -60,25 +60,25 @@ CemUI supports loading 3rd party themes. Themes can be loaded from `%appdata%/Ce
 # Events
 To fully utilize themes you will need to hook into the many events emitted (not all possible events are documented. All missing events were deemed useless to themes and thus have not been documented).
 | Event | Sent From | Description | Takes in/sends |
-|-------|-----------|-------------|-------------|
-| `init` | ipcRenderer | Start wrapper and theme loading |
-| `open_dev` | ipcRenderer | Opens the developer console |
-| `theme_finished_loading` | ipcRenderer | Tells backend the theme is finished loading |
-| `open_menu` | ipcRenderer | Opens the settings menu sidebar |
-| `check_for_update` | ipcRenderer | Manually checks for CemUI update |
-| `download_update` | ipcRenderer | Manually downloads update if one exists |
-| `apply_update` | ipcRenderer | Manually applies downloaded update |
-| `change_theme` | ipcRenderer | Tells backend to change current theme settings |
+|-------|-----------|-------------|-------------| |
+| `init` | ipcRenderer | Start wrapper and theme loading | |
+| `open_dev` | ipcRenderer | Opens the developer console | |
+| `theme_finished_loading` | ipcRenderer | Tells backend the theme is finished loading | |
+| `open_menu` | ipcRenderer | Opens the settings menu sidebar | |
+| `check_for_update` | ipcRenderer | Manually checks for CemUI update | |
+| `download_update` | ipcRenderer | Manually downloads update if one exists | |
+| `apply_update` | ipcRenderer | Manually applies downloaded update | |
+| `change_theme` | ipcRenderer | Tells backend to change current theme settings | |
 | `play_rom` | ipcRenderer | Plays a rom | (String) fully qualified TID (title ID) |
 | `open_rom` | ipcRenderer | Opens a rom folder | (String) fully qualified TID (title ID) |
 | `make_shortcut` | ipcRenderer | Makes a shortcut | (Object) `emu (name of emulator instance)`, `rom (fully qualified TID (title ID))` |
 | `set_favorite` | ipcRenderer | Sets game as favorite | (String) fully qualified TID (title ID) |
 | `remove_favorite` | ipcRenderer | Unsts game as favorite | (String) fully qualified TID (title ID) |
 | `update_game_settings` | ipcRenderer | Sets game profile settings | (Object) `rom (fully qualified TID (title ID))`, `settings (Object) (json-ified .ini settings)` |
-| `ask_for_emulator_list` | ipRenderer | Sends back `emulator_list` |
+| `ask_for_emulator_list` | ipRenderer | Sends back `emulator_list` | |
 | `init_complete` | ipcMain | Sends back initalized data | Library array, Most Played array and Suggested array |
 | `controller_event` | ipcMain | Generic controller event | Controller event |
-| `controller_found` | ipcMain | Generic controller event |
+| `controller_found` | ipcMain | Generic controller event | |
 | `controller_button_press` | ipcMain | Generic controller event | Button pressed event |
 | `emulator_list` | ipcMain | Sends a list of all stored Cemu instances | Array of Cemu-instance objects |
 
