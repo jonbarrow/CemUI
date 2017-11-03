@@ -31,12 +31,14 @@ ipcRenderer.on('init_complete', function(event, data) {
                 item = document.getElementById("TEMPLATE_GAME_ITEM").content.firstElementChild.cloneNode(true);
 
             preload(game.grid);
+            createModal(game);
             item.style.backgroundImage = 'url("' + game.grid + '")';
             item.querySelector('p').innerHTML = game.name + ' <span>' + game.region + '</span>';
+            item.setAttribute('data-titleid', game.title_id);
             
             addEvent(item, 'click', () => {
                 // modal shit here
-                alert('Open modal');
+                openModal(game.title_id);
             });
 
             games_lib.appendChild(item);
@@ -72,6 +74,34 @@ ipcRenderer.send('init');
 function preload(url) {
     heavyImage = new Image();
     heavyImage.src = url;
+}
+
+function openModal(tid) {
+    document.getElementById(tid).classList.remove('hidden');
+    document.getElementById(tid).classList.add('active');
+}
+
+function closeModal() {
+    document.querySelector('.game_modal.active').classList.add('hidden');
+    document.querySelector('.game_modal.active').classList.remove('active');
+}
+
+function createModal(game) {
+    let item = document.getElementById("TEMPLATE_GAME_MODAL").content.firstElementChild.cloneNode(true);
+
+    item.id = game.title_id;
+    item.classList.add('hidden');
+    item.querySelector('.title').innerHTML = game.name;
+    item.querySelector('.about').querySelector('p').innerHTML = game.description;
+    item.querySelector('.main_content').style.backgroundImage = 'url("' + game.grid + '")';
+    item.querySelector('.screenshots').innerHTML = '';
+    for (let screenshot of game.screenshots) {
+        let img = document.createElement('img');
+        img.className = 'screenshot';
+        img.src = screenshot;
+        item.querySelector('.screenshots').appendChild(img);
+    }
+    document.querySelector('.modal_list').appendChild(item);
 }
 
 

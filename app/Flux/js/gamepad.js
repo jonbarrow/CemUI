@@ -126,7 +126,12 @@ ipcRenderer.on('controller_button_press', function(event, data) {
             current_highlighted.scrollLeft -= 25;
             break;
         case 'START': //Start XBox
-            //start game without modal
+            if (document.querySelector('.selected')) {
+                ipcRenderer.send('play_rom', {
+                    emu: 'Default',
+                    rom: document.querySelector('.selected').getAttribute('data-titleid')
+                });
+            }
             break;
         case 'FACE_1': //A button XBox
             if (document.querySelector('.selected')) {
@@ -134,7 +139,7 @@ ipcRenderer.on('controller_button_press', function(event, data) {
             }
             break;
         case 'FACE_2': // B button XBox
-            //close modal
+            closeModal();
             break;
         default:
             break;
