@@ -16,9 +16,7 @@ addEvent(document.getElementById('menu_button'),'click',function() {
 
 ipcRenderer.on('emulator_list', function(event, data) {
     emulators_list = data;
-})
-
-
+});
 
 ipcRenderer.on('init_complete', function(event, data) {
     console.log('init main.js flux');
@@ -89,6 +87,10 @@ function closeModal() {
 function createModal(game) {
     let item = document.getElementById("TEMPLATE_GAME_MODAL").content.firstElementChild.cloneNode(true);
 
+    addEvent(item.querySelector('.close-btn'), 'click', () => {
+        closeModal(game.title_id);
+    });
+
     item.id = game.title_id;
     item.classList.add('hidden');
     item.querySelector('.title').innerHTML = game.name;
@@ -101,7 +103,82 @@ function createModal(game) {
         img.src = screenshot;
         item.querySelector('.screenshots').appendChild(img);
     }
+
+    let l_dropdown = item.querySelector('.dropdownbutton.cemudropdown.launchgame'),
+        s_dropdown = item.querySelector('.dropdownbutton.cemudropdown.shortcut');
+    l_dropdown.querySelector('.items').innerHTML = '';
+    s_dropdown.querySelector('.items').innerHTML = '';
+    addEvent(l_dropdown.querySelector('.fa'), 'click', () => {
+        dropdown(l_dropdown.querySelector('.fa').parentElement);
+    });
+    addEvent(l_dropdown.querySelector('.play-button'), 'click', () => {
+        ipcRenderer.send('play_rom', {
+            emu: 'Default',
+            rom: game.title_id
+        });        
+        closeDropdown();
+    });
+    addEvent(s_dropdown.querySelector('.fa'), 'click', () => {
+        dropdown(s_dropdown.querySelector('.fa').parentElement);
+    });
+    addEvent(s_dropdown.querySelector('.shortcut-button'), 'click', () => {
+        ipcRenderer.send('make_shortcut', {
+            emu: 'Default',
+            rom: game.title_id
+        });        
+        closeDropdown();
+    });
+    for (let instance of emulators_list) {
+        let l_item = document.createElement('div'),
+            s_item = document.createElement('div');
+        
+        l_item.className = 'item';
+        l_item.innerHTML = instance.name;
+        addEvent(l_item, 'click', () => {
+            ipcRenderer.send('play_rom', {
+                emu: instance.name,
+                rom: game.title_id
+            });        
+            closeDropdown();
+        });
+        l_dropdown.querySelector('.items').appendChild(l_item);
+
+        s_item.className = 'item';
+        s_item.innerHTML = instance.name;
+        addEvent(s_item, 'click', () => {
+            ipcRenderer.send('make_shortcut', {
+                emu: instance.name,
+                rom: game.title_id
+            });        
+            closeDropdown();
+        });
+        s_dropdown.querySelector('.items').appendChild(s_item);
+    }
+
     document.querySelector('.modal_list').appendChild(item);
+}
+
+function dropdown(el) {
+    var items = el.parentElement.children[1];
+    var icon = el.getElementsByClassName('fa').item(0).classList;
+    if (items.classList.contains('visible')) {
+        closeDropdown();
+    } else {
+        closeDropdown();
+        items.classList.add('visible');
+        icon.remove('fa-caret-down');
+        icon.add('fa-caret-up');
+    }
+}
+
+function closeDropdown() {
+    var dropdowns = document.getElementsByClassName('visible');
+    for (var i = 0; i < dropdowns.length; i++) {
+        var icon = dropdowns.item(i).parentElement.getElementsByClassName('fa').item(0).classList;
+        dropdowns.item(i).classList.remove('visible');
+        icon.remove('fa-caret-up');
+        icon.add('fa-caret-down');
+    }
 }
 
 
