@@ -51,6 +51,7 @@ CemUI ships with 2 default themes, Fluent and Flux. Fluent is the original CemUI
 
 # Custom Themes
 CemUI supports loading 3rd party themes. Themes can be loaded from `%appdata%/CemUI/app_data/themes`. Each theme must have an `index.html` file, `config.json` file and a `thumbnail.jpg` file. `config.json` stores the basic settings for the theme. It is an object with these properties:
+
 | Property | Description |
 |----------|-------------|
 | title | Theme name |
