@@ -1,6 +1,7 @@
 ipcRenderer = window.ipcRenderer; // Gets ipcRenderer
-var games_lib = document.getElementById('library'),
-    modal_list  = document.getElementById('modal-content-list'),
+var games_lib = document.querySelector('#library'),
+    recents_lib = document.querySelector('#recent'),
+    modal_list  = document.querySelector('#modal-content-list'),
     modal_open = false,
     clicks = 0,
     emulators_list;
@@ -741,6 +742,11 @@ function clock() {
 clock();
 setInterval(clock, 1000);
 
-addEvent(games_lib, 'scroll', (event) => {
-    console.log(event);
+addEvent(games_lib, 'mousewheel', (event) => {
+    games_lib.scrollLeft += -(event.wheelDelta/3);
+    return false;
+});
+addEvent(recents_lib, 'mousewheel', (event) => {
+    recents_lib.scrollLeft += -(event.wheelDelta/3);
+    return false;
 });

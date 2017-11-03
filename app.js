@@ -2,9 +2,9 @@ const APP_VERSION = '2.1.1';
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
-	/*electron_reload = require('electron-reload')(__dirname, {
+	electron_reload = require('electron-reload')(__dirname, {
 		ignored: /node_modules|[\/\\]\.|cemui.log|cemui.error.log|cemui.info.log/
-	}),*/
+	}),
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
