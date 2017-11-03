@@ -59,36 +59,13 @@ const CEMU_BUTTON_MAPPINGS = {
 var sound_switch = new Audio('sounds/pop_drip.wav'),
     sound_switch_error = new Audio('sounds/digi_chirp.wav');
 
-
-Controller.search({
-    settings: {
-        useAnalogAsDpad: "both"
-    }
-});
-
-window.addEventListener('gc.controller.found', function(event) {
-    var games = document.getElementById('games-grid').getElementsByClassName('grid-item'),
-        highlighted = document.getElementsByClassName('highlight');
-
-    if (!games[0]) return;
-
-    console.log(highlighted)
-
-    if (highlighted && highlighted[0]) {
-        highlighted[0].classList.add('controller-active');
-    } else {
-        games[0].classList.add('controller-active');
-    }
-    
+ipcRenderer.on('controller_found', function(event, data) {
+    checkGamepadCursor();
 }, false);
 
-window.addEventListener('gc.analog.start', function(event) {
-    //console.log(event.detail)
-})
-
-window.addEventListener('gc.button.press', function(event) {
-    console.log(event.detail.name)
-	switch (event.detail.name) {
+ipcRenderer.on('controller_button_press', function(event, data) {
+    checkGamepadCursor();
+	switch (data.name) {
         case 'FACE_4':
             var current_selected = document.getElementsByClassName('controller-active grid-item')[0];
             if (!current_selected) return;
@@ -342,6 +319,19 @@ window.addEventListener('gc.button.press', function(event) {
     }
 }, false);
 
+function checkGamepadCursor() {
+    var games = document.getElementById('games-grid').getElementsByClassName('grid-item'),
+        highlighted = document.getElementsByClassName('highlight'),
+        active = document.getElementsByClassName('controller-active');
+
+    if (!games[0]) return;
+
+    if (highlighted && highlighted[0]) {
+        highlighted[0].classList.add('controller-active');
+    } else if (!active || !active[0]) {
+        games[0].classList.add('controller-active');
+    }  
+}
 
 Element.prototype.documentOffsetTop = function () {
     return this.offsetTop + ( this.offsetParent ? this.offsetParent.documentOffsetTop() : 0 );

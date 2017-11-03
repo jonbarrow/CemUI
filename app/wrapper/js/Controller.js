@@ -34,7 +34,6 @@ function Controller(HTMLgamepad) {
     }
     function checkInputs() {
         gamepad = this.constructor.gamepads[index];
-        if (!gamepad) return;
         lastUpdated = performance.now();
         loopThroughButtons.call(this);
         if ("LEFT_ANALOG_STICK_HOR" in analogMap && "LEFT_ANALOG_STICK_VERT" in analogMap) {
@@ -226,18 +225,13 @@ function Controller(HTMLgamepad) {
         }
     }
     function loopThroughButtons() {
-        try {
-            var inputs = state.buttons;
-            for (var name in inputs) {
-                var _index3 = inputs[name].getGamepadIndex();
-                var section = inputs[name].getGamepadSection();
-                var value = _typeof(gamepad[section][_index3]) === "object" ? gamepad[section][_index3].value : gamepad[section][_index3];
-                processButton.call(this, name, value);
-            }
-        } catch (error) {
-            // Do nothing cuz fuck you
+        var inputs = state.buttons;
+        for (var name in inputs) {
+            var _index3 = inputs[name].getGamepadIndex();
+            var section = inputs[name].getGamepadSection();
+            var value = _typeof(gamepad[section][_index3]) === "object" ? gamepad[section][_index3].value : gamepad[section][_index3];
+            processButton.call(this, name, value);
         }
-        
     }
     function processButton(name, value) {
         if (value === undefined) {

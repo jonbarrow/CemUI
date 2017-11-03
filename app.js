@@ -314,6 +314,21 @@ ipcMain.on('open_dev', () => {
 	ApplicationWindow.webContents.openDevTools(); // debug stuff
 });
 
+ipcMain.on('controller_event', (event, data) => {
+	ApplicationWindow.webContents.send('controller_event', data);
+	switch (data.name) {
+		case 'found':
+			ApplicationWindow.webContents.send('controller_found', data.event);
+			break;
+		case 'button_press':
+			ApplicationWindow.webContents.send('controller_button_press', data.event);
+			break;
+	
+		default:
+			break;
+	}
+});
+
 ipcMain.on('theme_finished_loading', (event, data) => {
     console.log({
 		level: 'info',

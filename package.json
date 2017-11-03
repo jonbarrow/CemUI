@@ -39,9 +39,9 @@
     "zip-folder": "^1.0.0"
   },
   "devDependencies": {
-    "electron": "^1.7.5",
-    "electron-builder": "^19.27.3",
-    "electron-reload": "^1.2.1"
+    "electron": "*",
+    "electron-builder": "*",
+    "electron-reload": "*"
   },
   "build": {
     "publish": [

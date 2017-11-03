@@ -116,6 +116,10 @@ body, html {
     position: relative;
     right: 0;
 }
+.square-cont.highlighted {
+    /*background: rgba(255, 0, 255, 0.4);*/
+    animation: highlighted 1s infinite;
+}
 .item {
     position: relative;
     max-height: 100%;
@@ -131,7 +135,7 @@ body, html {
     overflow: hidden;
     background-image: url('http://cemui.com/api/v2/image/grid/00050000-1010ED00');
 }
-.item:hover {
+.item:hover, .item.selected {
     cursor: pointer;
     width: 400px;
 }
@@ -168,11 +172,11 @@ body, html {
 .img-cap-black div p span::after {
     background-color: #2c2c2c;
 }
-.item div p span:hover::after {
+.item div p span:hover::after, .item.selected div p span::after {
     left: -25%;
     width: 150%;
 }
-.item:hover div {
+.item:hover div, .item.selected div {
     opacity: 1;
     bottom: 0;
 }
@@ -338,4 +342,17 @@ body, html {
     .modal-grid-game {
         grid-gap: 30px;
     }
+}
+
+
+@keyframes highlighted {
+	0% {
+		box-shadow: 0 0 5px rgba(0, 0, 0, .05), 0 0 0 5px #3FE9D3;
+	}
+	50% {
+		box-shadow: 0 0 5px rgba(0, 0, 0, .05), 0 0 0 5px #04B9C3;
+	}
+	100% {
+		box-shadow: 0 0 5px rgba(0, 0, 0, .05), 0 0 0 5px #3FE9D3;
+	}
 }
