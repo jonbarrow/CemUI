@@ -29,6 +29,10 @@ builder.build({
             "!build.js",
             "!smm.js",
             "!test.js",
+            "!cemui.info.log",
+            "!cemui.error.log",
+            "!cemui.log",
+            "!log.txt",
         ],
     }
 }).then(() => {

@@ -414,6 +414,11 @@ ipcMain.on('load_cemu_folder', () => {
 	var cemu_path = pickEmuFolder(),
 		cemu_object = {name: 'Default'};
 
+	if (!cemu_path) {
+		ApplicationWindow.webContents.send('cemu_folder_loaded');
+		return;
+	}
+
 	cemu_path = cemu_path.replace(/\\/g, '/');
 	cemu_object.cemu_path = cemu_path;
 
@@ -431,6 +436,10 @@ ipcMain.on('skip_cemu_folder', () => {
 ipcMain.on('load_games_folder', () => {
 	var game_path = pickGameFolder();
 
+	if (!game_path) {
+		ApplicationWindow.webContents.send('games_folder_loaded');
+		return;
+	}
 	ApplicationWindow.webContents.send('game_folder_loading');
 
 	if (!settings_storage.get('game_paths').value().contains(game_path)) {
@@ -575,6 +584,7 @@ ipcMain.on('play_rom', (event, data) => {
 		game_path = game.path + '/code/' + game.rom;
 	}
 
+	game_storage.get('games').find(game).set('last_started', Date.now()).write();
 	exec('"' + instance.cemu_path + '" -g ' + '"' + game_path + '"', (error, stdout, stderr) => {
 		if (error) {
 			console.error(error);
@@ -582,6 +592,7 @@ ipcMain.on('play_rom', (event, data) => {
 		}
 
 		game_storage.get('games').find(game).set('plays', game.plays+=1).write();
+		game_storage.get('games').find(game).set('last_stopped', Date.now()).write();
 	});
 });
 
@@ -1139,11 +1150,17 @@ function sendScreens() {
 
 function init() {
 	verifyGames(() => {
-		async.each(settings_storage.get('game_paths').value(), (game_path, callback) => {
+		let load_games_queue = async.queue((game_path, callback) => {
+			console.log({
+				level: 'info',
+				message: game_path
+			})
 			loadGames(game_path, () => {
 				callback();
 			});
-		}, (error) => {
+		});
+	
+		load_games_queue.drain = () => {
 			var games = game_storage.get('games').value();
 			ApplicationWindow.webContents.send('games_folder_list', settings_storage.get('game_paths').value());
 			if (!games || games.length <= 0) {
@@ -1155,10 +1172,12 @@ function init() {
 				getSuggested(most_played, (error, suggested) => {
 					if (error) throw error;
 					ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
-					ApplicationWindow.webContents.send('init_complete', {library: games, most_played: most_played, suggested: suggested});
+					ApplicationWindow.webContents.send('init_complete', {library: fs.readJSONSync(path.join(DATA_ROOT, 'cache/json/games.json')).games, most_played: most_played, suggested: suggested});
 				});
 			}
-		})
+		}
+	
+		load_games_queue.push(settings_storage.get('game_paths').value());
 	});
 }
 
@@ -1215,15 +1234,14 @@ function loadGames(dir, master_callback) {
 		if (error) throw error;
 
 		async.each(files, (file, callback) => {
+			let exists = game_storage.get('games').find({ path: dir + '/' + file }).value();
+			if (exists) {
+				return callback();
+			}
 			if (isGame(dir + '/' + file)) {
 				async.waterfall([
 					function(cb) {
-						var test = game_storage.get('games').find({ path: dir + '/' + file }).value(),
-							is_wud = false;
-						if (test) {
-							return cb(true);
-						}
-
+						let is_wud = false
 						console.log({
 							level: 'info',
 							message: 'Found new game ' + file
@@ -1542,6 +1560,8 @@ function loadGames(dir, master_callback) {
 					var game_data = {
 						is_favorite: false,
 						plays: 0,
+						last_started: Date.now(),
+						last_stopped: Date.now(),
 						is_wud: is_wud,
 						title_id: data.game_title_id,
 						product_code: data.game_product_code,
@@ -1604,7 +1624,7 @@ function loadGames(dir, master_callback) {
 				if (event.removedFiles || event.removedFolders) {
 					checkInvalidGames();
 				}
-			})*/
+			});*/
 		});
 	});
 }
@@ -1641,7 +1661,7 @@ function pickGameFolder() {
 	});
 
 	if (!gameFolder) {
-		return pickGameFolder();
+		return false;
 	}
 	return gameFolder[0];
 }
@@ -1656,7 +1676,7 @@ function pickEmuFolder() {
 	});
 
 	if (!emuFolder) {
-		return pickEmuFolder();
+		return false;
 	}
 	return emuFolder[0];
 }

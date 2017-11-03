@@ -113,65 +113,47 @@ ipcRenderer.on('game_folder_loading', function(event, data) {
 
 ipcRenderer.on('init_complete', function(event, data) {
     console.log('init main.js flux');
-    ipcRenderer.send('theme_finished_loading'); 
-    //$('#library').slick();
+    ipcRenderer.send('theme_finished_loading');
     setTimeout(function () {
         var games = data.library;
+        games_lib.innerHTML = '';
         for (var i=0,length = games.length ;i<length;i++) {
-            var game = games[i],
-                wrapper = document.createElement('div'),
-                box = document.createElement('div');
+            let game = games[i],
+                item = document.getElementById("TEMPLATE_GAME_ITEM").content.firstElementChild.cloneNode(true);
 
-            wrapper.setAttribute('data-modal-id', game.title_id);
-            wrapper.className = 'grid-item';
+            preload(game.grid);
+            item.style.backgroundImage = 'url("' + game.grid + '")';
+            item.querySelector('p').innerHTML = game.name + ' <span>' + game.region + '</span>';
+            
+            addEvent(item, 'click', () => {
+                // modal shit here
+                alert('Open modal');
+            });
 
-            preload(game.boxart);
-            box.style.backgroundImage = 'url("' + game.grid + '")';
-            box.classList = 'game';
-            box.onclick = function() {
-                clicks++;
-                if (clicks === 1) {
-                    clicktimer = setTimeout(function() {
-                        clicks = 0;
-                        closeExpandModal(document.getElementById(this.parentElement.getAttribute('data-modal-id')).children[0].children[1]);
-                        openModal(this.parentElement.getAttribute('data-modal-id'));
-                    }.bind(this), 400);
-                } else if (clicks === 2) {
-                    clearTimeout(clicktimer);
-                    clicks = 0;
-                    ipcRenderer.send('play_rom', this.parentElement.getAttribute('data-modal-id'));
-                }
-            }
-
-            wrapper.appendChild(box);
-
-            //games_lib.appendChild(wrapper);
-        }
-
-        //addToGrid(data.suggested,'suggest_grid');
-        //addToGrid(data.most_played,'most_grid');
-
-        var count = games.length;
-        count = 16 - count;
-        for (var i=0;i<count;i++) {
-            var item = document.createElement('div');
-            item.classList = "grid-item filler-grid-item";
-            item.innerHTML = "<div class='game'></div>"
             games_lib.appendChild(item);
         }
-        /*
-        document.getElementById('main').style.display = 'grid';
-        openModal('modal1');
-        
-        setTimeout(function () {
-            closeModal();
-        },1000);
-        */
-    // This was 2000, but the timeout above was removed so i added the 1000 here
 
-        //createCemuDropdowns();
-        
-    },0);
+        let recent_sorted = games.sort((a, b) => {
+            return b.last_stopped - a.last_stopped;
+        });
+
+        recents_lib.innerHTML = '';
+        for (var i=0,length = recent_sorted.length ;i<length;i++) {
+            let game = recent_sorted[i],
+                item = document.getElementById("TEMPLATE_GAME_ITEM").content.firstElementChild.cloneNode(true);
+
+            preload(game.grid);
+            item.style.backgroundImage = 'url("' + game.grid + '")';
+            item.querySelector('p').innerHTML = game.name + ' <span>' + game.region + '</span>';
+
+            addEvent(item, 'click', () => {
+                // modal shit here
+                alert('Open modal');
+            });
+
+            recents_lib.appendChild(item);
+        }
+    }, 0);
 });
 
 ipcRenderer.send('init');

@@ -127,12 +127,12 @@ body, html {
     background-position: center;
     background-size: cover;
     box-shadow: 0px 0px 8px -3px rgba(0,0,0,0.55);
-    cursor: pointer;
     transition: width .25s;
     overflow: hidden;
     background-image: url('http://cemui.com/api/v2/image/grid/00050000-1010ED00');
 }
 .item:hover {
+    cursor: pointer;
     width: 400px;
 }
 .item div {
@@ -143,7 +143,6 @@ body, html {
     bottom: -100%;
     width: 100%;
     transition: bottom .35s;
-    cursor: auto;
 }
 .item div p {
     padding: .75em 1em;

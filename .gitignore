@@ -3,5 +3,6 @@ builds
 certs
 cdecrypt
 *.log
+*.txt
 test.js
 logo.psd
