@@ -46,10 +46,10 @@ To get the latest developer version of CemUI right now, you may run from source.
 
 **This is the only official place that you can download CemUI, any other places hosting CemUI are doing it without our permission.**
 
-## Themes
+# Themes
 CemUI ships with 2 default themes, Fluent and Flux. Fluent is the original CemUI 2.0 design theme. Flux is our uniform theme following our own custom design specs, based on a mix of several existing specs.
 
-## Custom Themes
+# Custom Themes
 CemUI supports loading 3rd party themes. Themes can be loaded from `%appdata%/CemUI/app_data/themes`. Each theme must have an `index.html` file, `config.json` file and a `thumbnail.jpg` file. `config.json` stores the basic settings for the theme. It is an object with these properties:
 | Property | Description |
 |----------|-------------|
@@ -57,7 +57,7 @@ CemUI supports loading 3rd party themes. Themes can be loaded from `%appdata%/Ce
 | description | Theme description |
 | theme_color | Theme color (HEX) |
 
-## Events
+# Events
 To fully utilize themes you will need to hook into the many events emitted (not all possible events are documented. All missing events were deemed useless to themes and thus have not been documented).
 | Event | Sent From | Description | Takes in/sends |
 |-------|-----------|-------------|-------------|
@@ -83,7 +83,7 @@ To fully utilize themes you will need to hook into the many events emitted (not 
 | `emulator_list` | ipcMain | Sends a list of all stored Cemu instances | Array of Cemu-instance objects |
 
 
-## I found a bug!
+# I found a bug!
 Given that this project is still very early in development, bugs will probably be common, and vary from person to person. If you find a bug, we ask that you follow this format for reporting the bug on the [Issue Tracker](https://github.com/RedDuckss/CemUI/issues) on the repo:
 - A detailed name describing the bug (no "A bug happened" type titles!)
 - A detailed description of the bug
