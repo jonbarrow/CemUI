@@ -1990,7 +1990,7 @@ function updateContextMenuCemuInstances() {
 							title_id = xml.title_id._Data,
 							titld_id_type = title_id.substring(4, 8),
 							title_version = xml.title_version._Data,
-							copy_path;
+							copy_path, finish_message;
 
 						if (titld_id_type.toUpperCase() == '000C') {
 							copy_path = path.join(instance.cemu_folder_path, 'mlc01', 'usr', 'title', '00050000', title_id.substring(8), 'aoc');
@@ -2005,11 +2005,17 @@ function updateContextMenuCemuInstances() {
 						await fs.copy(path.join(meta_location, '../../', 'content'), path.join(copy_path, 'content'));
 						await fs.copy(path.join(meta_location, '../../', 'meta'), path.join(copy_path, 'meta'));
 					
+						if (titld_id_type.toUpperCase() == '000C') {
+							finish_message = 'DLC for ' + xml.longname_en._Data + ' installed to\n' + instance.cemu_folder_path;
+						} else if (parseInt(title_version) > 0) {
+							finish_message = 'Update v' + xml.title_version._Data + ' for ' + xml.longname_en._Data + ' installed to\n' + instance.cemu_folder_path;
+						}
+
 						dialog.showMessageBox(ApplicationWindow, {
 							type: 'info',
 							title: 'CemUI',
 							message: 'Update/DLC added',
-							detail: 'Your update/DLC was successfully installed to ' + instance.cemu_folder_path
+							detail: finish_message
 						});
 					}
 				}
