@@ -378,7 +378,7 @@ function createWindow(file) {
 app.on('ready', () => {
 	updater.checkForUpdates();
 	createWindow('index'); 
-	let c_version = fs.readJsonSync(DATA_ROOT + 'cache/json/settings.json').cache_version;
+	/*let c_version = fs.readJsonSync(DATA_ROOT + 'cache/json/settings.json').cache_version;
 	if (!c_version || c_version < CACHE_VERSION) {
 		dialog.showMessageBox(ApplicationWindow, {
 			type: 'question',
@@ -393,7 +393,7 @@ app.on('ready', () => {
                 app.quit();
             }
         });
-	}
+	}*/
 });
 
 app.on('window-all-closed', () => {
