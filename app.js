@@ -39,7 +39,78 @@ let electron = require('electron'),
     ipcMain = electron.ipcMain,
 	app = electron.app;
 
-let game_storage, settings_storage, ticket_cache_storage, fuse_searchable;
+const context = [
+    {
+        label: 'Cemu Instances',
+        submenu: [
+        ]
+    },
+    {
+        label: 'View',
+        submenu: [
+            {
+                label: 'Reload',
+                accelerator: 'CmdOrCtrl+R',
+                click (item, focusedWindow) {
+                    if (focusedWindow) {
+                        focusedWindow.reload();
+                    }
+                }
+            },
+            {
+                label: 'Toggle Dev Tools',
+                accelerator: 'Ctrl+Shift+I',
+                click (item, focusedWindow) {
+                    if (focusedWindow) {
+                        focusedWindow.webContents.toggleDevTools()
+                    }
+                }
+            },
+            { type: 'separator' },
+            { role: 'resetzoom' },
+            { type: 'separator' },
+            { role: 'togglefullscreen' }
+        ]
+    },
+    {
+        role: 'help',
+        submenu: [
+            {
+                label: 'Cemu',
+                click () {
+                    shell.openExternal('http://cemu.info/')
+                }
+            },
+            {
+                label: 'CemUI',
+                click () {
+                    shell.openExternal('http://cemui.com/')
+                }
+            },
+            {
+                label: 'Cemu Compatibility List',
+                click () {
+                    shell.openExternal('http://compat.cemu.info/')
+                }
+            },
+            {
+                label: 'SMMDB',
+                click () {
+                    shell.openExternal('https://smmdb.ddns.net/')
+                }
+            },
+            {
+                label: 'Cemu Graphics Packs',
+                click () {
+                    shell.openExternal('https://github.com/slashiee/cemu_graphic_packs')
+                }
+            }
+        ]
+    }
+]
+
+let game_storage, settings_storage, ticket_cache_storage, fuse_searchable,
+	context_menu;
 
 const API_ROOT = 'http://cemui.com';
 const DATA_ROOT = app.getPath('userData').replace(/\\/g, '/') + '/app_data/';
@@ -298,7 +369,7 @@ function createWindow(file) {
 		electron.shell.openExternal(url);
 	});
 
-	require('./context.js');  
+	updateContextMenuCemuInstances();
 
 }
 
@@ -542,11 +613,13 @@ ipcMain.on('cemu_name_check', (event, data) => {
 	settings_storage.get('cemu_paths').push(cemu_object).write();
 	ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
 	ApplicationWindow.webContents.send('cemu_folder_added');
+	updateContextMenuCemuInstances();
 });
 ipcMain.on('remove_cemu_instance', (event, data) => {
 	settings_storage.get('cemu_paths').remove({name: data}).write();
 	ApplicationWindow.webContents.send('emulator_list', settings_storage.get('cemu_paths').value());
 	ApplicationWindow.webContents.send('cemu_folder_removed');
+	updateContextMenuCemuInstances();
 });
 
 ipcMain.on('ask_for_games_folder_list', () => {
@@ -1200,6 +1273,7 @@ function init() {
 					ApplicationWindow.webContents.send('init_complete', {library: fs.readJSONSync(path.join(DATA_ROOT, 'cache/json/games.json')).games, most_played: most_played, suggested: suggested});
 				});
 			}
+			updateContextMenuCemuInstances();
 		}
 	
 		load_games_queue.push(settings_storage.get('game_paths').value());
@@ -1724,12 +1798,14 @@ function isGame(game_path) {
 			if (subfolders.contains('meta') && fs.pathExistsSync(game_path + '/meta/meta.xml')) {
 				let xml = XMLParser.parse(game_path + '/meta/meta.xml');
 				if (xml.title_id._Data.substring(4, 8) != '0000') return false;
+				if (parseInt(xml.title_version._Data) != 0) return false;
 
 				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
 				if (!rom || rom.length < 0) return false;
 			} else if (fs.pathExistsSync(game_path + '/code/app.xml')) {
 				let xml = XMLParser.parse(game_path + '/code/app.xml');
 				if (xml.title_id._Data.substring(4, 8) != '0000') return false;
+				if (parseInt(xml.title_version._Data) != 0) return false;
 
 				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
 				if (!rom || rom.length < 0) return false;
@@ -1888,6 +1964,60 @@ function getThemes() {
 
 function sendThemes(themes) {
 	ApplicationWindow.webContents.send('themes_list', themes);
+}
+
+function updateContextMenuCemuInstances() {
+	context[0].submenu = [];
+	for (let instance of settings_storage.get('cemu_paths').value()) {
+		context[0].submenu.push({
+			label: instance.name,
+			submenu: [
+				{
+					label: 'Install game update or DLC',
+					async click () {
+						var meta_location = dialog.showOpenDialog({
+							title: 'Select update/DLC meta.xml',
+							message: 'Select update/DLC meta.xml',
+							properties: ['openFile'],
+							filters: [
+								{name: 'meta.xml', extensions: ['xml']}
+							]
+						});
+						if (!meta_location) return;
+						meta_location = meta_location[0];
+
+						let xml = XMLParser.parse(meta_location),
+							title_id = xml.title_id._Data,
+							titld_id_type = title_id.substring(4, 8),
+							title_version = xml.title_version._Data,
+							copy_path;
+
+						if (titld_id_type.toUpperCase() == '000C') {
+							copy_path = path.join(instance.cemu_folder_path, 'mlc01', 'usr', 'title', '00050000', title_id.substring(8), 'aoc');
+						} else if (parseInt(title_version) > 0) {
+							copy_path = path.join(instance.cemu_folder_path, 'mlc01', 'usr', 'title', '00050000', title_id.substring(8));							
+						} else {
+							return;
+						}
+
+						fs.ensureDirSync(copy_path);
+						await fs.copy(path.join(meta_location, '../../', 'code'), path.join(copy_path, 'code'));
+						await fs.copy(path.join(meta_location, '../../', 'content'), path.join(copy_path, 'content'));
+						await fs.copy(path.join(meta_location, '../../', 'meta'), path.join(copy_path, 'meta'));
+					
+						dialog.showMessageBox(ApplicationWindow, {
+							type: 'info',
+							title: 'CemUI',
+							message: 'Update/DLC added',
+							detail: 'Your update/DLC was successfully installed to ' + instance.cemu_folder_path
+						});
+					}
+				}
+			]
+		});
+	}
+	context_menu = Menu.buildFromTemplate(context);
+	Menu.setApplicationMenu(context_menu);
 }
 
 Array.prototype.contains = function(el) {
