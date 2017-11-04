@@ -235,6 +235,7 @@ function toggleGAMES() {
         setTimeout(function () {
             var el = document.getElementById('dl');
             el.style.display = 'none';
+            window.location.reload(true);
         },500);
         return;
     }

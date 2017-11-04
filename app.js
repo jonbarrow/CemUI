@@ -31,6 +31,7 @@ let electron = require('electron'),
 	request = require('request'),
 	ws = require('windows-shortcuts'),
 	winston = require('winston'),
+	Menu = electron.Menu,
 	notifications = electron.Notification,
 	dialog = electron.dialog,
 	shell = electron.shell,
@@ -291,16 +292,22 @@ function createWindow(file) {
 	ApplicationWindow.on('closed', () => {
     	ApplicationWindow = null;
 	});
+
+	ApplicationWindow.webContents.on('new-window', function(event, url) {
+		event.preventDefault();
+		electron.shell.openExternal(url);
+	});
+	
+	require('./context.js');  
+
 }
 
 app.on('ready', () => {
-	updater.checkForUpdates()
+	updater.checkForUpdates();
 	createWindow('index');
+
 	//ApplicationWindow.webContents.openDevTools();
-	ApplicationWindow.webContents.on('new-window', function(event, url) {
-  		event.preventDefault();
-	  	electron.shell.openExternal(url);
-	});
+
     
 })
 
@@ -1705,25 +1712,25 @@ function isGame(game_path) {
 	var stats = fs.lstatSync(game_path);
 	if (!stats) return false;
 
-	if (stats.isSymbolicLink()) {
-		var link = fs.readlinkSync(game_path),
-			subfolders = fs.readdirSync(link);
+	if (stats.isSymbolicLink() || stats.isDirectory()) {
+		let subfolders;
+		if (stats.isSymbolicLink()) {
+			subfolders = fs.readdirSync(fs.readlinkSync(game_path));
+		} else {
+			subfolders = fs.readdirSync(game_path);
+		}
+		
 		if (subfolders.contains('code') && subfolders.contains('content')) {
 			if (subfolders.contains('meta') && fs.pathExistsSync(game_path + '/meta/meta.xml')) {
+				let xml = XMLParser.parse(game_path + '/meta/meta.xml');
+				if (NUSRipper.getTIDType(xml.title_id) != '0000') return false;
+
 				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
 				if (!rom || rom.length < 0) return false;
 			} else if (fs.pathExistsSync(game_path + '/code/app.xml')) {
-				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
-				if (!rom || rom.length < 0) return false;
-			} else return false;
-		} else return false;
-	} else if (stats.isDirectory()) {
-		var subfolders = fs.readdirSync(game_path);
-		if (subfolders.contains('code') && subfolders.contains('content')) {
-			if (subfolders.contains('meta') && fs.pathExistsSync(game_path + '/meta/meta.xml')) {
-				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
-				if (!rom || rom.length < 0) return false;
-			} else if (fs.pathExistsSync(game_path + '/code/app.xml')) {
+				let xml = XMLParser.parse(game_path + '/code/app.xml');
+				if (NUSRipper.getTIDType(xml.title_id) != '0000') return false;
+
 				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
 				if (!rom || rom.length < 0) return false;
 			} else return false;
