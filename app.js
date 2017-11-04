@@ -1723,13 +1723,13 @@ function isGame(game_path) {
 		if (subfolders.contains('code') && subfolders.contains('content')) {
 			if (subfolders.contains('meta') && fs.pathExistsSync(game_path + '/meta/meta.xml')) {
 				let xml = XMLParser.parse(game_path + '/meta/meta.xml');
-				if (xml.title_id.substring(4, 8) != '0000') return false;
+				if (xml.title_id._Data.substring(4, 8) != '0000') return false;
 
 				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
 				if (!rom || rom.length < 0) return false;
 			} else if (fs.pathExistsSync(game_path + '/code/app.xml')) {
 				let xml = XMLParser.parse(game_path + '/code/app.xml');
-				if (xml.title_id.substring(4, 8) != '0000') return false;
+				if (xml.title_id._Data.substring(4, 8) != '0000') return false;
 
 				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
 				if (!rom || rom.length < 0) return false;
