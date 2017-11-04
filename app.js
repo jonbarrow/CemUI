@@ -45,7 +45,7 @@ const context = [
         label: 'Cemu Instances',
         submenu: [
         ]
-    },
+	},
     {
         label: 'View',
         submenu: [
@@ -76,6 +76,13 @@ const context = [
     {
         role: 'help',
         submenu: [
+			{
+				label: 'CemUI Help Desk',
+                click () {
+                    shell.openExternal('https://github.com/RedDuckss/CemUI/wiki/FAQ-Help')
+                }
+			},
+			{ type: 'separator' },
             {
                 label: 'Cemu',
                 click () {
