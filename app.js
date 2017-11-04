@@ -1,4 +1,5 @@
 const APP_VERSION = '2.1.1';
+const CACHE_VERSION = 2;
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
@@ -189,6 +190,7 @@ game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
 game_storage.defaults({games: []}).write();
 settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
 settings_storage.defaults({
+	//cache_version: CACHE_VERSION,
 	cemu_paths: [],
 	game_paths: [],
 	theme: 'Flux',
@@ -375,12 +377,24 @@ function createWindow(file) {
 
 app.on('ready', () => {
 	updater.checkForUpdates();
-	createWindow('index');
-
-	//ApplicationWindow.webContents.openDevTools();
-
-    
-})
+	createWindow('index'); 
+	let c_version = fs.readJsonSync(DATA_ROOT + 'cache/json/settings.json').cache_version;
+	if (!c_version || c_version < CACHE_VERSION) {
+		dialog.showMessageBox(ApplicationWindow, {
+			type: 'question',
+			buttons: ['Yes delete old cache and restart', 'No, continue'],
+			title: 'CemUI Error',
+			message: 'Out of date cache version',
+			detail: 'CemUI has detected an out of date/invalid cache version. You may experience issues with this cache version.\nWould you like CemUI to delete and remake the cache?',
+			icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
+		}, (response) => {
+            if (response === 0) {
+                app.relaunch();
+                app.quit();
+            }
+        });
+	}
+});
 
 app.on('window-all-closed', () => {
   	if (process.platform !== 'darwin') {

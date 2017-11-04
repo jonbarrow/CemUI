@@ -608,7 +608,7 @@ Main.prototype._ripFile = function(TID, url, file, cb) {
             if (this.CANCEL_LIST.contains(TID)) {
                 console.log('KILLED');
                 req.abort();
-                req.destroy();
+                //req.destroy();
             }
 
             received_bytes += chunk.length;
