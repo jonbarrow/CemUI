@@ -238,7 +238,8 @@ body, html {
 /* typography styles */
 
 .img-cap-white {
-    color: #d9d9d9;
+    /*color: #d9d9d9;*/
+    color: #FFFFFF;
 }
 .img-cap-black {
     color: #2c2c2c;

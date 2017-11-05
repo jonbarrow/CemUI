@@ -29,6 +29,16 @@ ipcRenderer.on('init_complete', function(event, data) {
                 item = document.getElementById("TEMPLATE_GAME_ITEM").content.firstElementChild.cloneNode(true);
 
             preload(game.grid);
+            let tmp_img = new Image();
+            tmp_img.src = game.grid;
+        
+            addEvent(tmp_img, 'load', () => {
+                let vibrant = new Vibrant(tmp_img),
+                    swatches = vibrant.swatches(),
+                    rgba = swatches.Vibrant.getRgb();
+                rgba.push(0.2);
+                item.querySelector('div').style.backgroundColor = 'rgba(' + rgba[0] + ', ' + rgba[1] + ', ' + rgba[2] + ', ' + rgba[3] + ')';
+            });
             createModal(game);
             item.style.backgroundImage = 'url("' + game.grid + '")';
             item.querySelector('p').innerHTML = game.name + ' <span>' + game.region + '</span>';
@@ -52,6 +62,16 @@ ipcRenderer.on('init_complete', function(event, data) {
                 item = document.getElementById("TEMPLATE_GAME_ITEM").content.firstElementChild.cloneNode(true);
 
             preload(game.grid);
+            let tmp_img = new Image();
+            tmp_img.src = game.grid;
+        
+            addEvent(tmp_img, 'load', () => {
+                let vibrant = new Vibrant(tmp_img),
+                    swatches = vibrant.swatches(),
+                    rgba = swatches.Vibrant.getRgb();
+                rgba.push(0.2);
+                item.querySelector('div').style.backgroundColor = 'rgba(' + rgba[0] + ', ' + rgba[1] + ', ' + rgba[2] + ', ' + rgba[3] + ')';
+            });
             item.style.backgroundImage = 'url("' + game.grid + '")';
             item.querySelector('p').innerHTML = game.name + ' <span>' + game.region + '</span>';
 
