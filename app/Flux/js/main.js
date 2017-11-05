@@ -85,6 +85,7 @@ function closeModal() {
 }
 
 function createModal(game) {
+
     let item = document.getElementById("TEMPLATE_GAME_MODAL").content.firstElementChild.cloneNode(true);
 
     addEvent(item.querySelector('.close-btn'), 'click', () => {
