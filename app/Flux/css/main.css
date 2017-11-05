@@ -215,6 +215,14 @@ body, html {
     clip-path: inset(0 0 0 0 round 15px);
     overflow: scroll;
 }
+.game_modal .content .main_content .border-fix {
+    position: absolute;
+    display: block;
+    max-height: 30px;
+    height: 30px;
+    width: 50%;
+    backdrop-filter: blur(30px);
+}
 .game_modal .content .screenshots {
     font-size: 0;
     width: 100%;
