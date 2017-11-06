@@ -759,6 +759,10 @@ ipcMain.on('smm_upload_course', async (event, data) => {
 		message: 'Uploading SMM level from ' + data
 	});
 
+	let course = smm_editor.loadCourseSync(data);
+	await course.setMaker('');
+	course.writeToSave(data.split('\\').pop().replace(/course/, ''), data);
+
 	let zip = archiver('zip'),
 		buffer;
 		
@@ -1924,17 +1928,16 @@ async function sendSMMCourses() {
 			if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
 				let save = await smm_editor.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path));
 
-				await save.loadCourses();
-
-				await save.importThumbnail();
-				await save.exportThumbnail();
-
 				let saved_courses = await save.loadCourses(),
 					courses = {
 					save_dir: smm_save_path,
 					cemu_path: cemu_path.cemu_folder_path,
 					courses: []
 				}
+
+				await save.importThumbnail();
+				await save.exportThumbnail();
+
 				
 				for (let course in saved_courses) {
 					var course_id = course.replace(/course/, '');
@@ -1944,10 +1947,14 @@ async function sendSMMCourses() {
 						id: course_id,
 						course_id: 'course' + course_id,
 						save_id: smm_save_path,
+						thumbnail: course.thumbnailPreview,
+						preview: course.thumbnail,
 						cemu: cemu_path.cemu_folder_path,
 						title: course.title,
 						maker: course.maker
 					});
+
+					console.log(course.maker);
 				}
 				smm_courses.push(courses);
 			}

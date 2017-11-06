@@ -789,6 +789,7 @@ function setIPCevents() {
         for (let smm_save_dir of data) {
             for (let course_data of smm_save_dir.courses) {
                 i++;
+                console.log(course_data.preview)
                 let course = document.getElementById("TEMPLATE_SMMDB_COURSE").content.firstElementChild.cloneNode(true);
                 course.querySelector('.details').removeChild(course.querySelector('.stars'));
                 course.querySelector('.details').removeChild(course.querySelector('.owner'));
@@ -817,8 +818,8 @@ function setIPCevents() {
                 course.querySelector('h1.download').classList.add('upload');
                 course.querySelector('h1.download').classList.remove('download');
                 course.querySelector('.course-name').innerHTML = course_data.title;
-                course.querySelector('.img_preview img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, 'course' + course_data.id, 'thumbnail0.jpg?' + new Date());
-                course.querySelector('.img_thumbnail img').src = path.join(course_data.cemu, 'mlc01/emulatorSave', course_data.save_id, 'course' + course_data.id, 'thumbnail1.jpg?' + new Date());
+                course.querySelector('.img_preview img').src = 'data:image/png;base64,' + Unit8Array2Base64(course_data.preview);
+                course.querySelector('.img_thumbnail img').src = 'data:image/png;base64,' + Unit8Array2Base64(course_data.thumbnail);
 
                 if (i % 2 != 0) {
                     course_cols[2].appendChild(course)
@@ -847,6 +848,10 @@ function hex2RGB(hex) {
         g = parseInt(hex.slice(3, 5), 16),
         b = parseInt(hex.slice(5, 7), 16);
     return {r:r,g:g,b:b};
+}
+
+function Unit8Array2Base64(array) {
+    return btoa(String.fromCharCode.apply(null, array));
 }
 
 String.prototype.insert = function(index, string) {
