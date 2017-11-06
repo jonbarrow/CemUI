@@ -153,7 +153,7 @@ if (fs.pathExistsSync('./resources')) {
 
 updater.autoDownload = false;
 
-const console = winston.createLogger({
+const logger = winston.createLogger({
 	level: 'verbose',
 	format: winston.format.combine(
 		winston.format.timestamp(),
@@ -213,7 +213,7 @@ updater.on('checking-for-update', () => {
 		type: 'checking',
 		message: 'Checking for update...'
 	});
-  	console.log({
+  	logger.log({
 		level: 'info',
 		message: 'Checking for update...'
 	});
@@ -244,7 +244,7 @@ updater.on('update-not-available', (info) => {
 		type: 'unavailable',
 		message: 'Update not available'
 	})
-	console.log({
+	logger.log({
 		level: 'info',
 		message: 'Update not available.'
 	});
@@ -254,7 +254,7 @@ updater.on('error', (error) => {
 		type: 'error',
 		message: error
 	})
-	console.log({
+	logger.log({
 		level: 'error', 
 		message: error
 	});
@@ -270,7 +270,7 @@ updater.on('update-downloaded', (info) => {
 		type: 'completed',
 		message: 'Update downloaded'
 	})
-  	console.log({
+  	logger.log({
 		level: 'info',
 		message: 'Update downloaded'
 	});
@@ -314,7 +314,7 @@ NUSRipper.on('download_status', (data) => {
 
 NUSRipper.on('download_total_size', (data) => {
 	ApplicationWindow.webContents.send('download_total_size', data);
-	console.log({
+	logger.log({
 		level: 'info',
 		message: 'Total download size for' + data.tid + ': ' + data.size
 	});
@@ -429,7 +429,7 @@ ipcMain.on('controller_event', (event, data) => {
 });
 
 ipcMain.on('theme_finished_loading', (event, data) => {
-    console.log({
+    logger.log({
 		level: 'info',
 		message: 'theme finished loading, closing loading screen'
 	});
@@ -492,7 +492,7 @@ ipcMain.on('change_theme', (event, data) => {
 ipcMain.on('init', (event, data) => {
 	if (data && data.page == '_dlgames') {
 		// init for downloading games
-		console.log({
+		logger.log({
 			level: 'info',
 			message: 'Started ticket cache download'
 		});
@@ -505,7 +505,7 @@ ipcMain.on('init', (event, data) => {
 			//ticket_cache_storage = low(new FileSync(settings_storage.get('ticket_cache_folder').value() + '/_cache.json'));
 			fuse_searchable = new fusejs(data, FUSE_OPTIONS);
 			ApplicationWindow.webContents.send('ticket_cache_downloaded');
-			console.log({
+			logger.log({
 				level: 'info',
 				message: 'Ticket cache downloaded'
 			});
@@ -705,7 +705,7 @@ ipcMain.on('play_rom', (event, data) => {
 		cwd: instance.cemu_folder_path
 	}, (error, stdout, stderr) => {
 		if (error) {
-			console.log({
+			logger.log({
 				level: 'error',
 				message: error
 			});
@@ -754,7 +754,7 @@ ipcMain.on('smm_save_api_key', (event, data) => {
 ipcMain.on('smm_upload_course', async (event, data) => {
 	smm.apiKey(settings_storage.get('smmdb_api_key').value());
 
-	console.log({
+	logger.log({
 		level: 'info',
 		message: 'Uploading SMM level from ' + data
 	});
@@ -772,11 +772,18 @@ ipcMain.on('smm_upload_course', async (event, data) => {
 	
 	smm.uploadCourse(buffer, (error, course_data) => {
 		if (error) {
-			console.log({
+			logger.log({
 				level: 'error',
 				message: error
 			});
-			throw new Error(error);
+			dialog.showMessageBox(ApplicationWindow, {
+				type: 'error',
+				title: 'CemUI Error',
+				message: 'SMMDB Error',
+				detail: error,
+				icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
+			});
+			return;
 		}
 		dialog.showMessageBox(ApplicationWindow, {
 			type: 'info',
@@ -784,7 +791,7 @@ ipcMain.on('smm_upload_course', async (event, data) => {
 			message: 'Course uploaded to SMMDB',
 			detail: 'Course uploaded successfully. Course ID: ' + course_data[0].id
 		});
-		console.log({
+		logger.log({
 			level: 'info',
 			message: 'upload course to SMMDB: ' + JSON.stringify(course_data)
 		});
@@ -822,7 +829,7 @@ ipcMain.on('smm_dl_level', function(event, data) {
 	SMMLevelFolder = SMMLevelFolder[0];
 	event.sender.send("smm_show_loader");
 
-	console.log({
+	logger.log({
 		level: 'info',
 		message: 'starting download of SMMDB course: ' + data
 	});
@@ -830,13 +837,13 @@ ipcMain.on('smm_dl_level', function(event, data) {
 	async.waterfall([
 		function(callback) {
 			event.sender.send("smm_level_dl_start");
-			console.log({
+			logger.log({
 				level: 'info',
 				message: 'starting backup zip of local course'
 			});
 			zipFolder(SMMLevelFolder, path.join(SMMLevelFolder, 'backup.zip'), function(err) {
 			    if(err) {
-			        console.log({
+			        logger.log({
 						level: 'error',
 						message: err
 					});
@@ -844,7 +851,7 @@ ipcMain.on('smm_dl_level', function(event, data) {
 			    } else {
 			        callback(null);
 				}
-				console.log({
+				logger.log({
 					level: 'info',
 					message: 'local course backed up'
 				});
@@ -870,7 +877,7 @@ ipcMain.on('smm_dl_level', function(event, data) {
 		    req.on('data', function(chunk) {
 		        received_bytes += chunk.length;
 				var percent = (received_bytes * 100) / total_bytes;
-				console.log({
+				logger.log({
 					level: 'info',
 					message: 'downloaded ' + percent + '% of SMMDB course: ' + data
 				});
@@ -883,20 +890,20 @@ ipcMain.on('smm_dl_level', function(event, data) {
 		},
 		function(callback) {
 			event.sender.send("smm_level_extract");
-			console.log({
+			logger.log({
 				level: 'info',
 				message: 'unpacking SMMDB course: ' + data
 			});
 			fs.createReadStream(path.join(SMMLevelFolder, 'new_level.zip'))
 			.pipe(unzip.Extract({ path: SMMLevelFolder }))
 			.on('entry', (entry) => {
-				console.log({
+				logger.log({
 					level: 'info',
 					message: 'Found zip file ' + entry.path
 				})
 			})
 			.on('close', () => {
-				console.log({
+				logger.log({
 					level: 'info',
 					message: 'unpacked SMMDB course: ' + data
 				});
@@ -904,12 +911,12 @@ ipcMain.on('smm_dl_level', function(event, data) {
 			});
 		},
 		function(callback) {
-			console.log({
+			logger.log({
 				level: 'info',
 				message: 'removing zip of SMMDB course: ' + data
 			});
 			fs.unlink(path.join(SMMLevelFolder, 'new_level.zip'), function() {
-				console.log({
+				logger.log({
 					level: 'info',
 					message: 'removed zip of SMMDB course: ' + data
 				});
@@ -929,7 +936,7 @@ ipcMain.on('smm_dl_level', function(event, data) {
 		function(dir, callback) {
 			fs.remove(path.join(SMMLevelFolder, dir), error => {
 			  	if (error) {
-			  		console.log({
+			  		logger.log({
 						level: 'error',
 						message: error
 					});
@@ -970,24 +977,24 @@ ipcMain.on('dl_game', (event, data) => {
 			ApplicationWindow.webContents.send('game_dl_started', data);
 			NUSRipper.downloadTID(data.tid, rom_dl_path, null, () => {
 				if (NUSRipper.CANCEL_LIST.contains(NUSRipper.formatTID(data.tid))) {
-					console.log({
+					logger.log({
 						level: 'info',
 						message: 'Download for ' + NUSRipper.formatTID(data.tid) + ' aborted'
 					});
 					return callback(true);
 				}
 				
-				console.log({
+				logger.log({
 					level: 'info',
 					message: 'Verifying encrypted download for ' + NUSRipper.formatTID(data.tid) + ' at ' + rom_dl_path + '...'
 				});
 				NUSRipper.verifyEncryptedContents(rom_dl_path, data.tid, () => {
-					console.log({
+					logger.log({
 						level: 'info',
 						message: 'Decrypting files for ' + NUSRipper.formatTID(data.tid) + ' at ' + rom_dl_path + '...'
 					});
 					NUSRipper.decrypt(rom_dl_path, (cdecrypt_missing) => {
-						console.log({
+						logger.log({
 							level: 'info',
 							message: 'Game ' + NUSRipper.formatTID(data.tid) + ' downloaded at ' + rom_dl_path + '...'
 						});
@@ -1043,24 +1050,24 @@ ipcMain.on('dl_game', (event, data) => {
 				ApplicationWindow.webContents.send('game_dl_started', new_data);
 				NUSRipper.downloadTID(new_data.tid, rom_dl_path, new_data.dl_update, () => {
 					if (NUSRipper.CANCEL_LIST.contains(NUSRipper.formatTID(new_data.tid))) {
-						console.log({
+						logger.log({
 							level: 'info',
 							message: 'Download for ' + NUSRipper.formatTID(new_data.tid) + ' aborted'
 						});
 						return callback(true);
 					}
 					
-					console.log({
+					logger.log({
 						level: 'info',
 						message: 'Verifying encrypted download for ' + NUSRipper.formatTID(new_data.tid) + ' at ' + rom_dl_path + '...'
 					});
 					NUSRipper.verifyEncryptedContents(rom_dl_path, new_data.tid, () => {
-						console.log({
+						logger.log({
 							level: 'info',
 							message: 'Decrypting files for ' + NUSRipper.formatTID(new_data.tid) + ' at ' + rom_dl_path + '...'
 						});
 						NUSRipper.decrypt(rom_dl_path, (cdecrypt_missing) => {
-							console.log({
+							logger.log({
 								level: 'info',
 								message: 'Update for ' + NUSRipper.formatTID(new_data.tid) + ' downloaded at ' + rom_dl_path + '...'
 							});
@@ -1119,24 +1126,24 @@ ipcMain.on('dl_game', (event, data) => {
 				ApplicationWindow.webContents.send('game_dl_started', new_data);
 				NUSRipper.downloadTID(new_data.tid, rom_dl_path, null, () => {
 					if (NUSRipper.CANCEL_LIST.contains(NUSRipper.formatTID(new_data.tid))) {
-						console.log({
+						logger.log({
 							level: 'info',
 							message: 'Download for ' + NUSRipper.formatTID(new_data.tid) + ' aborted'
 						});
 						return callback(true);
 					}
 					
-					console.log({
+					logger.log({
 						level: 'info',
 						message: 'Verifying encrypted download for ' + NUSRipper.formatTID(new_data.tid) + ' at ' + rom_dl_path + '...'
 					});
 					NUSRipper.verifyEncryptedContents(rom_dl_path, new_data.tid, () => {
-						console.log({
+						logger.log({
 							level: 'info',
 							message: 'Decrypting files for ' + NUSRipper.formatTID(new_data.tid) + ' at ' + rom_dl_path + '...'
 						});
 						NUSRipper.decrypt(rom_dl_path, (cdecrypt_missing) => {
-							console.log({
+							logger.log({
 								level: 'info',
 								message: 'DLC for ' + NUSRipper.formatTID(new_data.tid) + ' downloaded at ' + rom_dl_path + '...'
 							});
@@ -1215,7 +1222,7 @@ ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
 	});
 
 	if (!image_location) {
-		sendSMMCourses();
+		ApplicationWindow.webContents.send('smm_hide_loader');
 		return;
 	}
 	image_location = image_location[0];
@@ -1237,7 +1244,7 @@ ipcMain.on('smm_change_preview_image', (event, data) => {
 	});
 
 	if (!image_location) {
-		sendSMMCourses();
+		ApplicationWindow.webContents.send('smm_hide_loader');
 		return;
 	}
 	image_location = image_location[0];
@@ -1362,7 +1369,7 @@ function loadGames(dir, master_callback) {
 				async.waterfall([
 					function(cb) {
 						let is_wud = false
-						console.log({
+						logger.log({
 							level: 'info',
 							message: 'Found new game ' + file
 						});
@@ -1375,7 +1382,7 @@ function loadGames(dir, master_callback) {
 					function(is_wud, cb) {
 						request(API_ROOT, (error, response, body) => {
 							if (error) {
-								console.log({
+								logger.log({
 									level: 'error',
 									message: 'DNS ERROR WHILE SCANNING DATA FOR ' + file
 								});
@@ -1395,7 +1402,7 @@ function loadGames(dir, master_callback) {
 								}
 							}
 						} catch (error) {
-							console.log({
+							logger.log({
 								level: 'error',
 								message: error
 							});
@@ -1405,7 +1412,7 @@ function loadGames(dir, master_callback) {
 						
 						if (!is_wud) {
 							if (!xml || !xml.title_id) {
-								console.log({
+								logger.log({
 									level: 'error',
 									message: 'Failed to find TID for ' + file
 								});
@@ -1419,7 +1426,7 @@ function loadGames(dir, master_callback) {
 						var name = file;
 						getGameData(dir + '/' + file, is_wud, (error, data) => {
 							if (error) {
-								console.log({
+								logger.log({
 									level: 'error',
 									message: error
 								});
@@ -1439,7 +1446,7 @@ function loadGames(dir, master_callback) {
 								var req = request(url);
 
 								req.on('error', (error) => {
-									console.log({
+									logger.log({
 										level: 'error',
 										message: error
 									});
@@ -1448,14 +1455,14 @@ function loadGames(dir, master_callback) {
 								
 								req.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + urls.indexOf(url) + '.jpg'))
 								.on('error', (error) => {
-									console.log({
+									logger.log({
 										level: 'error',
 										message: error
 									});
 									return sc_callback(url);
 								})
 								.on('close', () => {
-									console.log({
+									logger.log({
 										level: 'info',
 										message: 'Downloaded screenshot ' + urls.indexOf(url) + ' for ' + data.game_title_id + ' to ' + DATA_ROOT + 'cache/images/' + data.game_title_id + '/screenshots/' + urls.indexOf(url) + '.jpg'
 									});
@@ -1464,7 +1471,7 @@ function loadGames(dir, master_callback) {
 								});
 							}, (error) => {
 								if (error) {
-									console.log({
+									logger.log({
 										level: 'error',
 										message: error
 									});
@@ -1519,7 +1526,7 @@ function loadGames(dir, master_callback) {
 									method: "GET"
 								})
 								.on('error', (error) => {
-									console.log({
+									logger.log({
 										level: 'error',
 										message: error
 									});
@@ -1527,7 +1534,7 @@ function loadGames(dir, master_callback) {
 								})
 								.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.jpg'))
 								.on('error', (error) => {
-									console.log({
+									logger.log({
 										level: 'error',
 										message: error
 									});
@@ -1536,7 +1543,7 @@ function loadGames(dir, master_callback) {
 								.on('close', () => {
 									jimp.read(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.jpg', (error, icon) => {
 										if (error) {
-											console.log({
+											logger.log({
 												level: 'error',
 												message: error
 											});
@@ -1544,7 +1551,7 @@ function loadGames(dir, master_callback) {
 										}
 										icon.write(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.png', (error) => {
 											if (error) {
-												console.log({
+												logger.log({
 													level: 'error',
 													message: error
 												});
@@ -1557,7 +1564,7 @@ function loadGames(dir, master_callback) {
 												fs.writeFileSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico', buffer);
 												cb(null, data, name, is_wud);
 											}).catch((error) => {
-												console.log({
+												logger.log({
 													level: 'error',
 													message: error
 												});
@@ -1567,7 +1574,7 @@ function loadGames(dir, master_callback) {
 									})
 								});
 							} else {
-								console.log({
+								logger.log({
 									level: 'info',
 									message: 'No icon found for ' + data.game_title + '. Defaulting to default icon'
 								});
@@ -1584,7 +1591,7 @@ function loadGames(dir, master_callback) {
 								method: "GET"
 							})
 							.on('error', (error) => {
-								console.log({
+								logger.log({
 									level: 'error',
 									message: error
 								});
@@ -1592,7 +1599,7 @@ function loadGames(dir, master_callback) {
 							})
 							.pipe(fs.createWriteStream(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.jpg'))
 							.on('error', (error) => {
-								console.log({
+								logger.log({
 									level: 'error',
 									message: error
 								});
@@ -1601,7 +1608,7 @@ function loadGames(dir, master_callback) {
 							.on('close', () => {
 								jimp.read(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.jpg', (error, icon) => {
 									if (error) {
-										console.log({
+										logger.log({
 											level: 'error',
 											message: error
 										});
@@ -1609,7 +1616,7 @@ function loadGames(dir, master_callback) {
 									}
 									icon.write(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.png', (error) => {
 										if (error) {
-											console.log({
+											logger.log({
 												level: 'error',
 												message: error
 											});
@@ -1622,7 +1629,7 @@ function loadGames(dir, master_callback) {
 											fs.writeFileSync(DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico', buffer);
 											cb(null, data, name, is_wud);
 										}).catch((error) => {
-											console.log({
+											logger.log({
 												level: 'error',
 												message: error
 											});
@@ -1632,7 +1639,7 @@ function loadGames(dir, master_callback) {
 								})
 							});
 						} else {
-							console.log({
+							logger.log({
 								level: 'info',
 								message: 'No icon found for ' + data.game_title + '. Defaulting to default icon'
 							});
@@ -1739,7 +1746,7 @@ function loadGames(dir, master_callback) {
 
 			/*fsmonitor.watch(settings_storage.get('games_path').value(), null, (event) => {
 				if (event.addedFiles || event.addedFolders) {
-					console.log(event)
+					logger.log(event)
 				}
 				if (event.removedFiles || event.removedFolders) {
 					checkInvalidGames();
@@ -1917,6 +1924,11 @@ async function sendSMMCourses() {
 			if (fs.pathExistsSync(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path))) {
 				let save = await smm_editor.loadSave(path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path));
 
+				await save.loadCourses();
+
+				await save.importThumbnail();
+				await save.exportThumbnail();
+
 				let saved_courses = await save.loadCourses(),
 					courses = {
 					save_dir: smm_save_path,
@@ -1927,15 +1939,6 @@ async function sendSMMCourses() {
 				for (let course in saved_courses) {
 					var course_id = course.replace(/course/, '');
 					course = saved_courses[course];
-
-					await course.exportThumbnail();
-					await course.setThumbnail(
-						path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, 'course'.concat(course_id), 'thumbnail0.jpg'),
-						path.join(cemu_path.cemu_folder_path, 'mlc01/emulatorSave', smm_save_path, 'course'.concat(course_id), 'thumbnail1.jpg')
-					);
-
-					await course.writeThumbnail();
-					await course.exportThumbnail();
 
 					courses.courses.push({
 						id: course_id,
