@@ -3,9 +3,9 @@ const CACHE_VERSION = 2;
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
-	electron_reload = require('electron-reload')(__dirname, {
+	/*electron_reload = require('electron-reload')(__dirname, {
 		ignored: /node_modules|[\/\\]\.|cemui.log|cemui.error.log|cemui.info.log/
-	}),
+	}),*/
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
@@ -1230,13 +1230,22 @@ ipcMain.on('smm_change_thumbnail_image', async (event, data) => {
 		return;
 	}
 	image_location = image_location[0];
+
+	let course = smm_editor.loadCourseSync(data);
+	await course.exportThumbnail();
 	
 	fs.copySync(image_location, path.join(data, 'thumbnail1.jpg'));
+	await course.setThumbnail(
+		path.join(data, 'thumbnail0.jpg'),
+		path.join(data, 'thumbnail1.jpg')
+	);
+
+	await course.writeThumbnail();
 	
 	sendSMMCourses();
 });
 
-ipcMain.on('smm_change_preview_image', (event, data) => {
+ipcMain.on('smm_change_preview_image', async (event, data) => {
 	ApplicationWindow.webContents.send('smm_show_loader');
 	let image_location = dialog.showOpenDialog({
 		title: 'Select new preview',
@@ -1253,7 +1262,16 @@ ipcMain.on('smm_change_preview_image', (event, data) => {
 	}
 	image_location = image_location[0];
 	
+	let course = smm_editor.loadCourseSync(data);
+	await course.exportThumbnail();
+	
 	fs.copySync(image_location, path.join(data, 'thumbnail0.jpg'));
+	await course.setThumbnail(
+		path.join(data, 'thumbnail0.jpg'),
+		path.join(data, 'thumbnail1.jpg')
+	);
+
+	await course.writeThumbnail();
 	
 	sendSMMCourses();
 });
