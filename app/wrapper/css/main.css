@@ -1108,6 +1108,61 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     }
 }
 
+@media screen and (max-width: 920px) {
+    .txt-s-64 {
+        font-size: 58px;
+        line-height: 58px;
+    }
+    .txt-s-48 {
+        font-size: 42px;
+        line-height: 42px;
+    }
+    .txt-s-38  {
+        font-size: 32px;
+        line-height: 32px;
+    }
+    .txt-s-32 {
+        font-size: 26px;
+        line-height: 26px;
+    }
+    .txt-s-24 {
+        font-size: 18px;
+        line-height: 18px;
+    }
+    .txt-s-16 {
+        font-size: 10px;
+        line-height: 10px;
+    }
+    .txt-s-12 {
+        font-size: 6px;
+        line-height: 6px;
+    }
+    .input-text-smm {
+        padding: 9px 20px;
+        margin: 0 5px;
+    }
+    #smm .txt-button {
+        padding: 10px 20px;
+    }
+    .close .txt-s-24 {
+        font-size: 13px;
+        line-height: 13px;
+    }
+    #smm .main .header h1 {
+        margin-right: 10px;
+    }
+    .header .txt-s-32 {
+        font-size: 23px;
+        line-height: 23px;
+    }
+    #smm .course {
+        height: 319px;
+    }
+    #smm .course:hover {
+        height: 470px;
+    }
+}
+
 .checkbox-wrapper {
     font-family: arial;
     display: block;
