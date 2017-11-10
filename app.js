@@ -3,9 +3,9 @@ const CACHE_VERSION = 2;
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
-	/*electron_reload = require('electron-reload')(__dirname, {
+	electron_reload = require('electron-reload')(__dirname, {
 		ignored: /node_modules|[\/\\]\.|cemui.log|cemui.error.log|cemui.info.log/
-	}),*/
+	}),
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
@@ -183,30 +183,7 @@ const logger = winston.createLogger({
     ]
 });
 
-fs.ensureDirSync(DATA_ROOT + 'cache/images');
-fs.ensureDirSync(DATA_ROOT + 'cache/json');
-fs.ensureDirSync(DATA_ROOT + 'themes');
-if (!fs.existsSync(DATA_ROOT + 'cache/json/games.json')) {
-	fs.createFileSync(DATA_ROOT + 'cache/json/games.json');
-}
-if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
-	fs.createFileSync(DATA_ROOT + 'cache/json/settings.json');
-}
-
-game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
-game_storage.defaults({games: []}).write();
-settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
-settings_storage.defaults({
-	//cache_version: CACHE_VERSION,
-	cemu_paths: [],
-	game_paths: [],
-	theme: 'Flux',
-	smmdb_api_key: '',
-	ticket_cache_folder: path.join(DATA_ROOT, 'ticketcache'),
-	ticket_cache_vendor: 'http://cemui.com/api/v2/ticketcache',
-	ticket_vendor: 'http://wiiu.titlekeys.gq/',
-	cdecrypt_location: '',
-}).write();
+setupDefaultFiles();
 
 updater.on('checking-for-update', () => {
 	ApplicationWindow.webContents.send('update_status', {
@@ -328,7 +305,8 @@ NUSRipper.on('rom_decryption_completed', (data) => {
 	ApplicationWindow.webContents.send('rom_decryption_completed', data);
 });
 
-let ApplicationWindow;
+let ApplicationWindow,
+	update_cache_version = true;
 
 let dns_errors = 0;
 
@@ -361,13 +339,6 @@ function createWindow(file) {
         ApplicationWindow.show();
 		ApplicationWindow.focus();
     });
-
-  	ApplicationWindow.loadURL(url.format({
-  		//pathname: path.join(__dirname, '/app/' + settings_storage.get('theme').value() + '/' + file + '.html'),
-  		pathname: path.join(__dirname, '/app/wrapper/index.html'),
-    	protocol: 'file:',
-    	slashes: true
-  	}));
 	
 	ApplicationWindow.on('closed', () => {
     	ApplicationWindow = null;
@@ -377,30 +348,33 @@ function createWindow(file) {
 		event.preventDefault();
 		electron.shell.openExternal(url);
 	});
+}
 
+function setWindow() {
+	ApplicationWindow.loadURL(url.format({
+		//pathname: path.join(__dirname, '/app/' + settings_storage.get('theme').value() + '/' + file + '.html'),
+		pathname: path.join(__dirname, '/app/wrapper/index.html'),
+		protocol: 'file:',
+		slashes: true
+	}));
 	updateContextMenuCemuInstances();
-
 }
 
 app.on('ready', () => {
 	updater.checkForUpdates();
-	createWindow('index'); 
-	/*let c_version = fs.readJsonSync(DATA_ROOT + 'cache/json/settings.json').cache_version;
-	if (!c_version || c_version < CACHE_VERSION) {
-		dialog.showMessageBox(ApplicationWindow, {
-			type: 'question',
-			buttons: ['Yes delete old cache and restart', 'No, continue'],
-			title: 'CemUI Error',
-			message: 'Out of date cache version',
-			detail: 'CemUI has detected an out of date/invalid cache version. You may experience issues with this cache version.\nWould you like CemUI to delete and remake the cache?',
-			icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
-		}, (response) => {
-            if (response === 0) {
-                app.relaunch();
-                app.quit();
-            }
-        });
-	}*/
+	createWindow();
+	verifyCacheVersion((response) => {
+		if (response === 0) {
+			clearCache();
+			setupDefaults();
+			app.relaunch();
+			app.quit();
+		} else {
+			update_cache_version = false;
+			setupDefaults();
+			setWindow();
+		}
+	});
 });
 
 app.on('window-all-closed', () => {
@@ -2076,6 +2050,74 @@ function updateContextMenuCemuInstances() {
 	}
 	context_menu = Menu.buildFromTemplate(context);
 	Menu.setApplicationMenu(context_menu);
+}
+
+function clearCache() {
+	fs.unlinkSync(DATA_ROOT + 'cache/json/games.json');
+	fs.unlinkSync(DATA_ROOT + 'cache/json/settings.json');
+}
+
+function setupDefaults() {
+
+	setupDefaultFiles();
+
+	let settings_defaults = {
+			//cache_version: CACHE_VERSION,
+			cemu_paths: [],
+			game_paths: [],
+			theme: 'Flux',
+			smmdb_api_key: '',
+			ticket_cache_folder: path.join(DATA_ROOT, 'ticketcache'),
+			ticket_cache_vendor: 'http://cemui.com/api/v2/ticketcache',
+			ticket_vendor: 'http://wiiu.titlekeys.gq/',
+			cdecrypt_location: '',
+		},
+		games_defaults = {
+			games: []
+		}
+
+	if (update_cache_version) {
+		settings_defaults.cache_version = CACHE_VERSION;
+	}
+
+	game_storage = low(new FileSync(DATA_ROOT + 'cache/json/games.json'));
+	game_storage.defaults(games_defaults).write();
+	settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
+	settings_storage.defaults(settings_defaults).write();
+}
+
+function setupDefaultFiles() {
+	fs.ensureDirSync(DATA_ROOT + 'cache/images');
+	fs.ensureDirSync(DATA_ROOT + 'cache/json');
+	fs.ensureDirSync(DATA_ROOT + 'themes');
+	if (!fs.existsSync(DATA_ROOT + 'cache/json/games.json')) {
+		fs.writeFileSync(DATA_ROOT + 'cache/json/games.json', JSON.stringify({}));
+	}
+	if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
+		fs.writeFileSync(DATA_ROOT + 'cache/json/settings.json', JSON.stringify({}));
+	}
+}
+
+function verifyCacheVersion(cb) {
+	let c_version = fs.readJsonSync(DATA_ROOT + 'cache/json/settings.json').cache_version;
+	if (!c_version || c_version < CACHE_VERSION) {
+		dialog.showMessageBox(ApplicationWindow, {
+			type: 'question',
+			buttons: ['Yes delete old cache and restart', 'No, continue'],
+			title: 'CemUI Error',
+			message: 'Out of date cache version',
+			detail: 'CemUI has detected an out of date/invalid cache version. You may experience issues with this cache version.\nWould you like CemUI to delete and remake the cache?',
+			icon: path.join(LOCAL_RESOURCES_ROOT, 'defaults/error.png')
+		}, (response) => {
+			return cb(response);
+            if (response === 0) {
+                app.relaunch();
+                app.quit();
+            }
+        });
+	} else {
+		return cb();
+	}
 }
 
 Array.prototype.contains = function(el) {
