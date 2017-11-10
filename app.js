@@ -2062,7 +2062,6 @@ function setupDefaults() {
 	setupDefaultFiles();
 
 	let settings_defaults = {
-			//cache_version: CACHE_VERSION,
 			cemu_paths: [],
 			game_paths: [],
 			theme: 'Flux',
@@ -2100,7 +2099,7 @@ function setupDefaultFiles() {
 
 function verifyCacheVersion(cb) {
 	let c_version = fs.readJsonSync(DATA_ROOT + 'cache/json/settings.json').cache_version;
-	if (!c_version || c_version < CACHE_VERSION) {
+	if (!c_version || c_version != CACHE_VERSION) {
 		dialog.showMessageBox(ApplicationWindow, {
 			type: 'question',
 			buttons: ['Yes delete old cache and restart', 'No, continue'],
