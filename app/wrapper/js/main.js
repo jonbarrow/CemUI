@@ -150,7 +150,7 @@ ipcRenderer.on('games_folder_added', () => {
         document.body.appendChild(current_view);
         addEvent(current_view.contentWindow, 'keypress', function(event) {
             if (event.charCode == 112) {
-                ipcRenderer.send('open_dev');
+                //ipcRenderer.send('open_dev');
             }
         });
         current_view.contentWindow.ipcRenderer = ipcWrapper;
@@ -171,7 +171,7 @@ ipcRenderer.on('games_folder_removed', () => {
         document.body.appendChild(current_view);
         addEvent(current_view.contentWindow, 'keypress', function(event) {
             if (event.charCode == 112) {
-                ipcRenderer.send('open_dev');
+                //ipcRenderer.send('open_dev');
             }
         });
         current_view.contentWindow.ipcRenderer = ipcWrapper;
@@ -252,7 +252,7 @@ function toggleGAMES() {
             
 addEvent(window, 'keypress', function(event) {
     if (event.charCode == 112) {
-        ipcRenderer.send('open_dev');
+        //ipcRenderer.send('open_dev');
     }
 });
 function setTheme(event,data) {
@@ -272,7 +272,7 @@ function setTheme(event,data) {
         document.body.appendChild(new_view);
         addEvent(new_view.contentWindow, 'keypress', function(event) {
             if (event.charCode == 112) {
-                ipcRenderer.send('open_dev');
+                //ipcRenderer.send('open_dev');
             }
         });
         new_view.contentWindow.ipcRenderer = ipcWrapper;
