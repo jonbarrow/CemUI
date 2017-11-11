@@ -3,9 +3,9 @@ const CACHE_VERSION = 2;
 
 let electron = require('electron'),
 	updater = require("electron-updater").autoUpdater,
-	electron_reload = require('electron-reload')(__dirname, {
+	/*electron_reload = require('electron-reload')(__dirname, {
 		ignored: /node_modules|[\/\\]\.|cemui.log|cemui.error.log|cemui.info.log/
-	}),
+	}),*/
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
@@ -1699,7 +1699,7 @@ function loadGames(dir, master_callback) {
 						icon: DATA_ROOT + 'cache/images/' + data.game_title_id + '/icon.ico',
 						grid: DATA_ROOT + 'cache/images/' + data.game_title_id + '/grid.webp',
 						screenshots: data.screenshots_list,
-						genres: data.game_genres.split('|'),
+						genres: [],
 						release_date: data.game_release_date,
 						publisher: data.game_publisher,
 						developer: data.game_developer,
@@ -1723,6 +1723,10 @@ function loadGames(dir, master_callback) {
 								disableAudio: false
 							}
 						}
+					}
+
+					if (data.game_genres) {
+						game_data.genres = data.game_genres.split('|')
 					}
 					
 					game_storage.get('games').push(game_data).write();
