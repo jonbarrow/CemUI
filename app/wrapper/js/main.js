@@ -214,6 +214,10 @@ function toggleSMMDB() {
     }
 }
 
+function toggleSMMDBIDDownloadModal() {
+    document.querySelector('#smm-modal-id-download').classList.remove('hidden');
+}
+
 function toggleSMMDBPlayerCourses() {
     var el = document.getElementById('smm-wrapper-player-courses');
     if (el.classList.contains('hidden')) {
@@ -471,6 +475,16 @@ addEvent(document.querySelector('.instance_add.emulator_instances'), 'click', ()
         },
         'new_cemu_instance_modal'
     );
+});
+
+addEvent(document.querySelectorAll('.smm-close')[0], 'click', () => {
+    document.querySelectorAll('.smm-close')[0].parentElement.parentElement.parentElement.classList.add('hidden');
+});
+addEvent(document.querySelectorAll('.smm-close')[1], 'click', () => {
+    document.querySelectorAll('.smm-close')[1].parentElement.parentElement.parentElement.classList.add('hidden');
+});
+addEvent(document.querySelector('.smm-id-download'), 'click', () => {
+    ipcRenderer.send('smm_dl_level', document.querySelector('.smm-id-download').parentElement.querySelector('input').value);
 });
 
 function openScreen(id) {
@@ -828,6 +842,12 @@ function setIPCevents() {
                 }
             }
         }
+    });
+
+    ipcRenderer.on('smm_course_uploaded', (event, data) => {
+        document.querySelector('#smm-modal-course-uploaded').querySelector('input').value = data.id;
+        document.querySelector('#smm-modal-course-uploaded').querySelector('input').size = data.id.length;
+        document.querySelector('#smm-modal-course-uploaded').classList.remove('hidden');
     });
 
     ipcRenderer.on('rom_decryption_missing', () => {

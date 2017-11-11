@@ -1220,3 +1220,69 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     -webkit-transform: rotate(45deg);
             transform: rotate(45deg);
 }
+
+.smm-modal {
+    color: whitesmoke;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 99999;
+}
+.smm-modal .modal-content {
+    border-radius: 15px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 35%;
+    min-height: 100px;
+    max-height: 386px;
+    background-color: rgb(47, 145, 25);
+    background-image: -webkit-linear-gradient(110deg, #2F9119 50%, #1B9119 50%);
+    background-color: rgb(47, 145, 25);
+    box-shadow: inset 0 0 0 10px #2F7D2D;
+}
+.smm-modal .modal-content > * {
+    padding-left: 10px;
+}
+.smm-modal .modal-content .smm-header {
+    padding-top: 20px;
+    padding-left: 20px;
+    font-size: 20px;
+    width: 100%;
+}
+.smm-modal .modal-content .smm-header .smm-close {
+    float: left;
+    padding-right: 20px;
+    cursor: pointer;
+}
+.smm-modal .modal-content .smm-body {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+.smm-modal .modal-content .smm-body h1 {
+    margin: 10px 20px;
+}
+.smm-modal .modal-content .smm-body input[type="text"] {
+    color: #33FF00;
+    height: 100%;
+    padding: 18px 40px;
+    background-color: #187402;
+    border: none;
+    border-radius: 5px;
+    margin: 0 20px;
+    box-shadow: 0px 6px 0px 0px rgba(1,1,1,0.1);
+    width: auto;
+}
+.smm-modal .modal-content .smm-body input[type="text"]::-webkit-input-placeholder {
+    color: #33FF00;
+}
+.smm-modal .modal-content .smm-body input[type="text"]:focus, .smm-modal .modal-content .smm-body input[type="text"]:active {
+    outline: none;
+    border-color: #31812E;
+    background-color: #2F7D2D;
+}

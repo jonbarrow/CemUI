@@ -763,12 +763,14 @@ ipcMain.on('smm_upload_course', async (event, data) => {
 			});
 			return;
 		}
+		/*
 		dialog.showMessageBox(ApplicationWindow, {
 			type: 'info',
 			title: 'CemUI SMMDB',
 			message: 'Course uploaded to SMMDB',
 			detail: 'Course uploaded successfully. Course ID: ' + course_data[0].id
 		});
+		*/
 		logger.log({
 			level: 'info',
 			message: 'upload course to SMMDB: ' + JSON.stringify(course_data)
