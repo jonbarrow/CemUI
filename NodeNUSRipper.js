@@ -230,9 +230,6 @@ Main.prototype._patchDLC = function(ticket) {
 }
 
 Main.prototype._generateTicket = function(tid, version, key, output, cb) {
-    console.log(tid)
-    console.log(version)
-    console.log(key)
     var ticket = TIK,
         version_buffer = new Buffer.from(version.toString()),
         tid_buffer = new Buffer.from(this._stringToBin(tid), 'binary'),
@@ -451,8 +448,6 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
             }
         }
 
-        console.log(tmd_total_size)
-
         self.emit('download_total_size', {
             tid: TID,
             size: tmd_total_size
@@ -495,7 +490,6 @@ Main.prototype.downloadTID = function(TID, location, update, cb) {
         });
 
         queue.drain = () => {
-            console.log(tmd_hashes)
             async.each(tmd_hashes, (hash, callback) => {
                 this._ripFile(TID, URL_BASE + '/' + hash + '.h3', path.join(location, hash + '.h3'), (error) => {
                     return callback();
@@ -518,7 +512,7 @@ Main.prototype.downloadTMD = function(TID, file, update, cb) {
     TID = this.formatTID(TID);
     let tmd_url = this.getTIDURL(TID) + '/tmd';
     if (update) tmd_url = tmd_url.concat('.', update);
-    console.log(tmd_url)
+    
     this._ripFile(TID, tmd_url, file, () => {
         return cb();
     });
@@ -583,21 +577,13 @@ Main.prototype._ripFile = function(TID, url, file, cb) {
             }, (error, response) => {
                 if (response.statusCode !== 200) {
                     if (response.statusCode == 404) {
-                        console.log(file);
                         return cb();
                     }
-                    console.log(url);
-                    console.log(file);
-                    console.log(response.statusCode)
                     throw new Error('Invalid response code', response.statusCode);
                 } else {
             
                     req.on('error', (error) => {
-                        console.log(error);
-                        console.log(error.message);
-                        console.log(url);
-                        console.log(file);
-                        throw error;
+                        throw new Error(error);
                     });
                 }
             });
@@ -638,11 +624,7 @@ Main.prototype._ripFile = function(TID, url, file, cb) {
         });
 
         out.on('error', (error) => {
-            console.log(error);
-            console.log(error.message);
-            console.log(url);
-            console.log(file);
-            throw error
+            throw new Error(error)
         });
     });
 }

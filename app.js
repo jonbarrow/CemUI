@@ -1,4 +1,4 @@
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.3.1';
 const CACHE_VERSION = 2;
 
 let electron = require('electron'),
@@ -1728,12 +1728,28 @@ function loadGames(dir, master_callback) {
 					if (data.game_genres) {
 						game_data.genres = data.game_genres.split('|')
 					}
+
+					let xml = XMLParser.parse(path.join(dir, name, 'code', 'app.xml'));
+
+					if (xml.title_id._Data.substring(4, 8) == '0002') {
+						game_data.name = game_data.name.concat(' (possible demo)');
+						game_data.name_clean = game_data.name_clean.concat(' (possible demo)');
+					}
+					if (xml.title_id._Data.substring(4, 8).toUpperCase() == '000E') {
+						game_data.name = game_data.name.concat(' (possible update data)');
+						game_data.name_clean = game_data.name_clean.concat(' (possible update data)');
+					}
+					if (xml.title_id._Data.substring(4, 8).toUpperCase() == '000C') {
+						game_data.name = game_data.name.concat(' (possible DLC data)');
+						game_data.name_clean = game_data.name_clean.concat(' (possible DLC data)');
+					}
 					
 					game_storage.get('games').push(game_data).write();
 
 					callback(null);
 				});
 			} else {
+				console.log('no', dir + '/' + file)
 				callback(null);
 			}
 		}, (error) => {
@@ -1824,25 +1840,15 @@ function isGame(game_path) {
 			subfolders = fs.readdirSync(game_path);
 		}
 		
-		if (subfolders.contains('code') && subfolders.contains('content')) {
+		if (subfolders.contains('code') && subfolders.contains('content') && subfolders.contains('meta')) {
 			if (!fs.pathExistsSync(game_path + '/code/app.xml')) {
 				return false;
 			}
-			if (subfolders.contains('meta') && fs.pathExistsSync(game_path + '/meta/meta.xml')) {
-				let xml = XMLParser.parse(game_path + '/meta/meta.xml');
-				if (xml.title_id._Data.substring(4, 8) != '0000') return false;
-				xml = XMLParser.parse(game_path + '/code/app.xml');
-				if (xml.title_id._Data.substring(4, 8) != '0000') return false;
+			let xml = XMLParser.parse(game_path + '/code/app.xml');
+			if (!xml.title_id) return false;
 
-				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
-				if (!rom || rom.length < 0) return false;
-			} else if (fs.pathExistsSync(game_path + '/code/app.xml')) {
-				let xml = XMLParser.parse(game_path + '/code/app.xml');
-				if (xml.title_id._Data.substring(4, 8) != '0000') return false;
-
-				var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
-				if (!rom || rom.length < 0) return false;
-			} else return false;
+			var rom = fs.readdirSync(game_path + '/code').filter(/./.test, /\.rpx$/i);
+			if (!rom || rom.length < 0) return false;
 		} else return false;
 	} else return false;
 
@@ -2099,7 +2105,9 @@ function setupDefaultFiles() {
 		fs.writeFileSync(DATA_ROOT + 'cache/json/games.json', JSON.stringify({}));
 	}
 	if (!fs.existsSync(DATA_ROOT + 'cache/json/settings.json')) {
-		fs.writeFileSync(DATA_ROOT + 'cache/json/settings.json', JSON.stringify({}));
+		fs.writeFileSync(DATA_ROOT + 'cache/json/settings.json', JSON.stringify({
+			cache_version: CACHE_VERSION
+		}));
 	}
 }
 
@@ -2108,7 +2116,7 @@ function verifyCacheVersion(cb) {
 	if (!c_version || c_version != CACHE_VERSION) {
 		dialog.showMessageBox(ApplicationWindow, {
 			type: 'question',
-			buttons: ['Yes delete old cache and restart', 'No, continue'],
+			buttons: ['No, continue', 'Yes delete old cache and restart'],
 			title: 'CemUI Error',
 			message: 'Out of date cache version',
 			detail: 'CemUI has detected an out of date/invalid cache version. You may experience issues with this cache version.\nWould you like CemUI to delete and remake the cache?',
