@@ -6,6 +6,7 @@ let electron = require('electron'),
 	/*electron_reload = require('electron-reload')(__dirname, {
 		ignored: /node_modules|[\/\\]\.|cemui.log|cemui.error.log|cemui.info.log/
 	}),*/
+	os = require('os'),
 	NodeNUSRipper = require('./NodeNUSRipper.js'),
     NUSRipper = new NodeNUSRipper(),
 	exec = require('child_process').exec,
@@ -372,7 +373,9 @@ app.on('ready', () => {
 		} else {
 			update_cache_version = false;
 			setupDefaults();
-			setWindow();
+			checkSystem(() => {
+				setWindow();
+			});
 		}
 	});
 });
@@ -1907,7 +1910,7 @@ function createShortcut(emulator, id) {
 		rom = game.path + '/code/' + game.rom;
 	}
 
-	ws.create(require('os').homedir() + '/Desktop/' + game.name_clean + ' (' + emulator + ').lnk', {
+	ws.create(os.homedir() + '/Desktop/' + game.name_clean + ' (' + emulator + ').lnk', {
 		target : cemu.cemu_path,
 		args: '-g "' + rom + '"',
 		icon: DATA_ROOT + 'cache/images/' + id + '/icon.ico',
@@ -2074,6 +2077,7 @@ function setupDefaults() {
 	setupDefaultFiles();
 
 	let settings_defaults = {
+			show_warning_popups: true,
 			cemu_paths: [],
 			game_paths: [],
 			theme: 'Flux',
@@ -2131,6 +2135,26 @@ function verifyCacheVersion(cb) {
 	} else {
 		return cb();
 	}
+}
+
+function checkSystem(cb) {
+	if (new RegExp('\\bIntel\\b').test(os.cpus()[0].model)) {
+		dialog.showMessageBox(ApplicationWindow, {
+			type: 'warning',
+			title: 'Warning',
+			message: 'Unsupported GPU',
+			detail: 'CemUI has detected an Intel GPU. Cemu does not currently support Intel GPUs. You will experience many bugs and glitches using Cemu'
+		});
+	}
+	if (os.platform() != 'Windows_NT') {
+		dialog.showMessageBox(ApplicationWindow, {
+			type: 'warning',
+			title: 'Warning',
+			message: 'Unsupported OS',
+			detail: 'CemUI, and Cemu, only offically supports Windows machines. We have detected you running on ' + os.platform() + '. Some features may not work properly'
+		});
+	}
+	return cb();
 }
 
 Array.prototype.contains = function(el) {
