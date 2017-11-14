@@ -2146,12 +2146,12 @@ function checkSystem(cb) {
 			detail: 'CemUI has detected an Intel GPU. Cemu does not currently support Intel GPUs. You will experience many bugs and glitches using Cemu'
 		});
 	}
-	if (os.platform() != 'Windows_NT') {
+	if (os.type() != 'Windows_NT') {
 		dialog.showMessageBox(ApplicationWindow, {
 			type: 'warning',
 			title: 'Warning',
 			message: 'Unsupported OS',
-			detail: 'CemUI, and Cemu, only offically supports Windows machines. We have detected you running on ' + os.platform() + '. Some features may not work properly'
+			detail: 'CemUI, and Cemu, only offically supports Windows machines. We have detected you running on ' + os.type() + '. Some features may not work properly'
 		});
 	}
 	return cb();
