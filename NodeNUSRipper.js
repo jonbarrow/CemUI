@@ -127,9 +127,13 @@ Main.prototype.decrypt = function(location, cb) {
     self.emit('rom_decryption_started', location);
 
     fs.copySync(this._config.cdecrypt_location, path.join(location, 'cdecrypt.exe'));
-    fs.copySync(path.join(this._config.cdecrypt_folder_location, 'libeay32.dll'), path.join(location, 'libeay32.dll'));
-    fs.copySync(path.join(this._config.cdecrypt_folder_location, 'msvcr120d.dll'), path.join(location, 'msvcr120d.dll'));
-
+    if (fs.pathExistsSync(path.join(this._config.cdecrypt_folder_location, 'libeay32.dll'))) {
+        fs.copySync(path.join(this._config.cdecrypt_folder_location, 'libeay32.dll'), path.join(location, 'libeay32.dll'));    
+    }
+    if (fs.pathExistsSync(path.join(this._config.cdecrypt_folder_location, 'msvcr120d.dll'))) {
+        fs.copySync(path.join(this._config.cdecrypt_folder_location, 'msvcr120d.dll'), path.join(location, 'msvcr120d.dll'));    
+    }
+    
     console.log('CemUI does not ship with any means to decrypt rom files.\nWhile we would love to do so, we cannot for legal reasons.\nIn order to decrypt the files, CemUI makes use of CDecrypt, which is also not shipped with CemUI due to legal reasons.\nPlease obtain a copy of CDecrypt and tell CemUI where to look for it.');
     
     let decrypter = child_process.spawn('cdecrypt.exe', [ 

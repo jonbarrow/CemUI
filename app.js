@@ -1,4 +1,4 @@
-const APP_VERSION = '2.3.2';
+const APP_VERSION = '2.3.3';
 const CACHE_VERSION = 2;
 
 let electron = require('electron'),
@@ -1320,7 +1320,13 @@ function getMostPlayed(values) {
 function getSuggested(most_played, cb) {
 	var genres = [];
 	for (var i=most_played.length-1;i>=0;i--) {
-		genres.push(most_played[i].genres[Math.floor(Math.random() * most_played[i].genres.length)]);
+		let game_genres = most_played[i].genres;
+		if (game_genres.length >= 1) {
+			genres.push(most_played[i].genres[Math.floor(Math.random() * most_played[i].genres.length)]);
+		}
+	}
+	if (genres.length < 1) {
+		return cb(null, []);
 	}
 	request(API_ROOT + '/api/v2/GetSuggested/' + genres.join('|'), (error, response, body) => {
 		if (error || response.statusCode !== 200 || !body || body.error) return cb(true);
@@ -2138,14 +2144,14 @@ function verifyCacheVersion(cb) {
 }
 
 function checkSystem(cb) {
-	if (new RegExp('\\bIntel\\b').test(os.cpus()[0].model)) {
+	/*if (new RegExp('\\bIntel\\b').test(os.cpus()[0].model)) {
 		dialog.showMessageBox(ApplicationWindow, {
 			type: 'warning',
 			title: 'Warning',
 			message: 'Unsupported GPU',
 			detail: 'CemUI has detected an Intel GPU. Cemu does not currently support Intel GPUs. You will experience many bugs and glitches using Cemu'
 		});
-	}
+	}*/
 	if (os.type() != 'Windows_NT') {
 		dialog.showMessageBox(ApplicationWindow, {
 			type: 'warning',
