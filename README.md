@@ -36,7 +36,7 @@ The latest official builds can be found in the [GitHub Releases section](https:/
 
 To get the latest developer version of CemUI right now, you may build and run from source. These are more likely to be unstable.
 
-To do get the latest developer version, follow these steps:
+To get the latest developer version, follow these steps:
 
 1. Install [NodeJS](https://nodejs.org/)
 2. Clone/Download this repo
