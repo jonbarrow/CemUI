@@ -108,7 +108,7 @@ ipcRenderer.on('emulator_list', function(event, data) {
         let item = document.getElementById("TEMPLATE_EMULATOR_LIST").content.firstElementChild.cloneNode(true);
         item.querySelector('.instance_name small').innerHTML = instance.name;
         item.querySelector('.instance_path').innerHTML = instance.cemu_path;
-        addEvent(item.querySelector('.instance_action'), 'click', () => {
+        addEvent(item.querySelector('.instance_action_remove'), 'click', () => {
             if (instance.name.toUpperCase() == 'DEFAULT') {
                 return;
             }
@@ -126,7 +126,7 @@ ipcRenderer.on('games_folder_list', function(event, data) {
     for (let folder of data) {
         let item = document.getElementById("TEMPLATE_GAME_FOLDER_LIST").content.firstElementChild.cloneNode(true);
         item.querySelector('.instance_path').innerHTML = folder;
-        addEvent(item.querySelector('.instance_action'), 'click', () => {
+        addEvent(item.querySelector('.instance_action_remove'), 'click', () => {
             if (games_folder_list.length == 1) {
                 return;
             }

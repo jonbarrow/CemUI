@@ -561,7 +561,7 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     border-top-left-radius: 10px;
 }
 .instance_name > * {
-    margin-left: 5px;
+    margin-left: 1em;
 }
 .instance_container:hover {
     background-color: #e5e5e5;
@@ -573,13 +573,17 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     padding: 10px 15px;
     background-color: #fff;
     color: #939393;
+    overflow-x: hidden;
+    white-space: nowrap;
 }
 .instance_action {
     padding: 10px 15px;
     color: #fff;
-    border-bottom-right-radius: 10px;
     background-color: #6594ff;
     cursor: pointer;
+}
+.instance_action:last-child {
+    border-bottom-right-radius: 10px;
 }
 .instance_action:hover {
     background-color: #296aff;
@@ -594,7 +598,7 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
 #game_folder_list .instance_container .instance_path {
     border-radius: 10px 0 0 10px;
 }
-#game_folder_list .instance_action {
+#game_folder_list .instance_action:last-child {
     border-radius: 0 10px 10px 0;
 }
 
