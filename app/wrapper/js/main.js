@@ -307,13 +307,26 @@ function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 } 
 //menu animations
-function createPopup(title,content,inputs,button_text,button_event,id,close_event) {
-    let btn = document.getElementById("TEMPLATE_POPUP").content.firstElementChild.cloneNode(true);
+function createPopup(title,content,inputs,button_text,button_event,id,close_event,large) {
+    let btn = document.getElementById(large ? "TEMPLATE_POPUP_LARGE" : "TEMPLATE_POPUP").content.firstElementChild.cloneNode(true);
     btn.id = id;
     btn.querySelector('.title').innerHTML = title;
-    btn.querySelector('.content').innerHTML = content;
+    btn.querySelector('.content').innerHTML = content + btn.querySelector('.content').innerHTML;
     if (inputs != null) {
         let content = btn.querySelector('.content');
+        let count = true;
+        function addContent(cont) {
+            if (large) {
+                if (count) {
+                    content.querySelector('.left-cont').innerHTML += cont;
+                } else {
+                    content.querySelector('.right-cont').innerHTML += cont;
+                }
+                count = !count;
+            } else {
+                content.innerHTML += cont;
+            }
+        }
         for (let ind = 0; ind < inputs.length;ind++) {
             switch (inputs[ind].type) {
                 case 'button':
@@ -321,15 +334,18 @@ function createPopup(title,content,inputs,button_text,button_event,id,close_even
                     if (inputs[ind].caption) {
                         cap = inputs[ind].caption;
                     }
-                    content.innerHTML += '<h2 class="txt-button txt-button-blue txt-s-16 txt-c-white" onclick="closeUpdate();" style="float: left;">Cancel</h2>';
+                    addContent('<h2 class="txt-button txt-button-blue txt-s-16 txt-c-white" onclick="closeUpdate();" style="float: left;">Cancel</h2>');
                     break;
-            
+                case 'check':
+                    let lbl = '';
+                    if (inputs[ind].caption) {
+                        lbl = inputs[ind].caption;
+                    }
+                    addContent('<div><input type="checkbox" id="' + inputs[ind].id + '" >' + lbl + '</div>');
+                    break;
                 case 'text':
                 default:
-                    if (inputs[ind].caption) {
-                        content.innerHTML += '<p>' + inputs[ind].caption + '</p>';
-                    }
-                    content.innerHTML += '<input type="text" id="' + inputs[ind].id + '" class="input-text" />';
+                    addContent( ( inputs[ind].caption ? '<p>' + inputs[ind].caption + '</p>' : '' ) + '<input type="text" id="' + inputs[ind].id + '" class="input-text" />');
                     break;
             }
         }

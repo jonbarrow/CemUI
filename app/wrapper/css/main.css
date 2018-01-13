@@ -475,6 +475,10 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
 .popup-hidden {
     opacity: 0;
 }
+.popup-large .left-cont, .popup-large .right-cont {
+    padding: 0 10px;
+    flex: 1;
+}
 .popup-overlay .input-text {
     width: calc(100% - 20px);
     padding: 10px;
@@ -542,7 +546,14 @@ END OF THINGS RIPPED FROM NINTENDO BOOKMARK SITE
     left: 15%;
   }
 }
-
+.popup-overlay .popup.popup-large {
+    width: 60%;
+}
+.cont-container {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1em;
+}
 .instance_container .content {
     display: -webkit-box;
     display: flex;
