@@ -218,6 +218,8 @@ function clock() {
     else if( hours > 12 ) {
         hours = hours%12;
         mid = 'pm';
+    } else if ( hours == 12 && minutes != 0 ) {
+        mid = 'pm';
     }
     
     
