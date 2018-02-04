@@ -346,7 +346,11 @@ function createWindow(file) {
 
 	ApplicationWindow.setMenu(null);
 	ApplicationWindow.maximize();
-    
+	
+	if(process.argv.indexOf("--fullscreen") > -1){
+		ApplicationWindow.setFullScreen(true);
+	}
+
 	ApplicationWindow.webContents.on('did-finish-load', () => {
         ApplicationWindow.show();
 		ApplicationWindow.focus();
