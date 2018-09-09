@@ -9,6 +9,8 @@
 **CemUI** is an easy-to-use, open source, game manager for the popular Wii-U Emulator, [Cemu](http://cemu.info/).
 
 **Note:**
+> **CemUI is currently on hiatus, development is currently being focused on [Pretendo](https://github.com/PretendoNetwork/Pretendo)**
+
 > CemUI v2.0 is currently a WIP and is not guaranteed to be stable.
 
 # Screenshots
