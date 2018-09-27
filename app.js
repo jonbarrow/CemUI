@@ -71,7 +71,18 @@ const context = [
             { type: 'separator' },
             { role: 'resetzoom' },
             { type: 'separator' },
-            { role: 'togglefullscreen' }
+			{ role: 'togglefullscreen' },
+			{
+				label: 'Toggle Auto-Hiding the Menubar',
+				accelerator: 'Ctrl+Shift+H',
+				click (item, focusedWindow) {
+                    if (focusedWindow) {
+						focusedWindow.setAutoHideMenuBar(!focusedWindow.isMenuBarAutoHide());
+						settings_storage.set('menubar_autohide', focusedWindow.isMenuBarAutoHide()).write();
+						focusedWindow.setMenuBarVisibility(!focusedWindow.isMenuBarVisible());
+                    }
+                }
+			}
         ]
     },
     {
@@ -327,7 +338,7 @@ function createWindow(file) {
   	ApplicationWindow = new BrowserWindow({
 		icon: './ico.png',
 		minHeight: 561,
-  		minWidth: 837,
+		minWidth: 837,
         webPreferences: {
             experimentalFeatures: true //for backdrop-filter css. if causes issues we will find an alternative.
         }
@@ -335,7 +346,11 @@ function createWindow(file) {
 
 	ApplicationWindow.setMenu(null);
 	ApplicationWindow.maximize();
-    
+	
+	if(process.argv.indexOf("--fullscreen") > -1){
+		ApplicationWindow.setFullScreen(true);
+	}
+
 	ApplicationWindow.webContents.on('did-finish-load', () => {
         ApplicationWindow.show();
 		ApplicationWindow.focus();
@@ -2092,6 +2107,7 @@ function setupDefaults() {
 			ticket_cache_vendor: 'http://cemui.com/api/v2/ticketcache',
 			ticket_vendor: 'http://wiiu.titlekeys.gq/',
 			cdecrypt_location: '',
+			menubar_autohide: false,
 		},
 		games_defaults = {
 			games: []
@@ -2105,6 +2121,8 @@ function setupDefaults() {
 	game_storage.defaults(games_defaults).write();
 	settings_storage = low(new FileSync(DATA_ROOT + 'cache/json/settings.json'));
 	settings_storage.defaults(settings_defaults).write();
+
+	ApplicationWindow.setAutoHideMenuBar(settings_storage.get('menubar_autohide').value());
 }
 
 function setupDefaultFiles() {
