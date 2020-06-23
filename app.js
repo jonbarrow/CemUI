@@ -13,7 +13,7 @@ let electron = require('electron'),
 	smm = require('smm-api'),
 	smm_editor = require('cemu-smm'),
 	fusejs = require('fuse.js'),
-	unzip = require('unzip'),
+	unzip = require('unzipper'),
 	zipFolder = require('zip-folder'),
 	archiver = require('archiver'),
 	bl = require('bl'),
@@ -329,6 +329,7 @@ function createWindow(file) {
 		minHeight: 561,
   		minWidth: 837,
         webPreferences: {
+            nodeIntegration: true,
             experimentalFeatures: true //for backdrop-filter css. if causes issues we will find an alternative.
         }
 	});
